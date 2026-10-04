@@ -4691,7 +4691,7 @@ end
 ---@return Vector2  text bounds wrapped at width (cached)
 function Layout.Measure(text, size, fontKind, width)
     width = math.max(1, math.floor(width))
-    local key = table.concat({ text, size, fontKind, width, State.Language }, "\0")
+    local key = table.concat({ text, size, fontKind, width,  }, "\0")
     local cached = Layout.Measured[key]
     if cached then
         return cached
@@ -13675,8 +13675,8 @@ function Window.RunConfig(ui, actionKey, handler)
     end
     local ok, reason = handler(name)
     local action = Lang.Strings[actionKey]
-    local message = ok and { EN = action.EN .. ": " .. name, TH = action.TH .. ": " .. name }
-        or { EN = action.EN .. " failed: " .. tostring(reason), TH = action.TH .. " ไม่สำเร็จ: " .. tostring(reason) }
+    local message = ok and { EN = action.EN .. ": " .. name }
+        or { EN = action.EN .. " failed: " .. tostring(reason) }
     Library:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
     if ok and actionKey == "SetAutoload" then
         ui.Autoload:SetText(Lang.Format("Autoload", name))
@@ -14666,7 +14666,7 @@ end
 
 function Library.Visuals.Category()
     if not Kit.Esp.Categories.Visuals then
-        Kit.Esp.AddCategory("Visuals", { Text = Library:T("Targets", "เป้าหมาย"), Color = Color3.fromRGB(240, 92, 80), Source = Library.Visuals.Source, Enabled = true, Characters = true })
+        Kit.Esp.AddCategory("Visuals", { Text = Library:T("Targets"), Color = Color3.fromRGB(240, 92, 80), Source = Library.Visuals.Source, Enabled = true, Characters = true })
     end
     return Kit.Esp.Categories.Visuals
 end
@@ -14713,7 +14713,7 @@ Library.Visuals.Panel = {}
 function Library.Visuals.BuildView()
     local settings = Config.Preview
     local holder = Draw.New("Frame", { Name = "EspPreview", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) })
-    Draw.Text({ Name = "Title", Position = UDim2.fromOffset(settings.Pad, 2), Size = UDim2.new(1, -settings.Pad * 2, 0, settings.Title - 2), Parent = holder }, "Display", Util.TextSize("Group"), "Text", Library:T("ESP Preview", "ตัวอย่าง ESP"))
+    Draw.Text({ Name = "Title", Position = UDim2.fromOffset(settings.Pad, 2), Size = UDim2.new(1, -settings.Pad * 2, 0, settings.Title - 2), Parent = holder }, "Display", Util.TextSize("Group"), "Text", Library:T("ESP Preview"))
     local view = Draw.Box("ViewportFrame", {
         Name = "View",
         Position = UDim2.fromOffset(settings.Pad, settings.Title),
@@ -15012,14 +15012,14 @@ function Window:AddVisualsTab(options)
     Library.Visuals.Provider = options.Provider
     Library.Visuals.Preview = options.Preview == true
     Kit.Esp.FocusSource = options.Focus
-    local tab = self:AddTab(options.Name or Library:T("Visuals", "การมองเห็น"), options.Icon or "eye")
+    local tab = self:AddTab(options.Name or Library:T("Visuals"), options.Icon or "eye")
     Library.Visuals.Tab = tab
     if options.Provider then
         Library.Visuals.Category()
     end
     local _, look = Kit.Esp.Build(tab, { Players = options.Provider == nil, Kinds = options.Kinds, Categories = options.Categories })
     look:AddToggle("MarioEspPreview", {
-        Text = Library:T("Show Preview", "แสดงตัวอย่าง"),
+        Text = Library:T("Show Preview"),
         Default = Library.Visuals.Preview,
         Callback = function(on) Library.Visuals:SetPreview(on) end,
     })
@@ -16331,7 +16331,7 @@ function Kit.Caps.NeedCap(option, cap)
             return
         end
         local feature = Lang.Resolve(option.Info and option.Info.Text or option.Idx)
-        Library:Notify("m0pu", Kit.T(feature .. " is not supported on this executor", feature .. " ใช้กับ executor นี้ไม่ได้"), 4, "Warn")
+        Library:Notify("m0pu", Kit.T(feature .. " is not supported on this executor"), 4, "Warn")
         task.defer(option.SetValue, option, false)
     end)
 end
@@ -17060,8 +17060,8 @@ function Kit.Ui.Group(target, side, name, icon)
     return side == "Right" and target:AddRightGroupbox(name, icon) or target:AddLeftGroupbox(name, icon)
 end
 
-function Kit.Ui.Notify(english, thai, kind)
-    Library:Notify("m0pu", Kit.T(english, thai), 3, kind or "Info")
+function Kit.Ui.Notify(english, kind)
+    Library:Notify("m0pu", Kit.T(english), 3, kind or "Info")
 end
 
 ---Adds the standard Toggle/Hold/Always keybind; touch screens get a floating button instead of a key.
@@ -17419,56 +17419,56 @@ Kit.Switchable(Kit.Player)
 function Kit.Player.Build(target)
     local T = Kit.T
     local config = Kit.Config.Player
-    local move = Kit.Ui.Group(target, "Left", T("Movement", "การเคลื่อนที่"), "speed")
+    local move = Kit.Ui.Group(target, "Left", T("Movement"), "speed")
 
     Kit.Ui.Key(move:AddToggle("KitWalkSpeed", {
-        Text = T("WalkSpeed", "ความเร็วเดิน"), Icon = "speed",
+        Text = T("WalkSpeed"), Icon = "speed",
         Callback = function(on) Kit.Player.Set("WalkSpeed", on) end,
     }), "KitWalkSpeedKey")
     move:AddSlider("KitWalkSpeedValue", {
-        Text = T("Speed", "ความเร็ว"), Icon = "speed", Min = 16, Max = config.MaxWalkSpeed, Default = config.WalkSpeed, Step = 1,
+        Text = T("Speed"), Icon = "speed", Min = 16, Max = config.MaxWalkSpeed, Default = config.WalkSpeed, Step = 1,
         Callback = function(value) Kit.Player.SetValue("WalkSpeed", value) end,
     })
 
     Kit.Ui.Key(move:AddToggle("KitJumpPower", {
-        Text = T("JumpPower", "พลังกระโดด"), Icon = "jump",
+        Text = T("JumpPower"), Icon = "jump",
         Callback = function(on) Kit.Player.Set("JumpPower", on) end,
     }), "KitJumpPowerKey")
     move:AddSlider("KitJumpPowerValue", {
-        Text = T("Power", "พลัง"), Icon = "jump", Min = 50, Max = config.MaxJumpPower, Default = config.JumpPower, Step = 1,
+        Text = T("Power"), Icon = "jump", Min = 50, Max = config.MaxJumpPower, Default = config.JumpPower, Step = 1,
         Callback = function(value) Kit.Player.SetValue("JumpPower", value) end,
     })
 
     Kit.Ui.Key(move:AddToggle("KitFly", {
-        Text = T("Fly", "บิน"), Icon = "fly",
-        Description = T("Space/E up, Q down", "Space/E ขึ้น, Q ลง"),
+        Text = T("Fly"), Icon = "fly",
+        Description = T("Space/E up, Q down"),
         Callback = function(on) Kit.Player.Set("Fly", on) end,
     }), "KitFlyKey", "F")
     move:AddSlider("KitFlySpeed", {
-        Text = T("Fly Speed", "ความเร็วบิน"), Icon = "fly", Min = 10, Max = config.MaxFlySpeed, Default = config.FlySpeed, Step = 5,
+        Text = T("Fly Speed"), Icon = "fly", Min = 10, Max = config.MaxFlySpeed, Default = config.FlySpeed, Step = 5,
         Callback = function(value) Kit.Player.SetValue("FlySpeed", value) end,
     })
 
     Kit.Ui.Key(move:AddToggle("KitNoclip", {
-        Text = T("Noclip", "ทะลุกำแพง"), Icon = "noclip",
+        Text = T("Noclip"), Icon = "noclip",
         Callback = function(on) Kit.Player.Set("Noclip", on) end,
     }), "KitNoclipKey")
     move:AddToggle("KitInfJump", {
-        Text = T("Infinite Jump", "กระโดดไม่จำกัด"), Icon = "infjump",
+        Text = T("Infinite Jump"), Icon = "infjump",
         Callback = function(on) Kit.Player.Set("InfJump", on) end,
     })
 
-    local body = Kit.Ui.Group(target, "Right", T("Character", "ตัวละคร"), "player")
+    local body = Kit.Ui.Group(target, "Right", T("Character"), "player")
     body:AddToggle("KitWalkOnWater", {
-        Text = T("Walk on Water", "เดินบนน้ำ"), Icon = "walkwater",
+        Text = T("Walk on Water"), Icon = "walkwater",
         Callback = function(on) Kit.Player.Set("WalkOnWater", on) end,
     })
     body:AddToggle("KitNoFall", {
-        Text = T("No Fall Damage", "ไม่เจ็บตอนตก"), Icon = "nofall",
+        Text = T("No Fall Damage"), Icon = "nofall",
         Callback = function(on) Kit.Player.Set("NoFall", on) end,
     })
     body:AddToggle("KitAntiAfk", {
-        Text = T("Anti AFK", "กันหลุด AFK"), Icon = "antiafk",
+        Text = T("Anti AFK"), Icon = "antiafk",
         Callback = function(on)
             if on then Kit.AntiAfk.Start() else Kit.AntiAfk.Stop() end
         end,
@@ -17571,17 +17571,17 @@ end
 
 function Kit.World.Build(target)
     local T = Kit.T
-    local group = Kit.Ui.Group(target, "Right", T("World", "โลก"), "sun")
-    group:AddToggle("KitFullbright", { Text = T("Fullbright", "สว่างทั้งแมพ"), Icon = "fullbright", Callback = function(on) Kit.World.Set("Fullbright", on) end })
-    group:AddToggle("KitNoFog", { Text = T("No Fog", "ไม่มีหมอก"), Icon = "fog", Callback = function(on) Kit.World.Set("NoFog", on) end })
+    local group = Kit.Ui.Group(target, "Right", T("World"), "sun")
+    group:AddToggle("KitFullbright", { Text = T("Fullbright"), Icon = "fullbright", Callback = function(on) Kit.World.Set("Fullbright", on) end })
+    group:AddToggle("KitNoFog", { Text = T("No Fog"), Icon = "fog", Callback = function(on) Kit.World.Set("NoFog", on) end })
     group:AddToggle("KitFpsBoost", {
-        Text = T("FPS Boost", "เพิ่ม FPS"), Icon = "fpsboost",
-        Description = T("Lower graphics and effects", "ลดกราฟิกและเอฟเฟกต์"),
+        Text = T("FPS Boost"), Icon = "fpsboost",
+        Description = T("Lower graphics and effects"),
         Callback = function(on) Kit.World.Set("FpsBoost", on) end,
     })
-    group:AddToggle("KitTimeLock", { Text = T("Lock Time", "ล็อกเวลา"), Icon = "clock", Callback = function(on) Kit.World.Set("TimeLock", on) end })
+    group:AddToggle("KitTimeLock", { Text = T("Lock Time"), Icon = "clock", Callback = function(on) Kit.World.Set("TimeLock", on) end })
     group:AddSlider("KitTimeValue", {
-        Text = T("Time", "เวลา"), Icon = "clock", Min = 0, Max = 24, Default = Kit.Config.World.Time, Step = 0.5, Suffix = "h",
+        Text = T("Time"), Icon = "clock", Min = 0, Max = 24, Default = Kit.Config.World.Time, Step = 0.5, Suffix = "h",
         Callback = Kit.World.SetTime,
     })
     return group
@@ -17678,7 +17678,7 @@ end
 function Kit.Server.Hop(mode)
     local servers = Kit.Server.List()
     if not servers then
-        Kit.Ui.Notify("No other server found", "ไม่เจอเซิร์ฟอื่น", "Warn")
+        Kit.Ui.Notify("No other server found", "Warn")
         return false
     end
     local pick
@@ -17730,24 +17730,24 @@ table.insert(Kit.Modules, Kit.Server)
 
 function Kit.Server.Build(target)
     local T = Kit.T
-    local group = Kit.Ui.Group(target, "Right", T("Server", "เซิร์ฟเวอร์"), "server")
+    local group = Kit.Ui.Group(target, "Right", T("Server"), "server")
     group:AddToggle("KitAutoRejoin", {
-        Text = T("Auto Rejoin", "เข้าใหม่อัตโนมัติ"), Icon = "rejoin",
-        Description = T("Rejoins after a kick or disconnect", "เข้าใหม่เองเมื่อโดนเตะหรือหลุด"),
+        Text = T("Auto Rejoin"), Icon = "rejoin",
+        Description = T("Rejoins after a kick or disconnect"),
         Callback = function(on)
             if on then Kit.Server.Start() else Kit.Server.Stop() end
         end,
     })
     group:AddDropdown("KitHopMode", {
-        Text = T("Hop To", "ย้ายไป"), Icon = "hop",
+        Text = T("Hop To"), Icon = "hop",
         Values = { "Low", "Random" },
         Default = "Low",
     })
-    group:AddButton({ Text = T("Server Hop", "ย้ายเซิร์ฟ"), Icon = "hop" }, function()
+    group:AddButton({ Text = T("Server Hop"), Icon = "hop" }, function()
         local mode = Library.Options.KitHopMode and Library.Options.KitHopMode.Value
         task.spawn(Kit.Server.Hop, mode)
-    end):AddButton({ Text = T("Rejoin", "เข้าใหม่"), Icon = "rejoin" }, Kit.Server.Rejoin)
-    group:AddButton({ Text = T("Copy Job ID", "คัดลอก Job ID"), Icon = "copy" }, function()
+    end):AddButton({ Text = T("Rejoin"), Icon = "rejoin" }, Kit.Server.Rejoin)
+    group:AddButton({ Text = T("Copy Job ID"), Icon = "copy" }, function()
         if not Util.Clipboard(game.JobId) then
             Kit.Ui.Notify(game.JobId, game.JobId)
         end
@@ -18820,7 +18820,7 @@ function Kit.Esp.ApplyPreset(name)
         local option = Library.Toggles[idx] or Library.Options[idx]
         if option then option:SetValue(value) end
     end
-    Kit.Ui.Notify("ESP preset: " .. name, "ตั้งค่า ESP: " .. name, "Success")
+    Kit.Ui.Notify("ESP preset: " .. name, "Success")
 end
 
 ---Element toggle; its sub-options pass `DependsOn = Kit.Esp.Under(key)` so they only show while it is on.
@@ -18836,7 +18836,7 @@ function Kit.Esp.BuildMain(target, T)
     local tuning = Kit.Esp.Settings
     local main = Kit.Ui.Group(target, "Left", T("ESP", "ESP"), "eye")
     Kit.Ui.Key(main:AddToggle("KitEsp", {
-        Text = T("Enabled", "เปิดใช้"),
+        Text = T("Enabled"),
         Callback = function(on)
             if on then Kit.Esp.Start() else Kit.Esp.Stop() end
         end,
@@ -18852,61 +18852,61 @@ function Kit.Esp.BuildMain(target, T)
             Callback = function(color) Kit.Esp.SetColor(name, color) end,
         })
     end
-    main:AddToggle("KitEspTeamCheck", { Text = T("Team Check", "ไม่แสดงทีมเดียวกัน"), Callback = Kit.Esp.Setter("TeamCheck") })
-    main:AddToggle("KitEspVisibleOnly", { Text = T("Visible Only", "เฉพาะที่มองเห็น"), Callback = Kit.Esp.Setter("VisibleOnly") })
+    main:AddToggle("KitEspTeamCheck", { Text = T("Team Check"), Callback = Kit.Esp.Setter("TeamCheck") })
+    main:AddToggle("KitEspVisibleOnly", { Text = T("Visible Only"), Callback = Kit.Esp.Setter("VisibleOnly") })
     main:AddSlider("KitEspDistance", {
-        Text = T("Max Distance", "ระยะสูงสุด"), Min = 50, Max = 5000, Step = 50, Default = tuning.MaxDistance, Suffix = "m",
+        Text = T("Max Distance"), Min = 50, Max = 5000, Step = 50, Default = tuning.MaxDistance, Suffix = "m",
         Callback = Kit.Esp.Setter("MaxDistance"),
     })
-    main:AddSeparatorText(T("Presets", "ค่าสำเร็จรูป"))
-    main:AddButton({ Text = T("Legit", "เนียน"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Legit") end)
-        :AddButton({ Text = T("Full", "เต็ม"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Full") end)
-        :AddButton({ Text = T("Mobile", "มือถือ"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Mobile") end)
+    main:AddSeparatorText(T("Presets"))
+    main:AddButton({ Text = T("Legit"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Legit") end)
+        :AddButton({ Text = T("Full"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Full") end)
+        :AddButton({ Text = T("Mobile"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Mobile") end)
     return main
 end
 
 function Kit.Esp.BuildBox(target, T)
     local tuning = Kit.Esp.Settings
-    local group = Kit.Ui.Group(target, "Left", T("Box", "กรอบ"), "box")
-    Kit.Esp.Element(group, "Box", T("Box", "กรอบ"))
-    group:AddSegmented("KitEspBoxStyle", { Text = T("Style", "แบบ"), Values = { "2D", "Corner", "3D" }, Default = "2D", DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxStyle") })
-    group:AddToggle("KitEspBoxOutline", { Text = T("Outline", "ขอบดำ"), Default = true, DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxOutline") })
-    group:AddToggle("KitEspBoxFill", { Text = T("Filled", "ทึบ"), DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxFill") })
+    local group = Kit.Ui.Group(target, "Left", T("Box"), "box")
+    Kit.Esp.Element(group, "Box", T("Box"))
+    group:AddSegmented("KitEspBoxStyle", { Text = T("Style"), Values = { "2D", "Corner", "3D" }, Default = "2D", DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxStyle") })
+    group:AddToggle("KitEspBoxOutline", { Text = T("Outline"), Default = true, DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxOutline") })
+    group:AddToggle("KitEspBoxFill", { Text = T("Filled"), DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxFill") })
     group:AddSlider("KitEspBoxFillAlpha", {
-        Text = T("Fill Opacity", "ความทึบพื้น"), Min = 5, Max = 80, Default = tuning.BoxFillAlpha * 100, Suffix = "%",
+        Text = T("Fill Opacity"), Min = 5, Max = 80, Default = tuning.BoxFillAlpha * 100, Suffix = "%",
         DependsOn = { "KitEspBoxFill", true }, Callback = Kit.Esp.Setter("BoxFillAlpha", 100),
     })
-    group:AddSlider("KitEspThickness", { Text = T("Line Thickness", "ความหนาเส้น"), Min = 1, Max = 4, Step = 0.5, Rounding = 1, Default = tuning.Thickness, Callback = Kit.Esp.Setter("Thickness") })
+    group:AddSlider("KitEspThickness", { Text = T("Line Thickness"), Min = 1, Max = 4, Step = 0.5, Rounding = 1, Default = tuning.Thickness, Callback = Kit.Esp.Setter("Thickness") })
 end
 
 function Kit.Esp.BuildChams(target, T)
     local tuning = Kit.Esp.Settings
-    local group = Kit.Ui.Group(target, "Left", T("Chams", "ไฮไลต์ตัว"), "chams")
-    Kit.Esp.Element(group, "Chams", T("Chams", "ไฮไลต์ตัว"))
+    local group = Kit.Ui.Group(target, "Left", T("Chams"), "chams")
+    Kit.Esp.Element(group, "Chams", T("Chams"))
     group:AddDropdown("KitEspChamsMode", {
-        Text = T("Show", "แสดง"), Default = "Always", DependsOn = Kit.Esp.Under("Chams"),
-        Values = { T("Always", "ตลอด"), T("Visible", "เฉพาะที่เห็น"), T("Behind Wall", "เฉพาะหลังกำแพง") }, Callback = Kit.Esp.Setter("ChamsMode"),
+        Text = T("Show"), Default = "Always", DependsOn = Kit.Esp.Under("Chams"),
+        Values = { T("Always"), T("Visible"), T("Behind Wall") }, Callback = Kit.Esp.Setter("ChamsMode"),
     })
-    group:AddSlider("KitEspChamsFill", { Text = T("Fill Opacity", "ความทึบไส้"), Min = 0, Max = 100, Default = tuning.ChamsFill * 100, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsFill", 100) })
-    group:AddSlider("KitEspChamsOutline", { Text = T("Outline Transparency", "ความโปร่งขอบ"), Min = 0, Max = 100, Default = 0, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsOutline", 100) })
+    group:AddSlider("KitEspChamsFill", { Text = T("Fill Opacity"), Min = 0, Max = 100, Default = tuning.ChamsFill * 100, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsFill", 100) })
+    group:AddSlider("KitEspChamsOutline", { Text = T("Outline Transparency"), Min = 0, Max = 100, Default = 0, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsOutline", 100) })
 end
 
 function Kit.Esp.BuildHealth(target, T)
-    local group = Kit.Ui.Group(target, "Left", T("Health", "เลือด"), "health")
-    Kit.Esp.Element(group, "Health", T("Health Bar", "แถบเลือด"))
-    Kit.Esp.Element(group, "Armor", T("Armor Bar", "แถบเกราะ"))
+    local group = Kit.Ui.Group(target, "Left", T("Health"), "health")
+    Kit.Esp.Element(group, "Health", T("Health Bar"))
+    Kit.Esp.Element(group, "Armor", T("Armor Bar"))
     group:AddSegmented("KitEspBarSide", {
-        Text = T("Bar Side", "ตำแหน่งแถบ"), Default = "Left",
-        Values = { T("Left", "ซ้าย"), T("Right", "ขวา"), T("Top", "บน"), T("Bottom", "ล่าง") }, Callback = Kit.Esp.Setter("BarSide"),
+        Text = T("Bar Side"), Default = "Left",
+        Values = { T("Left"), T("Right"), T("Top"), T("Bottom") }, Callback = Kit.Esp.Setter("BarSide"),
     })
 end
 
 function Kit.Esp.BuildText(target, T)
     local tuning = Kit.Esp.Settings
-    local group = Kit.Ui.Group(target, "Right", T("Text", "ข้อความ"), "edit")
+    local group = Kit.Ui.Group(target, "Right", T("Text"), "edit")
     group:AddMultiChips("KitEspText", {
-        Text = T("Show", "แสดง"), Default = { "Name", "Distance" },
-        Values = { T("Name", "ชื่อ"), T("Distance", "ระยะ"), T("Health", "เลือด"), T("Weapon", "อาวุธ"), T("Status", "สถานะ") },
+        Text = T("Show"), Default = { "Name", "Distance" },
+        Values = { T("Name"), T("Distance"), T("Health"), T("Weapon"), T("Status") },
         Callback = function(set)
             local show = Kit.Esp.Settings.Show
             for _, key in pairs(Kit.Esp.TextKeys) do show[key] = false end
@@ -18917,78 +18917,78 @@ function Kit.Esp.BuildText(target, T)
             Kit.Esp.Changed()
         end,
     })
-    group:AddSlider("KitEspTextSize", { Text = T("Size", "ขนาด"), Min = 8, Max = 24, Step = 1, Default = tuning.TextSize, Callback = Kit.Esp.Setter("TextSize") })
+    group:AddSlider("KitEspTextSize", { Text = T("Size"), Min = 8, Max = 24, Step = 1, Default = tuning.TextSize, Callback = Kit.Esp.Setter("TextSize") })
 end
 
 function Kit.Esp.BuildLines(target, T)
     local tuning = Kit.Esp.Settings
-    local group = Kit.Ui.Group(target, "Right", T("Tracer & Body", "เส้นและโครง"), "tracer")
-    Kit.Esp.Element(group, "Tracer", T("Tracer", "เส้นชี้"))
+    local group = Kit.Ui.Group(target, "Right", T("Tracer & Body"), "tracer")
+    Kit.Esp.Element(group, "Tracer", T("Tracer"))
     group:AddDropdown("KitEspTracerOrigin", {
-        Text = T("From", "เริ่มจาก"), Default = "Bottom", DependsOn = Kit.Esp.Under("Tracer"),
-        Values = { T("Bottom", "ล่างจอ"), T("Center", "กลางจอ"), T("Top", "บนจอ"), T("Mouse", "เมาส์") }, Callback = Kit.Esp.Setter("TracerOrigin"),
+        Text = T("From"), Default = "Bottom", DependsOn = Kit.Esp.Under("Tracer"),
+        Values = { T("Bottom"), T("Center"), T("Top"), T("Mouse") }, Callback = Kit.Esp.Setter("TracerOrigin"),
     })
-    Kit.Esp.Element(group, "Skeleton", T("Skeleton", "โครงกระดูก"))
-    Kit.Esp.Element(group, "HeadDot", T("Head Dot", "จุดที่หัว"))
+    Kit.Esp.Element(group, "Skeleton", T("Skeleton"))
+    Kit.Esp.Element(group, "HeadDot", T("Head Dot"))
 end
 
 function Kit.Esp.BuildOffscreen(target, T)
     local tuning = Kit.Esp.Settings
-    local group = Kit.Ui.Group(target, "Right", T("Off-screen & Radar", "นอกจอและเรดาร์"), "radar")
-    Kit.Esp.Element(group, "Arrows", T("Off-screen Arrows", "ลูกศรนอกจอ"))
-    group:AddSlider("KitEspArrowRadius", { Text = T("Distance From Center", "ระยะจากกลางจอ"), Min = 60, Max = 400, Step = 10, Default = tuning.ArrowRadius, Suffix = "px", DependsOn = Kit.Esp.Under("Arrows"), Callback = Kit.Esp.Setter("ArrowRadius") })
-    group:AddSlider("KitEspArrowSize", { Text = T("Arrow Size", "ขนาดลูกศร"), Min = 6, Max = 30, Default = tuning.ArrowSize, Suffix = "px", DependsOn = Kit.Esp.Under("Arrows"), Callback = Kit.Esp.Setter("ArrowSize") })
-    Kit.Esp.Element(group, "Radar", T("Radar", "เรดาร์"))
-    group:AddSlider("KitEspRadarSize", { Text = T("Radar Size", "ขนาดเรดาร์"), Min = 100, Max = 300, Step = 10, Default = tuning.RadarSize, Suffix = "px", DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarSize") })
-    group:AddSlider("KitEspRadarRange", { Text = T("Radar Range", "ระยะเรดาร์"), Min = 50, Max = 1000, Step = 25, Default = tuning.RadarRange, Suffix = "m", DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRange") })
+    local group = Kit.Ui.Group(target, "Right", T("Off-screen & Radar"), "radar")
+    Kit.Esp.Element(group, "Arrows", T("Off-screen Arrows"))
+    group:AddSlider("KitEspArrowRadius", { Text = T("Distance From Center"), Min = 60, Max = 400, Step = 10, Default = tuning.ArrowRadius, Suffix = "px", DependsOn = Kit.Esp.Under("Arrows"), Callback = Kit.Esp.Setter("ArrowRadius") })
+    group:AddSlider("KitEspArrowSize", { Text = T("Arrow Size"), Min = 6, Max = 30, Default = tuning.ArrowSize, Suffix = "px", DependsOn = Kit.Esp.Under("Arrows"), Callback = Kit.Esp.Setter("ArrowSize") })
+    Kit.Esp.Element(group, "Radar", T("Radar"))
+    group:AddSlider("KitEspRadarSize", { Text = T("Radar Size"), Min = 100, Max = 300, Step = 10, Default = tuning.RadarSize, Suffix = "px", DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarSize") })
+    group:AddSlider("KitEspRadarRange", { Text = T("Radar Range"), Min = 50, Max = 1000, Step = 25, Default = tuning.RadarRange, Suffix = "m", DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRange") })
     group:AddDropdown("KitEspRadarCorner", {
-        Text = T("Position", "ตำแหน่ง"), Default = "Top Left", DependsOn = Kit.Esp.Under("Radar"),
-        Values = { T("Top Left", "ซ้ายบน"), T("Top Right", "ขวาบน"), T("Bottom Left", "ซ้ายล่าง"), T("Bottom Right", "ขวาล่าง") },
+        Text = T("Position"), Default = "Top Left", DependsOn = Kit.Esp.Under("Radar"),
+        Values = { T("Top Left"), T("Top Right"), T("Bottom Left"), T("Bottom Right") },
         Callback = Kit.Esp.Setter("RadarCorner"),
     })
-    group:AddToggle("KitEspRadarRotate", { Text = T("Rotate With Camera", "หมุนตามกล้อง"), Default = true, DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRotate") })
+    group:AddToggle("KitEspRadarRotate", { Text = T("Rotate With Camera"), Default = true, DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRotate") })
 end
 
 function Kit.Esp.BuildColors(target, T)
-    local group = Kit.Ui.Group(target, "Right", T("Colors", "สี"), "palette")
+    local group = Kit.Ui.Group(target, "Right", T("Colors"), "palette")
     local colors = Kit.Esp.Settings.Colors
     group:AddDropdown("KitEspColorMode", {
-        Text = T("Color By", "ใช้สีตาม"), Default = "Relation",
-        Values = { T("Relation", "ศัตรู/ทีม/บอท"), T("Team", "สีทีม"), T("Health", "เลือด") },
+        Text = T("Color By"), Default = "Relation",
+        Values = { T("Relation"), T("Team"), T("Health") },
         Callback = Kit.Esp.Setter("ColorMode"),
     })
     local pairsList = {
-        { "Enemy", T("Enemy  ·  Visible / Behind Wall", "ศัตรู · เห็น / หลังกำแพง") },
-        { "Team", T("Team  ·  Visible / Behind Wall", "ทีม · เห็น / หลังกำแพง") },
-        { "Bot", T("Bot  ·  Visible / Behind Wall", "บอท · เห็น / หลังกำแพง") },
+        { "Enemy", T("Enemy  ·  Visible / Behind Wall") },
+        { "Team", T("Team  ·  Visible / Behind Wall") },
+        { "Bot", T("Bot  ·  Visible / Behind Wall") },
     }
     for _, spec in ipairs(pairsList) do
         group:AddLabel({ Text = spec[2] })
             :AddColorPicker("KitEspColor" .. spec[1] .. "Visible", { Default = colors[spec[1] .. "Visible"], Callback = Kit.Esp.ColorSetter(spec[1] .. "Visible") })
             :AddColorPicker("KitEspColor" .. spec[1] .. "Hidden", { Default = colors[spec[1] .. "Hidden"], Callback = Kit.Esp.ColorSetter(spec[1] .. "Hidden") })
     end
-    group:AddLabel({ Text = T("Aim Target", "เป้าที่ล็อก") }):AddColorPicker("KitEspColorFocus", { Default = colors.Focus, Callback = Kit.Esp.ColorSetter("Focus") })
-    group:AddToggle("KitEspLowHealth", { Text = T("Low Health Color", "สีเมื่อเลือดต่ำ"), Callback = Kit.Esp.Setter("LowHealth") })
+    group:AddLabel({ Text = T("Aim Target") }):AddColorPicker("KitEspColorFocus", { Default = colors.Focus, Callback = Kit.Esp.ColorSetter("Focus") })
+    group:AddToggle("KitEspLowHealth", { Text = T("Low Health Color"), Callback = Kit.Esp.Setter("LowHealth") })
         :AddColorPicker("KitEspColorLowHealth", { Default = colors.LowHealth, Callback = Kit.Esp.ColorSetter("LowHealth") })
     group:AddSlider("KitEspLowHealthAt", {
-        Text = T("Below", "ต่ำกว่า"), Min = 5, Max = 90, Step = 5, Default = 30, Suffix = "%",
+        Text = T("Below"), Min = 5, Max = 90, Step = 5, Default = 30, Suffix = "%",
         DependsOn = { "KitEspLowHealth", true }, Callback = Kit.Esp.Setter("LowHealthAt"),
     })
-    group:AddLabel({ Text = T("Health Bar  ·  Full / Empty", "แถบเลือด · เต็ม / หมด") })
+    group:AddLabel({ Text = T("Health Bar  ·  Full / Empty") })
         :AddColorPicker("KitEspElementHealthHigh", { Default = colors.HealthHigh, Callback = Kit.Esp.ColorSetter("HealthHigh") })
         :AddColorPicker("KitEspElementHealthLow", { Default = colors.HealthLow, Callback = Kit.Esp.ColorSetter("HealthLow") })
-    group:AddLabel({ Text = T("Armor Bar", "แถบเกราะ") }):AddColorPicker("KitEspElementArmor", { Default = colors.Armor, Callback = Kit.Esp.ColorSetter("Armor") })
+    group:AddLabel({ Text = T("Armor Bar") }):AddColorPicker("KitEspElementArmor", { Default = colors.Armor, Callback = Kit.Esp.ColorSetter("Armor") })
 end
 
 function Kit.Esp.BuildAdvanced(target, T, kinds)
     local tuning = Kit.Esp.Settings
-    local group = Kit.Ui.Group(target, "Left", T("Advanced", "ขั้นสูง"), "filter")
-    local values, picked = { T("Players", "ผู้เล่น"), T("Bots", "บอท") }, { "Players", "Bots" }
+    local group = Kit.Ui.Group(target, "Left", T("Advanced"), "filter")
+    local values, picked = { T("Players"), T("Bots") }, { "Players", "Bots" }
     for _, kind in ipairs(kinds or {}) do
         values[#values + 1], picked[#picked + 1] = kind, kind
     end
     group:AddMultiChips("KitEspKinds", {
-        Text = T("Show Types", "ประเภทที่แสดง"), Values = values, Default = picked,
+        Text = T("Show Types"), Values = values, Default = picked,
         Callback = function(set)
             local kindSet = {}
             for entry, on in pairs(set or {}) do
@@ -18997,17 +18997,17 @@ function Kit.Esp.BuildAdvanced(target, T, kinds)
             Kit.Esp.Set("Kinds", kindSet)
         end,
     })
-    group:AddToggle("KitEspHideDead", { Text = T("Hide Dead", "ซ่อนตัวที่ตาย"), Default = true, Callback = Kit.Esp.Setter("HideDead") })
+    group:AddToggle("KitEspHideDead", { Text = T("Hide Dead"), Default = true, Callback = Kit.Esp.Setter("HideDead") })
     group:AddToggle("KitEspWatch", {
-        Text = T("Warn When Watched", "เตือนเมื่อถูกมอง"), Description = T("Marks enemies looking at you", "เปลี่ยนสีศัตรูที่หันมาทางคุณ"),
+        Text = T("Warn When Watched"), Description = T("Marks enemies looking at you"),
         Callback = Kit.Esp.Setter("Watch"),
     }):AddColorPicker("KitEspColorWatching", { Default = tuning.Colors.Watching, Callback = Kit.Esp.ColorSetter("Watching") })
     group:AddSlider("KitEspWatchAngle", {
-        Text = T("Watch Angle", "มุมที่นับว่ามอง"), Min = 2, Max = 30, Default = tuning.WatchAngle, Suffix = "°",
+        Text = T("Watch Angle"), Min = 2, Max = 30, Default = tuning.WatchAngle, Suffix = "°",
         DependsOn = { "KitEspWatch", true }, Callback = Kit.Esp.Setter("WatchAngle"),
     })
     group:AddSlider("KitEspRate", {
-        Text = T("Update Rate", "อัปเดตทุก"), Min = 0.05, Max = 2, Step = 0.05, Rounding = 2, Default = tuning.Rate, Suffix = "s",
+        Text = T("Update Rate"), Min = 0.05, Max = 2, Step = 0.05, Rounding = 2, Default = tuning.Rate, Suffix = "s",
         Callback = Kit.Esp.Setter("Rate"),
     })
 end
@@ -19023,7 +19023,7 @@ function Kit.Esp.Build(target, options)
     local T = Kit.T
     Kit.Esp.Defaults()
     if options.Players ~= false and not Kit.Esp.Categories.Players then
-        Kit.Esp.AddCategory("Players", { Text = T("Players", "ผู้เล่น"), Color = Color3.fromRGB(240, 92, 80), Source = Kit.Esp.PlayerSource, Characters = true })
+        Kit.Esp.AddCategory("Players", { Text = T("Players"), Color = Color3.fromRGB(240, 92, 80), Source = Kit.Esp.PlayerSource, Characters = true })
     end
     for _, spec in ipairs(options.Categories or {}) do
         Kit.Esp.AddCategory(spec.Name, spec)
@@ -19541,23 +19541,23 @@ function Kit.Aim.BuildBase(group, which, text, extra)
         Kit.Caps.NeedCap(toggle, extra.Cap)
     end
     system.Key = group:AddKeybind(id .. "Key", {
-        Text = T("Aim Key", "ปุ่มเล็ง"),
+        Text = T("Aim Key"),
         Default = "None",
         Mode = "Always",
         FloatButton = true,
     })
-    group:AddToggle(id .. "TeamCheck", { Text = T("Team Check", "ไม่เล็งทีมเดียวกัน"), Callback = Kit.Aim.Bind(system, "TeamCheck") })
+    group:AddToggle(id .. "TeamCheck", { Text = T("Team Check"), Callback = Kit.Aim.Bind(system, "TeamCheck") })
     if tuning.VisibleOnly ~= nil then
-        group:AddToggle(id .. "Visible", { Text = T("Visible Only", "เฉพาะที่มองเห็น"), Callback = Kit.Aim.Bind(system, "VisibleOnly") })
+        group:AddToggle(id .. "Visible", { Text = T("Visible Only"), Callback = Kit.Aim.Bind(system, "VisibleOnly") })
     end
     if tuning.Priority then
         group:AddDropdown(id .. "Priority", {
-            Text = T("Priority", "เลือกเป้าตาม"), Values = { "Crosshair", "Distance", "Health" }, Default = tuning.Priority,
+            Text = T("Priority"), Values = { "Crosshair", "Distance", "Health" }, Default = tuning.Priority,
             Callback = Kit.Aim.Bind(system, "Priority"),
         })
     end
     group:AddSlider(id .. "Distance", {
-        Text = T("Max Distance", "ระยะสูงสุด"), Min = 50, Max = 3000, Step = 50, Default = tuning.MaxDistance, Suffix = "m",
+        Text = T("Max Distance"), Min = 50, Max = 3000, Step = 50, Default = tuning.MaxDistance, Suffix = "m",
         Callback = Kit.Aim.Bind(system, "MaxDistance"),
     })
     return toggle
@@ -19569,18 +19569,18 @@ function Kit.Aim.BuildFov(group, which)
     local tuning = system.Settings
     local id = "Kit" .. which
     group:AddToggle(id .. "ShowFov", {
-        Text = T("Show FOV", "แสดงวง FOV"),
+        Text = T("Show FOV"),
         Callback = Kit.Aim.Bind(system, "ShowFov"),
     }):AddColorPicker(id .. "FovColor", { Default = tuning.FovColor, Callback = Kit.Aim.Bind(system, "FovColor") })
     group:AddSlider(id .. "Fov", {
-        Text = T("FOV", "ขนาด FOV"), Min = 20, Max = 600, Step = 5, Default = tuning.Fov, Suffix = "px",
+        Text = T("FOV"), Min = 20, Max = 600, Step = 5, Default = tuning.Fov, Suffix = "px",
         Callback = Kit.Aim.Bind(system, "Fov"),
     })
 end
 
 function Kit.Aim.BuildPart(group, which)
     group:AddDropdown("Kit" .. which .. "Part", {
-        Text = Kit.T("Aim Part", "จุดเล็ง"), Values = { "Head", "Torso" }, Default = Kit.Aim[which].Settings.Part,
+        Text = Kit.T("Aim Part"), Values = { "Head", "Torso" }, Default = Kit.Aim[which].Settings.Part,
         Callback = Kit.Aim.Bind(Kit.Aim[which], "Part"),
     })
 end
@@ -19595,30 +19595,30 @@ function Kit.Aim.Build(target, options)
     end
     Kit.Aim.Aimbot.Settings.ShowFov, Kit.Aim.Silent.Settings.ShowFov = false, false
 
-    local aimbot = Kit.Ui.Group(target, "Left", T("Aimbot", "ล็อกเป้า"), "aimbot")
-    Kit.Aim.BuildBase(aimbot, "Aimbot", T("Aimbot", "ล็อกเป้า"))
+    local aimbot = Kit.Ui.Group(target, "Left", T("Aimbot"), "aimbot")
+    Kit.Aim.BuildBase(aimbot, "Aimbot", T("Aimbot"))
     Kit.Aim.BuildPart(aimbot, "Aimbot")
     aimbot:AddSlider("KitAimbotSmooth", {
-        Text = T("Smoothness", "ความนุ่ม"), Min = 0, Max = 0.95, Step = 0.05, Default = Kit.Aim.Aimbot.Settings.Smoothness,
+        Text = T("Smoothness"), Min = 0, Max = 0.95, Step = 0.05, Default = Kit.Aim.Aimbot.Settings.Smoothness,
         Callback = Kit.Aim.Bind(Kit.Aim.Aimbot, "Smoothness"),
     })
-    aimbot:AddToggle("KitAimbotSticky", { Text = T("Sticky Target", "ล็อกเป้าเดิม"), Callback = Kit.Aim.Bind(Kit.Aim.Aimbot, "Sticky") })
+    aimbot:AddToggle("KitAimbotSticky", { Text = T("Sticky Target"), Callback = Kit.Aim.Bind(Kit.Aim.Aimbot, "Sticky") })
     Kit.Aim.BuildFov(aimbot, "Aimbot")
 
     local silent
     if options.Silent then
-        silent = Kit.Ui.Group(target, "Right", T("Silent Aim", "ยิงเข้าเป้า"), "silentaim")
-        Kit.Aim.BuildBase(silent, "Silent", T("Silent Aim", "ยิงเข้าเป้า"), { Cap = "Hook", Risky = true })
+        silent = Kit.Ui.Group(target, "Right", T("Silent Aim"), "silentaim")
+        Kit.Aim.BuildBase(silent, "Silent", T("Silent Aim"), { Cap = "Hook", Risky = true })
         silent:AddDropdown("KitSilentMethod", {
-            Text = T("Method", "วิธี"), Values = { "Both", "Raycast", "Mouse" }, Default = Kit.Aim.Silent.Settings.Method,
+            Text = T("Method"), Values = { "Both", "Raycast", "Mouse" }, Default = Kit.Aim.Silent.Settings.Method,
             Callback = Kit.Aim.SetSilentMethod,
         })
         silent:AddSlider("KitSilentHit", {
-            Text = T("Hit Chance", "โอกาสโดน"), Min = 0, Max = 100, Step = 1, Default = 100, Suffix = "%",
+            Text = T("Hit Chance"), Min = 0, Max = 100, Step = 1, Default = 100, Suffix = "%",
             Callback = Kit.Aim.Bind(Kit.Aim.Silent, "HitChance"),
         })
         silent:AddSlider("KitSilentHead", {
-            Text = T("Headshot Chance", "โอกาสเข้าหัว"), Min = 0, Max = 100, Step = 1, Default = 50, Suffix = "%",
+            Text = T("Headshot Chance"), Min = 0, Max = 100, Step = 1, Default = 50, Suffix = "%",
             Callback = Kit.Aim.Bind(Kit.Aim.Silent, "HeadChance"),
         })
         Kit.Aim.BuildFov(silent, "Silent")
@@ -19626,25 +19626,25 @@ function Kit.Aim.Build(target, options)
 
     local trigger
     if options.Trigger ~= false then
-        trigger = Kit.Ui.Group(target, options.Silent and "Left" or "Right", T("Triggerbot", "ยิงอัตโนมัติ"), "triggerbot")
-        Kit.Aim.BuildBase(trigger, "Trigger", T("Triggerbot", "ยิงอัตโนมัติ"))
+        trigger = Kit.Ui.Group(target, options.Silent and "Left" or "Right", T("Triggerbot"), "triggerbot")
+        Kit.Aim.BuildBase(trigger, "Trigger", T("Triggerbot"))
         trigger:AddSlider("KitTriggerDelay", {
-            Text = T("Reaction Delay", "หน่วงก่อนยิง"), Min = 0, Max = 0.5, Step = 0.01, Default = 0.05, Suffix = "s",
+            Text = T("Reaction Delay"), Min = 0, Max = 0.5, Step = 0.01, Default = 0.05, Suffix = "s",
             Callback = Kit.Aim.Bind(Kit.Aim.Trigger, "Delay"),
         })
         trigger:AddSlider("KitTriggerChance", {
-            Text = T("Fire Chance", "โอกาสยิง"), Min = 0, Max = 100, Step = 1, Default = 100, Suffix = "%",
+            Text = T("Fire Chance"), Min = 0, Max = 100, Step = 1, Default = 100, Suffix = "%",
             Callback = Kit.Aim.Bind(Kit.Aim.Trigger, "Chance"),
         })
     end
 
     local rage
     if options.Rage ~= false then
-        rage = Kit.Ui.Group(target, "Right", T("Ragebot", "ยิงล็อกทุกทิศ"), "ragebot")
-        Kit.Aim.BuildBase(rage, "Rage", T("Ragebot", "ยิงล็อกทุกทิศ"), { Risky = true })
+        rage = Kit.Ui.Group(target, "Right", T("Ragebot"), "ragebot")
+        Kit.Aim.BuildBase(rage, "Rage", T("Ragebot"), { Risky = true })
         Kit.Aim.BuildPart(rage, "Rage")
         rage:AddSlider("KitRageGap", {
-            Text = T("Fire Interval", "ยิงทุก"), Min = 0.02, Max = 1, Step = 0.01, Default = Kit.Aim.Rage.Settings.FireGap, Suffix = "s",
+            Text = T("Fire Interval"), Min = 0.02, Max = 1, Step = 0.01, Default = Kit.Aim.Rage.Settings.FireGap, Suffix = "s",
             Callback = Kit.Aim.Bind(Kit.Aim.Rage, "FireGap"),
         })
     end
@@ -19847,18 +19847,18 @@ table.insert(Kit.Modules, Kit.Guns)
 
 function Kit.Guns.Build(target)
     local T = Kit.T
-    local group = Kit.Ui.Group(target, "Left", T("Gun Mods", "ปรับปืน"), "fullauto")
+    local group = Kit.Ui.Group(target, "Left", T("Gun Mods"), "fullauto")
     local mods = {
-        { "NoRecoil", T("No Recoil", "ไม่มีแรงถีบ") },
-        { "NoSpread", T("No Spread", "กระสุนไม่กระจาย") },
-        { "FullAuto", T("Full Auto", "ยิงรัว") },
-        { "RapidFire", T("Rapid Fire", "ยิงเร็ว") },
+        { "NoRecoil", T("No Recoil") },
+        { "NoSpread", T("No Spread") },
+        { "FullAuto", T("Full Auto") },
+        { "RapidFire", T("Rapid Fire") },
     }
     for _, mod in ipairs(mods) do
         group:AddToggle("KitGuns" .. mod[1], { Text = mod[2], Risky = true, Callback = function(on) Kit.Guns.Set(mod[1], on) end })
     end
     group:AddSlider("KitGunsRapidScale", {
-        Text = T("Fire Rate Boost", "เร่งอัตรายิง"), Min = 1.5, Max = 10, Step = 0.5, Default = Kit.Guns.Settings.RapidScale, Suffix = "x",
+        Text = T("Fire Rate Boost"), Min = 1.5, Max = 10, Step = 0.5, Default = Kit.Guns.Settings.RapidScale, Suffix = "x",
         Callback = Kit.Guns.SetRapidScale,
     })
     return group
@@ -20076,11 +20076,11 @@ function Kit.Teleport.Build(target, providers)
         list[#list + 1] = provider
     end
     if providers.Players ~= false then
-        list[#list + 1] = Kit.Teleport.FromPlayers(T("Players", "ผู้เล่น"))
+        list[#list + 1] = Kit.Teleport.FromPlayers(T("Players"))
     end
-    local group = Kit.Ui.Group(target, "Left", T("Teleport", "วาร์ป"), "teleport")
+    local group = Kit.Ui.Group(target, "Left", T("Teleport"), "teleport")
     group:AddTeleportList("KitTeleport", {
-        Text = T("Places", "สถานที่"), Icon = "waypoint",
+        Text = T("Places"), Icon = "waypoint",
         Source = function()
             return Kit.Teleport.Collect(list)
         end,
@@ -20091,17 +20091,17 @@ function Kit.Teleport.Build(target, providers)
         end,
     })
     group:AddDropdown("KitTeleportMode", {
-        Text = T("Mode", "รูปแบบ"), Icon = "teleport",
+        Text = T("Mode"), Icon = "teleport",
         Values = { "Instant", "Tween" },
         Default = Kit.Teleport.Mode,
         Callback = function(mode) Kit.Teleport.Mode = mode end,
     })
     group:AddSlider("KitTeleportSpeed", {
-        Text = T("Tween Speed", "ความเร็วเคลื่อน"), Icon = "speed", Min = 30, Max = 600, Step = 10, Default = Kit.Teleport.Speed,
+        Text = T("Tween Speed"), Icon = "speed", Min = 30, Max = 600, Step = 10, Default = Kit.Teleport.Speed,
         DependsOn = { "KitTeleportMode", "Tween" },
         Callback = function(speed) Kit.Teleport.Speed = speed end,
     })
-    group:AddButton({ Text = T("Go Back", "กลับจุดเดิม"), Icon = "waypoint" }, function()
+    group:AddButton({ Text = T("Go Back"), Icon = "waypoint" }, function()
         task.spawn(Kit.Teleport.Back)
     end)
     return group
@@ -20194,28 +20194,28 @@ table.insert(Kit.Modules, Kit.Webhook)
 
 function Kit.Webhook.Build(target)
     local T = Kit.T
-    local group = Kit.Ui.Group(target, "Right", T("Webhook", "เว็บฮุค"), "webhook")
+    local group = Kit.Ui.Group(target, "Right", T("Webhook"), "webhook")
     local toggle = group:AddToggle("KitWebhook", {
-        Text = T("Webhook", "เว็บฮุค"), Icon = "webhook",
-        Description = T("Send alerts to your Discord channel", "ส่งแจ้งเตือนเข้าห้อง Discord"),
+        Text = T("Webhook"), Icon = "webhook",
+        Description = T("Send alerts to your Discord channel"),
         Callback = function(on) Kit.Webhook.Enabled = on end,
     })
     Kit.Caps.NeedCap(toggle, "Http")
     group:AddInput("KitWebhookUrl", {
-        Text = T("Webhook URL", "ลิงก์เว็บฮุค"), Icon = "link",
+        Text = T("Webhook URL"), Icon = "link",
         Placeholder = T("https://discord.com/api/webhooks/...", "https://discord.com/api/webhooks/..."),
         Finished = true,
         Callback = function(url)
             Kit.Webhook.Url = url
             if url ~= "" and not Kit.Webhook.Valid(url) then
-                Kit.Ui.Notify("That is not a Discord webhook link", "ลิงก์นี้ไม่ใช่เว็บฮุค Discord", "Warn")
+                Kit.Ui.Notify("That is not a Discord webhook link", "Warn")
             end
         end,
     })
-    group:AddButton({ Text = T("Send Test", "ส่งทดสอบ"), Icon = "webhook" }, function()
+    group:AddButton({ Text = T("Send Test"), Icon = "webhook" }, function()
         local sent = Kit.Webhook.Send({ Title = "m0pu", Description = "Webhook test from " .. LocalPlayer.Name })
         if not sent then
-            Kit.Ui.Notify("Check the link and executor support", "เช็คลิงก์และ executor อีกครั้ง", "Warn")
+            Kit.Ui.Notify("Check the link and executor support", "Warn")
         end
     end)
     return group
@@ -20226,7 +20226,7 @@ Kit.Discord = {}
 function Kit.Discord.Copy(link)
     link = link or Kit.Config.Discord
     if Util.Clipboard(link) then
-        Kit.Ui.Notify("Discord link copied", "คัดลอกลิงก์ Discord แล้ว", "Success")
+        Kit.Ui.Notify("Discord link copied", "Success")
     else
         Library:Notify("Discord", link, Kit.Config.DiscordNotify, "Info")
     end
@@ -20237,7 +20237,7 @@ function Kit.Discord.Build(target, link)
     link = link or Kit.Config.Discord
     local group = Kit.Ui.Group(target, "Right", "Discord", "discord")
     group:AddLabel((link:gsub("^https://", "")))
-    group:AddButton({ Text = T("Copy Discord Link", "คัดลอกลิงก์ Discord"), Icon = "copy" }, function()
+    group:AddButton({ Text = T("Copy Discord Link"), Icon = "copy" }, function()
         Kit.Discord.Copy(link)
     end)
     return group
@@ -20318,10 +20318,10 @@ function Library.Boot(window, options)
         Title = window.Title,
         SubTitle = window.SubTitle,
         Steps = {
-            { Label = { EN = steps.EN[1], TH = steps.TH[1] } },
-            { Label = { EN = steps.EN[2], TH = steps.TH[2] } },
-            { Label = { EN = steps.EN[3], TH = steps.TH[3] }, Run = WaitBuilt },
-            { Label = { EN = steps.EN[4], TH = steps.TH[4] } },
+            { Label = steps.EN[1] },
+            { Label = steps.EN[2] },
+            { Label = steps.EN[3], Run = WaitBuilt },
+            { Label = steps.EN[4] },
         },
         OnDone = function()
             Library.Reveal(window)
