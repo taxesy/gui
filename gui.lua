@@ -1,4 +1,4 @@
--- m0pu UI · made by m0pu · .gg/sl8
+-- m0pu's gui · made by m0pu · .gg/sl8
 -- (c) m0pu. Do not reupload or rebrand without credit. build 2026-10-03
 ---@author m0pu  m0pu UI
 local TweenService = game:GetService("TweenService")
@@ -16,7 +16,7 @@ local LocalPlayer = Players.LocalPlayer
 local Library = {
     Version = "2.0",
     Author = "m0pu",
-    Credit = "m0pu UI by m0pu · .gg/sl8",
+    Credit = "m0pu · .gg/sl8",
     Options = {},
     Toggles = {},
     Unloaded = false,
@@ -29,7 +29,7 @@ local Config = {
     AssetDir = "m0pu/assets",
     ConfigRoot = "m0pu/configs",
     KeyCache = "m0pu/key.txt",
-    DefaultAssets = { logo = "https://raw.githubusercontent.com/m0puz/Roblox-Scripts/main/logo.png" },
+    DefaultAssets = { logo = "https://raw.githubusercontent.com/taxesy/gui/main/logo.png" },
     FontDir = "m0pu/fonts",
     HttpTimeout = 8,
     AssetWait = 0.25,
