@@ -1522,11 +1522,6 @@ Sprite.Art.knife = {
     "......kwek..", ".....kwek...", "...kkwek....", "..kqyek.....",
     "...kqk......", "..komk......", ".kBmk.......", "..kk........",
 }
-Sprite.Art.language = {
-    "....kkkk....", "..kkcccbkk..", ".kccgggbcbk.", ".kbggggbbCk.",
-    "kcbbggbgggbk", "kbbbbbbgggCk", "kbbbbbbbggCk", "kbggbbbbbbCk",
-    ".kbgggbbbCk.", ".kbCggbbCCk.", "..kkbCCCkk..", "....kkkk....",
-}
 Sprite.Art.left = {
     ".....k......", "....kbk.....", "...kcCk.....", "..kcbCkkkk..",
     ".kcbbbcccbk.", "kcbbbbbbbCk.", "kbbbbbbbbCk.", ".kbbbbCCCCk.",
@@ -2412,7 +2407,6 @@ Sprite.Alias["duration"] = "timer"
 Sprite.Alias["dye"] = "palette"
 Sprite.Alias["dynamite"] = "bomb"
 Sprite.Alias["earth"] = "map"
-Sprite.Alias["earth-lock"] = "language"
 Sprite.Alias["east"] = "right"
 Sprite.Alias["eat"] = "mushroom"
 Sprite.Alias["edit-2"] = "edit"
@@ -2675,9 +2669,6 @@ Sprite.Alias["koopa"] = "shell"
 Sprite.Alias["label"] = "nametag"
 Sprite.Alias["lag"] = "lowfps"
 Sprite.Alias["lamp"] = "fullbright"
-Sprite.Alias["lang"] = "language"
-Sprite.Alias["languages"] = "language"
-Sprite.Alias["languages-alt"] = "language"
 Sprite.Alias["laptop"] = "pc"
 Sprite.Alias["laugh"] = "troll"
 Sprite.Alias["launch"] = "fling"
@@ -2717,7 +2708,6 @@ Sprite.Alias["loader"] = "load"
 Sprite.Alias["loading"] = "load"
 Sprite.Alias["lobby"] = "home"
 Sprite.Alias["local"] = "player"
-Sprite.Alias["locale"] = "language"
 Sprite.Alias["localplayer"] = "player"
 Sprite.Alias["locate"] = "crosshair"
 Sprite.Alias["locate-fixed"] = "crosshair"
@@ -3188,7 +3178,6 @@ Sprite.Alias["tracers"] = "tracer"
 Sprite.Alias["tracker"] = "stats"
 Sprite.Alias["trade"] = "sell"
 Sprite.Alias["train"] = "upgrade"
-Sprite.Alias["translate"] = "language"
 Sprite.Alias["trash-2"] = "trash"
 Sprite.Alias["trash2"] = "trash"
 Sprite.Alias["treasure"] = "chest"
@@ -5534,7 +5523,7 @@ end
 ---@return any  stable compare/save key: a T() table collapses to its English text
 function Widget.Key(value)
     if type(value) == "table" then
-        return value.EN or value.EN or value[1]
+        return value.EN or value[1]
     end
     return value
 end
@@ -8615,7 +8604,6 @@ function MultiChips:BuildBulk()
     end)
 end
 
----Re-measures the All / None links, since their words change width with the language.
 function MultiChips:SizeBulk()
     local size = Util.TextSize("Small")
     local width = 0
@@ -9721,7 +9709,7 @@ function Feature.AttachNow(container, toggle, now)
     local spec = now
     if type(now) == "function" then
         spec = { Func = now }
-    elseif type(now) ~= "table" or now.EN or now.EN then
+    elseif type(now) ~= "table" or now.EN then
         spec = { Text = now }
     end
     toggle.Now = Button.Create(container, {
@@ -13840,7 +13828,9 @@ function Window.RunConfig(ui, actionKey, handler)
         return
     end
     local ok, reason = handler(name)
-    local action = Lang.Strings[actionKey]
+    local action = Lang.Resolve(Lang.Strings[actionKey] or actionKey)
+    local message = ok and (action .. ": " .. name)
+        or (action .. " failed: " .. tostring(reason))
     Library:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
     if ok and actionKey == "SetAutoload" then
         ui.Autoload:SetText(Lang.Format("Autoload", name))
@@ -15469,7 +15459,7 @@ function Configs.TabNamed(tab, name)
     local wanted = name:lower()
     local spec = tab.Name
     if type(spec) == "table" then
-        return (spec.EN or ""):lower() == wanted or (spec.EN or ""):lower() == wanted
+        return (spec.EN or ""):lower() == wanted
     end
     return tostring(spec):lower() == wanted or Lang.Resolve(spec):lower() == wanted
 end
@@ -19300,7 +19290,7 @@ function Library:CreateWindow(options)
     Assets.Configure(options.Assets)
     Gui.Setup()
     Theme.Apply(themeName)
-Configs.SetFolder(options.ConfigFolder or options.Title or "m0pu")
+    Configs.SetFolder(options.ConfigFolder or options.Title or "m0pu")
     local window = Window.New(options)
     self.Window = window
     Float.Build()
@@ -19364,6 +19354,10 @@ function Library.Boot(window, options)
         Title = window.Title,
         SubTitle = window.SubTitle,
         Steps = {
+            { Label = steps.EN[1] },
+            { Label = steps.EN[2] },
+            { Label = steps.EN[3], Run = WaitBuilt },
+            { Label = steps.EN[4] },
         },
         OnDone = function()
             Library.Reveal(window)
@@ -19391,7 +19385,7 @@ end
 ---@param action table?    { Text, Callback } button on the card
 ---@return table?          { Dismiss }
 function Library:Notify(info, content, duration, kind, action)
-    if type(info) == "table" and not info.EN and not info.EN then
+    if type(info) == "table" and not info.EN then
         info, content, duration, kind, action = info.Title, info.Content or info.Description, info.Duration, info.Kind or info.Type or info.Icon, info.Action
     end
     if self.Unloaded or type(Notify.Push) ~= "function" then
@@ -19554,8 +19548,8 @@ function Library:LoadAutoloadConfig()
         return
     end
     local ok, reason = Configs.Load(name)
-    local message = ok and { EN = "Autoloaded: " .. name .. name }
-        or { EN = "Autoload failed: " .. tostring(reason) .. tostring(reason) }
+    local message = ok and { EN = "Autoloaded: " .. name }
+        or { EN = "Autoload failed: " .. tostring(reason) }
     self:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
 end
 
