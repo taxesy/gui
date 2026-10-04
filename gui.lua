@@ -6904,6 +6904,7 @@ function Dropdown:Normalize(value)
     if self.Multi then
         return Widget.SelectSet(self.Values, value, self.Max)
     end
+    if type(value) == "table" then
         value = value[1]
     end
     local entry = Widget.Canonical(self.Values, value)
