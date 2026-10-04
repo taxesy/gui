@@ -30,17 +30,8 @@ local Config = {
     ConfigRoot = "m0pu/configs",
     KeyCache = "m0pu/key.txt",
     DefaultAssets = { logo = "https://raw.githubusercontent.com/taxesy/gui/main/logo.png" },
-    FontDir = "m0pu/fonts",
     HttpTimeout = 8,
     AssetWait = 0.25,
-    FontTimeout = 20,
-    PreloadTimeout = 5,
-    ThaiFont = {
-        Family = "MarioKanit",
-        Source = "https://raw.githubusercontent.com/google/fonts/main/ofl/kanit/Kanit-%s.ttf",
-        Weights = { [400] = "Regular", [500] = "Medium", [600] = "SemiBold" },
-    },
-    ThaiSizeBonus = { Body = 2, Desc = 2, Display = 1, Strong = 1 },
     Text = { Title = 26, Header = 22, Group = 16, Label = 15, Desc = 13, Small = 12, Button = 15, Watermark = 13, Section = 13 },
     TextBonus = { Desktop = 0, Tablet = 1, Phone = 1 },
     Platform = { PhoneMinSide = 500, PhoneMaxWidth = 640, Debounce = 0.2 },
@@ -239,7 +230,6 @@ local State = {
     Binding = nil,
     MenuKey = "LeftControl",
     ThemeName = "Overworld",
-    Language = "EN",
     UserScale = 1,
     Touch = false,
     KeyPickers = {},
@@ -252,8 +242,8 @@ local State = {
 
 local Platform = { Mode = "Desktop", Touch = false, Landscape = false, Console = false, Viewport = Vector2.new(1280, 720), Listeners = {}, ViewportListeners = {} }
 local Util = {}
-local Lang = { Bound = {}, Listeners = setmetatable({}, { __mode = "k" }), InstanceListeners = {} }
-local Fonts = { Texts = {}, Thai = nil }
+local Lang = { Bound = {} }
+local Fonts = { Texts = {} }
 local Assets = { Overrides = {}, Cache = {}, Jobs = {} }
 local Sprite = {}
 local Theme = { Colors = {}, Bound = {}, Renderers = setmetatable({}, { __mode = "k" }), InstanceRenderers = {}, Chain = {} }
@@ -690,79 +680,67 @@ function Util.FromHex(text)
 end
 
 Lang.Strings = {
-    Search = { EN = "Search...", TH = "ค้นหา..." },
-    Confirm = { EN = "Click again to confirm", TH = "กดอีกครั้งเพื่อยืนยัน" },
-    None = { EN = "None", TH = "ไม่มี" },
-    NoResults = { EN = "No matches", TH = "ไม่พบรายการ" },
-    Settings = { EN = "Settings", TH = "ตั้งค่า" },
-    SettingsDesc = { EN = "Interface, language and configs", TH = "หน้าตา ภาษา และคอนฟิก" },
-    Interface = { EN = "Interface", TH = "หน้าตา" },
-    Language = { EN = "Language", TH = "ภาษา" },
-    ThemeName = { EN = "Theme", TH = "ธีม" },
-    Scale = { EN = "UI scale", TH = "ขนาด UI" },
-    MenuKey = { EN = "Menu key", TH = "ปุ่มเปิดเมนู" },
-    Watermark = { EN = "Watermark", TH = "วอเตอร์มาร์ก" },
-    WatermarkDesc = { EN = "Hub name, FPS, ping and play time", TH = "ชื่อฮับ FPS ปิง และเวลาที่เล่น" },
-    FloatButton = { EN = "Mobile button", TH = "ปุ่มลอยมือถือ" },
-    FloatDesc = { EN = "Floating block that opens the menu", TH = "กล่อง ? ลอยสำหรับเปิดปิดเมนู" },
-    Configs = { EN = "Configs", TH = "คอนฟิก" },
-    ConfigName = { EN = "Config name", TH = "ชื่อคอนฟิก" },
-    SavedConfigs = { EN = "Saved configs", TH = "คอนฟิกที่บันทึกไว้" },
-    Save = { EN = "Save", TH = "บันทึก" },
-    Load = { EN = "Load", TH = "โหลด" },
-    Delete = { EN = "Delete", TH = "ลบ" },
-    Refresh = { EN = "Refresh", TH = "รีเฟรช" },
-    ResetAll = { EN = "Reset All", TH = "รีเซ็ตทั้งหมด" },
-    ResetTab = { EN = "Reset Tab", TH = "รีเซ็ตแท็บนี้" },
-    ResetDone = { EN = "Options reset: %d", TH = "รีเซ็ตแล้ว %d ค่า" },
-    SetAutoload = { EN = "Load on start", TH = "โหลดอัตโนมัติ" },
-    Autoload = { EN = "Autoload: %s", TH = "โหลดอัตโนมัติ: %s" },
-    PickConfig = { EN = "Type or select a config name first", TH = "พิมพ์หรือเลือกชื่อคอนฟิกก่อน" },
-    NoFileApi = { EN = "This executor cannot save files", TH = "executor นี้บันทึกไฟล์ไม่ได้" },
-    ConfigMissing = { EN = "Config not found", TH = "ไม่พบคอนฟิก" },
-    ConfigBroken = { EN = "Config file is damaged", TH = "ไฟล์คอนฟิกเสีย" },
-    About = { EN = "About", TH = "เกี่ยวกับ" },
-    Unload = { EN = "Unload hub", TH = "ปิดสคริปต์" },
-    Rejoin = { EN = "Rejoin", TH = "เข้าเซิร์ฟใหม่" },
-    KeyTitle = { EN = "ENTER KEY", TH = "ใส่คีย์" },
-    KeyNote = { EN = "Paste your key to start the adventure.", TH = "วางคีย์เพื่อเริ่มผจญภัย" },
-    KeyPlaceholder = { EN = "Paste key here", TH = "วางคีย์ที่นี่" },
-    GetKey = { EN = "Get key", TH = "รับคีย์" },
-    CheckKey = { EN = "Check key", TH = "ตรวจคีย์" },
-    KeyCopied = { EN = "Key link copied", TH = "คัดลอกลิงก์รับคีย์แล้ว" },
-    KeyChecking = { EN = "Checking...", TH = "กำลังตรวจ..." },
-    KeyInvalid = { EN = "Invalid key", TH = "คีย์ไม่ถูกต้อง" },
-    KeyValid = { EN = "Key accepted", TH = "คีย์ถูกต้อง" },
+    Search = { EN = "Search..." },
+    Confirm = { EN = "Click again to confirm" },
+    None = { EN = "None" },
+    NoResults = { EN = "No matches" },
+    Settings = { EN = "Settings" },
+    SettingsDesc = { EN = "Interface and configs" },
+    Interface = { EN = "Interface" },
+    ThemeName = { EN = "Theme" },
+    Scale = { EN = "UI scale" },
+    MenuKey = { EN = "Menu key" },
+    Watermark = { EN = "Watermark" },
+    WatermarkDesc = { EN = "Hub name, FPS, ping and play time" },
+    FloatButton = { EN = "Mobile button" },
+    FloatDesc = { EN = "Floating block that opens the menu" },
+    Configs = { EN = "Configs" },
+    ConfigName = { EN = "Config name" },
+    SavedConfigs = { EN = "Saved configs" },
+    Save = { EN = "Save" },
+    Load = { EN = "Load" },
+    Delete = { EN = "Delete" },
+    Refresh = { EN = "Refresh" },
+    ResetAll = { EN = "Reset All" },
+    ResetTab = { EN = "Reset Tab" },
+    ResetDone = { EN = "Options reset: %d" },
+    SetAutoload = { EN = "Load on start" },
+    Autoload = { EN = "Autoload: %s" },
+    PickConfig = { EN = "Type or select a config name first" },
+    NoFileApi = { EN = "This executor cannot save files" },
+    ConfigMissing = { EN = "Config not found" },
+    ConfigBroken = { EN = "Config file is damaged" },
+    About = { EN = "About" },
+    Unload = { EN = "Unload hub" },
+    Rejoin = { EN = "Rejoin" },
+    KeyTitle = { EN = "ENTER KEY" },
+    KeyNote = { EN = "Paste your key to start the adventure." },
+    KeyPlaceholder = { EN = "Paste key here" },
+    GetKey = { EN = "Get key" },
+    CheckKey = { EN = "Check key" },
+    KeyCopied = { EN = "Key link copied" },
+    KeyChecking = { EN = "Checking..." },
+    KeyInvalid = { EN = "Invalid key" },
+    KeyValid = { EN = "Key accepted" },
     IntroSteps = {
         EN = { "Warming up the warp pipe...", "Collecting coins...", "Building the castle...", "Let's-a go!" },
-        TH = { "กำลังอุ่นท่อวาร์ป...", "กำลังเก็บเหรียญ...", "กำลังสร้างปราสาท...", "ลุยกันเลย!" },
     },
-    Ready = { EN = "Ready. Press %s to toggle the menu.", TH = "พร้อมแล้ว กด %s เพื่อเปิดปิดเมนู" },
-    ReadyTouch = { EN = "Ready. Tap the ? block to toggle the menu.", TH = "พร้อมแล้ว แตะกล่อง ? เพื่อเปิดปิดเมนู" },
-    Hidden = { EN = "Menu hidden. Press %s to open.", TH = "ซ่อนเมนูแล้ว กด %s เพื่อเปิด" },
-    Session = { EN = "TIME", TH = "เวลา" },
-    Empty = { EN = "Nothing here yet", TH = "ยังไม่มีรายการ" },
-    Particles = { EN = "Ambient particles", TH = "ละอองตกแต่ง" },
-    ParticlesDesc = { EN = "Floating sparkles behind the menu", TH = "ประกายลอยด้านหลังเมนู" },
-    Device = { EN = "Device: %s", TH = "อุปกรณ์: %s" },
+    Ready = { EN = "Ready. Press %s to toggle the menu." },
+    ReadyTouch = { EN = "Ready. Tap the ? block to toggle the menu." },
+    Hidden = { EN = "Menu hidden. Press %s to open." },
+    Session = { EN = "TIME" },
+    Empty = { EN = "Nothing here yet" },
+    Particles = { EN = "Ambient particles" },
+    ParticlesDesc = { EN = "Floating sparkles behind the menu" },
+    Device = { EN = "Device: %s" },
 }
 
-function Lang.HasThai(text)
-    return text:find("\224[\184\185]") ~= nil
-end
-
----@param spec any     string, { EN, TH } or "English · ไทย"
----@return string     text in the current language
 function Lang.Resolve(spec)
     if type(spec) == "table" then
-        return spec[State.Language] or spec.EN or spec.TH or ""
+        return spec.EN or spec[1] or ""
     end
     if type(spec) ~= "string" then
         return spec == nil and "" or tostring(spec)
-    end
-    local english, thai = spec:match("^(.-)%s+·%s+(.+)$")
-    if english and Lang.HasThai(thai) then
-        return State.Language == "TH" and thai or english
     end
     return spec
 end
@@ -777,7 +755,7 @@ end
 
 function Lang.SearchText(spec)
     if type(spec) == "table" then
-        return ((spec.EN or "") .. " " .. (spec.TH or "")):lower()
+        return tostring(spec.EN or spec[1] or ""):lower()
     end
     return tostring(spec or ""):lower()
 end
@@ -794,68 +772,35 @@ function Lang.Apply(inst, binding)
     inst[binding.Property] = binding.Transform and binding.Transform(text) or text
 end
 
-function Lang.OnChange(owner, callback)
-    local registry = typeof(owner) == "Instance" and Lang.InstanceListeners or Lang.Listeners
-    registry[owner] = callback
-end
-
-function Lang.Set(code)
-    if code ~= "EN" and code ~= "TH" then
-        return
-    end
-    State.Language = code
-    if code == "TH" then
-        Fonts.LoadThaiAsync()
-    end
-    Theme.Prune()
-    for inst, binding in pairs(Lang.Bound) do
-        Lang.Apply(inst, binding)
-    end
-    Fonts.ApplyAll()
-    for _, registry in ipairs({ Lang.Listeners, Lang.InstanceListeners }) do
-        for _, callback in pairs(registry) do
-            Util.Try(callback, code)
-        end
-    end
-    Layout.MarkAll()
-end
-
 Fonts.Latin = {
-    Display = Enum.Font.LuckiestGuy, Body = Enum.Font.FredokaOne, Desc = Enum.Font.BuilderSansMedium,
-    Strong = Enum.Font.BuilderSansBold, Logo = Enum.Font.LuckiestGuy, Glyph = Enum.Font.BuilderSansBold,
+    Display = Enum.Font.LuckiestGuy,
+    Body = Enum.Font.FredokaOne,
+    Desc = Enum.Font.BuilderSansMedium,
+    Strong = Enum.Font.BuilderSansBold,
+    Logo = Enum.Font.LuckiestGuy,
+    Glyph = Enum.Font.BuilderSansBold,
 }
-Fonts.ThaiWeights = { Display = Enum.FontWeight.SemiBold, Body = Enum.FontWeight.Medium, Desc = Enum.FontWeight.Regular, Strong = Enum.FontWeight.SemiBold }
-Fonts.ThaiFallback = { Display = Enum.Font.BuilderSansBold, Body = Enum.Font.BuilderSansBold, Desc = Enum.Font.BuilderSansMedium, Strong = Enum.Font.BuilderSansBold }
 Fonts.Faces = {}
 
----@return Font  Kanit for Thai once loaded
 function Fonts.Face(kind)
-    local thai = State.Language == "TH" and Fonts.ThaiWeights[kind] ~= nil
-    local key = (thai and (Fonts.Thai and "TH" or "THF") or "EN") .. kind
+    local key = tostring(kind)
     local cached = Fonts.Faces[key]
     if cached then
         return cached
     end
-    local face
-    if thai and Fonts.Thai then
-        face = Font.new(Fonts.Thai, Fonts.ThaiWeights[kind])
-    elseif thai then
-        face = Font.fromEnum(Fonts.ThaiFallback[kind])
-    else
-        face = Font.fromEnum(Fonts.Latin[kind] or Fonts.Latin.Body)
-    end
+    local face = Font.fromEnum(Fonts.Latin[kind] or Fonts.Latin.Body)
     Fonts.Faces[key] = face
     return face
 end
 
-function Fonts.Size(kind, base)
-    return base + (State.Language == "TH" and Config.ThaiSizeBonus[kind] or 0)
+function Fonts.Size(_, base)
+    return base
 end
 
 function Fonts.Style(label, kind, base)
     Fonts.Texts[label] = { Kind = kind, Base = base }
     label.FontFace = Fonts.Face(kind)
-    label.TextSize = Fonts.Size(kind, base)
+    label.TextSize = base
 end
 
 function Fonts.ApplyAll()
@@ -863,101 +808,7 @@ function Fonts.ApplyAll()
     Layout.MeasuredCount = 0
     for label, style in pairs(Fonts.Texts) do
         label.FontFace = Fonts.Face(style.Kind)
-        label.TextSize = Fonts.Size(style.Kind, style.Base)
-    end
-end
-
-function Fonts.FetchFace(weight, name)
-    local path = Config.FontDir .. "/kanit-" .. weight .. ".ttf"
-    local cached = Util.SafeFile(isfile, path) == true and Util.SafeFile(readfile, path)
-    if type(cached) ~= "string" or cached:sub(1, 4) ~= "\0\1\0\0" then
-        local body = Util.HttpGet(string.format(Config.ThaiFont.Source, name))
-        if type(body) ~= "string" or body:sub(1, 4) ~= "\0\1\0\0" then
-            return nil
-        end
-        Util.SafeFile(writefile, path, body)
-        local check = Util.SafeFile(readfile, path)
-        if type(check) ~= "string" or #check ~= #body then
-            Fonts.Disable("binary write")
-            return nil
-        end
-    end
-    local asset = Util.CustomAsset(path)
-    if not asset then
-        Fonts.Disable("getcustomasset ttf")
-        return nil
-    end
-    return string.format('{"name":"W%d","weight":%d,"style":"normal","assetId":"%s"}', weight, weight, asset)
-end
-
-function Fonts.Disable(reason)
-    Fonts.Broken = true
-    Util.SafeFile(writefile, Config.FontDir .. "/disabled", tostring(reason))
-    warn("[m0pu] Thai font off: " .. tostring(reason))
-end
-
-function Fonts.LoadThai()
-    if Fonts.Thai or Fonts.Broken or not Util.FileApi() or type(getcustomasset) ~= "function" then
-        return Fonts.Thai ~= nil
-    end
-    if Util.SafeFile(isfile, Config.FontDir .. "/disabled") == true then
-        Fonts.Broken = true
-        return false
-    end
-    Util.EnsureFolder(Config.FontDir)
-    local faces = {}
-    for weight, name in pairs(Config.ThaiFont.Weights) do
-        if Fonts.Broken or Library.Unloaded then
-            return false
-        end
-        table.insert(faces, Fonts.FetchFace(weight, name))
-    end
-    if #faces == 0 then
-        return false
-    end
-    local descriptor = Config.FontDir .. "/kanit.font"
-    if Util.SafeFile(isfile, descriptor) == true then
-        Util.SafeFile(delfile, descriptor)
-    end
-    Util.SafeFile(writefile, descriptor, '{"name":"' .. Config.ThaiFont.Family .. '","faces":[' .. table.concat(faces, ",") .. "]}")
-    local family = Util.CustomAsset(descriptor)
-    if not family then
-        Fonts.Disable("getcustomasset family")
-        return false
-    end
-    Fonts.Thai = family
-    table.clear(Fonts.Faces)
-    if State.Language == "TH" and State.Gui then
-        Fonts.ApplyAll()
-        Layout.MarkAll()
-    end
-    task.spawn(Fonts.Preload)
-    return true
-end
-
-function Fonts.LoadThaiAsync()
-    if Fonts.Thai or Fonts.Broken or Fonts.Loading then
-        return
-    end
-    Fonts.Loading = true
-    task.spawn(function()
-        local finished = Util.Await(Config.FontTimeout, Fonts.LoadThai)
-        Fonts.Loading = false
-        if not finished and not Fonts.Thai and not Fonts.Broken and not Library.Unloaded then
-            Fonts.Disable("timeout")
-        end
-    end)
-end
-
-function Fonts.Preload()
-    local provider = game:GetService("ContentProvider")
-    local probes = {}
-    for _, weight in pairs(Fonts.ThaiWeights) do
-        table.insert(probes, Draw.New("TextLabel", { Text = "ก", FontFace = Font.new(Fonts.Thai, weight) }))
-    end
-    Util.Await(Config.PreloadTimeout, provider.PreloadAsync, provider, probes)
-    for _, probe in ipairs(probes) do
-        probe:Destroy()
+        label.TextSize = style.Base
     end
 end
 
@@ -1675,11 +1526,6 @@ Sprite.Art.knife = {
     "..........k.", ".........kwk", "........kwek", ".......kwek.",
     "......kwek..", ".....kwek...", "...kkwek....", "..kqyek.....",
     "...kqk......", "..komk......", ".kBmk.......", "..kk........",
-}
-Sprite.Art.language = {
-    "....kkkk....", "..kkcccbkk..", ".kccgggbcbk.", ".kbggggbbCk.",
-    "kcbbggbgggbk", "kbbbbbbgggCk", "kbbbbbbbggCk", "kbggbbbbbbCk",
-    ".kbgggbbbCk.", ".kbCggbbCCk.", "..kkbCCCkk..", "....kkkk....",
 }
 Sprite.Art.left = {
     ".....k......", "....kbk.....", "...kcCk.....", "..kcbCkkkk..",
@@ -2566,7 +2412,6 @@ Sprite.Alias["duration"] = "timer"
 Sprite.Alias["dye"] = "palette"
 Sprite.Alias["dynamite"] = "bomb"
 Sprite.Alias["earth"] = "map"
-Sprite.Alias["earth-lock"] = "language"
 Sprite.Alias["east"] = "right"
 Sprite.Alias["eat"] = "mushroom"
 Sprite.Alias["edit-2"] = "edit"
@@ -2830,9 +2675,6 @@ Sprite.Alias["koopa"] = "shell"
 Sprite.Alias["label"] = "nametag"
 Sprite.Alias["lag"] = "lowfps"
 Sprite.Alias["lamp"] = "fullbright"
-Sprite.Alias["lang"] = "language"
-Sprite.Alias["languages"] = "language"
-Sprite.Alias["languages-alt"] = "language"
 Sprite.Alias["laptop"] = "pc"
 Sprite.Alias["laugh"] = "troll"
 Sprite.Alias["launch"] = "fling"
@@ -2872,7 +2714,6 @@ Sprite.Alias["loader"] = "load"
 Sprite.Alias["loading"] = "load"
 Sprite.Alias["lobby"] = "home"
 Sprite.Alias["local"] = "player"
-Sprite.Alias["locale"] = "language"
 Sprite.Alias["localplayer"] = "player"
 Sprite.Alias["locate"] = "crosshair"
 Sprite.Alias["locate-fixed"] = "crosshair"
@@ -3343,7 +3184,6 @@ Sprite.Alias["tracers"] = "tracer"
 Sprite.Alias["tracker"] = "stats"
 Sprite.Alias["trade"] = "sell"
 Sprite.Alias["train"] = "upgrade"
-Sprite.Alias["translate"] = "language"
 Sprite.Alias["trash-2"] = "trash"
 Sprite.Alias["trash2"] = "trash"
 Sprite.Alias["treasure"] = "chest"
@@ -5558,27 +5398,27 @@ Config.Widget = {
     },
 }
 
-Lang.Strings.All = { EN = "All", TH = "ทั้งหมด" }
-Lang.Strings.Invert = { EN = "Invert", TH = "สลับ" }
-Lang.Strings.Reset = { EN = "Reset to default", TH = "คืนค่าเริ่มต้น" }
-Lang.Strings.Risky = { EN = "Risky", TH = "เสี่ยง" }
-Lang.Strings.Locked = { EN = "Working...", TH = "กำลังทำงาน..." }
-Lang.Strings.ModeToggle = { EN = "Toggle", TH = "กดสลับ" }
-Lang.Strings.ModeHold = { EN = "Hold", TH = "กดค้าง" }
-Lang.Strings.ModeAlways = { EN = "Always", TH = "ตลอดเวลา" }
-Lang.Strings.KeyMode = { EN = "Key mode", TH = "โหมดปุ่ม" }
-Lang.Strings.Keybind = { EN = "Keybind", TH = "ปุ่มลัด" }
-Lang.Strings.SetKey = { EN = "Change key", TH = "เปลี่ยนปุ่ม" }
-Lang.Strings.ClearKey = { EN = "Remove key", TH = "ลบปุ่ม" }
-Lang.Strings.ModeToggleHint = { EN = "Toggle · press to turn on / off", TH = "กดสลับ · กดเพื่อเปิด / ปิด" }
-Lang.Strings.ModeHoldHint = { EN = "Hold · on while the key is held", TH = "กดค้าง · ทำงานตอนกดค้างไว้" }
-Lang.Strings.ModeAlwaysHint = { EN = "Always · always on", TH = "ตลอดเวลา · เปิดตลอด" }
-Lang.Strings.DuplicateKey = { EN = "Key already in use", TH = "ปุ่มนี้ถูกใช้แล้ว" }
-Lang.Strings.DuplicateKeyText = { EN = "%s is also bound to %s", TH = "%s ผูกกับ %s อยู่แล้ว" }
-Lang.Strings.MaxPicked = { EN = "Up to %d selections", TH = "เลือกได้สูงสุด %d รายการ" }
-Lang.Strings.PickColor = { EN = "Pick a color", TH = "เลือกสี" }
-Lang.Strings.Selected = { EN = "%d selected", TH = "เลือก %d รายการ" }
-Lang.Strings.TapConfirm = { EN = "Tap again to confirm", TH = "แตะอีกครั้งเพื่อยืนยัน" }
+Lang.Strings.All = { EN = "All" }
+Lang.Strings.Invert = { EN = "Invert" }
+Lang.Strings.Reset = { EN = "Reset to default" }
+Lang.Strings.Risky = { EN = "Risky" }
+Lang.Strings.Locked = { EN = "Working..." }
+Lang.Strings.ModeToggle = { EN = "Toggle" }
+Lang.Strings.ModeHold = { EN = "Hold" }
+Lang.Strings.ModeAlways = { EN = "Always" }
+Lang.Strings.KeyMode = { EN = "Key mode" }
+Lang.Strings.Keybind = { EN = "Keybind" }
+Lang.Strings.SetKey = { EN = "Change key" }
+Lang.Strings.ClearKey = { EN = "Remove key" }
+Lang.Strings.ModeToggleHint = { EN = "Toggle · press to turn on / off" }
+Lang.Strings.ModeHoldHint = { EN = "Hold · on while the key is held" }
+Lang.Strings.ModeAlwaysHint = { EN = "Always · always on" }
+Lang.Strings.DuplicateKey = { EN = "Key already in use" }
+Lang.Strings.DuplicateKeyText = { EN = "%s is also bound to %s" }
+Lang.Strings.MaxPicked = { EN = "Up to %d selections" }
+Lang.Strings.PickColor = { EN = "Pick a color" }
+Lang.Strings.Selected = { EN = "%d selected" }
+Lang.Strings.TapConfirm = { EN = "Tap again to confirm" }
 
 Widget.Waiting = {}
 Widget.Drag = {}
@@ -6586,10 +6426,6 @@ function WidgetHost:AddSlider(idx, info)
     Widget.Register(slider, idx, info)
     slider:MeasureAside()
     slider:Render(false)
-    Lang.OnChange(slider, function()
-        slider:MeasureAside()
-        slider:Render(false)
-    end)
     return slider
 end
 
@@ -7020,9 +6856,6 @@ function WidgetHost:AddDropdown(idx, info)
     dropdown:ApplyDefault(info.Default)
     Widget.Register(dropdown, idx, info)
     dropdown:WatchPlayers()
-    Lang.OnChange(dropdown, function()
-        dropdown:Render()
-    end)
     return dropdown
 end
 
@@ -7665,9 +7498,6 @@ function KeyPicker.New(row, idx, info, linked)
     end
     table.insert(State.KeyPickers, picker)
     picker:Render()
-    Lang.OnChange(picker, function()
-        picker:Render()
-    end)
     if info.FloatButton and Platform.Touch and linked and linked.Idx and QuickBar.Add then
         QuickBar.Add(linked.Idx)
     end
@@ -8313,11 +8143,11 @@ Config.Widget.Stat = { Size = 26, MinWindow = 10, Speed = 9 }
 Config.Widget.Teleport = { Rows = 6, Chip = 30, TouchChip = 52, Pill = 40, ChipInset = 4 }
 Config.Widget.Confirm = { Hold = 0.9, Style = "Danger" }
 
-Lang.Strings.RunNow = { EN = "Run now", TH = "ทำเลย" }
-Lang.Strings.Mode = { EN = "Mode", TH = "โหมด" }
-Lang.Strings.HoldConfirm = { EN = "Hold to confirm", TH = "กดค้างเพื่อยืนยัน" }
-Lang.Strings.Teleport = { EN = "TP", TH = "วาร์ป" }
-Lang.Strings.PerHour = { EN = "%s/h", TH = "%s/ชม." }
+Lang.Strings.RunNow = { EN = "Run now" }
+Lang.Strings.Mode = { EN = "Mode" }
+Lang.Strings.HoldConfirm = { EN = "Hold to confirm" }
+Lang.Strings.Teleport = { EN = "TP" }
+Lang.Strings.PerHour = { EN = "%s/h" }
 
 ---@return string  "Ink" or "White", whichever reads better on the color
 function Widget.InkFor(color)
@@ -8769,9 +8599,6 @@ function MultiChips:BuildBulk()
         }))
     end
     self:SizeBulk()
-    Lang.OnChange(self, function()
-        self:SizeBulk()
-    end)
 end
 
 ---Re-measures the All / None links, since their words change width with the language.
@@ -9197,9 +9024,6 @@ function Table:BuildHeader()
     end
     self.Header = header
     self:PaintHeader()
-    Lang.OnChange(self, function()
-        self:PaintHeader()
-    end)
 end
 
 function Table:PaintHeader()
@@ -9938,12 +9762,12 @@ Config.Overlay = {
     Store = "m0pu/overlay.json", SaveDelay = 1,
 }
 
-Lang.Strings.OK = { EN = "OK", TH = "ตกลง" }
-Lang.Strings.Cancel = Lang.Strings.Cancel or { EN = "Cancel", TH = "ยกเลิก" }
-Lang.Strings.PromptNumber = { EN = "Enter a number", TH = "ใส่ตัวเลข" }
-Lang.Strings.PromptPick = { EN = "Pick one first", TH = "เลือกก่อน" }
-Lang.Strings.Keybinds = { EN = "KEYBINDS", TH = "ปุ่มลัด" }
-Lang.Strings.NoKeybinds = { EN = "No keys bound", TH = "ยังไม่ได้ตั้งปุ่ม" }
+Lang.Strings.OK = { EN = "OK" }
+Lang.Strings.Cancel = Lang.Strings.Cancel or { EN = "Cancel" }
+Lang.Strings.PromptNumber = { EN = "Enter a number" }
+Lang.Strings.PromptPick = { EN = "Pick one first" }
+Lang.Strings.Keybinds = { EN = "KEYBINDS" }
+Lang.Strings.NoKeybinds = { EN = "No keys bound" }
 
 Popup.Layers = {}
 Popup.Presence = { From = "Top", Distance = 8, Speed = "Fast" }
@@ -11684,7 +11508,7 @@ Config.Chrome = {
         Bubble = 1, DockIcon = 2, Raised = 2, SkyFar = 1, SkyNear = 2, Walker = 2, Particles = 2, Fx = 10, Flash = 5,
     },
     Emblem = 26, Brand = 18, LetterGap = 1, PillHeight = 22, PillPad = 10, PillAlpha = 0.45,
-    LangPill = Vector2.new(78, 28), Pad = 16, Gap = 8, BlockInset = 3,
+    Pad = 16, Gap = 8, BlockInset = 3,
     Header = { Desktop = 112, Tablet = 100, Phone = 58, Landscape = 52 }, HeaderPadY = 10, HeroGap = 4,
     Hero = { Desktop = 32, Tablet = 26 }, HeroStagger = 0.03, HeroDrop = { Height = 14, Damping = 0.5 }, HeroSpace = 0.32,
     DescKick = 14, DescDamping = 0.6,
@@ -11721,36 +11545,35 @@ Config.Chrome = {
 }
 
 
-Lang.Strings.SearchResults = { EN = "Search results", TH = "ผลการค้นหา" }
-Lang.Strings.SearchDesc = { EN = "Tap a result to jump to it", TH = "แตะผลลัพธ์เพื่อไปยังตัวเลือกนั้น" }
-Lang.Strings.More = { EN = "More", TH = "เพิ่มเติม" }
-Lang.Strings.MoreTabs = { EN = "More tabs", TH = "แท็บอื่น" }
-Lang.Strings.PaletteHint = { EN = "Type a feature, Enter to run", TH = "พิมพ์ชื่อฟีเจอร์ แล้วกด Enter" }
-Lang.Strings.On = { EN = "ON", TH = "เปิด" }
-Lang.Strings.Off = { EN = "OFF", TH = "ปิด" }
-Lang.Strings.Transparency = { EN = "Window transparency", TH = "ความโปร่งใสหน้าต่าง" }
-Lang.Strings.ReduceMotion = { EN = "Reduce motion", TH = "ลดแอนิเมชัน" }
-Lang.Strings.ReduceMotionDesc = { EN = "Snap instead of springing", TH = "ขยับทันทีไม่เด้ง" }
-Lang.Strings.FloatSize = { EN = "Mobile button size", TH = "ขนาดปุ่มลอย" }
-Lang.Strings.NotifyPosition = { EN = "Notification corner", TH = "มุมการแจ้งเตือน" }
-Lang.Strings.KeybindList = { EN = "Keybind list", TH = "รายการปุ่มลัด" }
-Lang.Strings.Overlays = { EN = "Overlays", TH = "ส่วนแสดงบนจอ" }
-Lang.Strings.QuickBar = { EN = "Quick bar", TH = "แถบลัด" }
-Lang.Strings.QuickBarDesc = { EN = "Floating buttons for toggles you pick", TH = "ปุ่มลอยสำหรับ toggle ที่เลือก" }
-Lang.Strings.Export = { EN = "Export", TH = "ส่งออก" }
-Lang.Strings.Import = { EN = "Import", TH = "นำเข้า" }
-Lang.Strings.ImportString = { EN = "Config string", TH = "ข้อความคอนฟิก" }
-Lang.Strings.ImportPlaceholder = { EN = "Paste an exported config", TH = "วางคอนฟิกที่ส่งออกไว้" }
-Lang.Strings.Exported = { EN = "Config copied to clipboard", TH = "คัดลอกคอนฟิกแล้ว" }
-Lang.Strings.Imported = { EN = "Config imported", TH = "นำเข้าคอนฟิกแล้ว" }
-Lang.Strings.ImportBroken = { EN = "That config string is not valid", TH = "ข้อความคอนฟิกไม่ถูกต้อง" }
-Lang.Strings.NoClipboard = { EN = "Clipboard is not available", TH = "คัดลอกไม่ได้บน executor นี้" }
-Lang.Strings.ConfirmUnload = { EN = "Tap again to unload", TH = "แตะอีกครั้งเพื่อปิด" }
+Lang.Strings.SearchResults = { EN = "Search results" }
+Lang.Strings.SearchDesc = { EN = "Tap a result to jump to it" }
+Lang.Strings.More = { EN = "More" }
+Lang.Strings.MoreTabs = { EN = "More tabs" }
+Lang.Strings.PaletteHint = { EN = "Type a feature, Enter to run" }
+Lang.Strings.On = { EN = "ON" }
+Lang.Strings.Off = { EN = "OFF" }
+Lang.Strings.Transparency = { EN = "Window transparency" }
+Lang.Strings.ReduceMotion = { EN = "Reduce motion" }
+Lang.Strings.ReduceMotionDesc = { EN = "Snap instead of springing" }
+Lang.Strings.FloatSize = { EN = "Mobile button size" }
+Lang.Strings.NotifyPosition = { EN = "Notification corner" }
+Lang.Strings.KeybindList = { EN = "Keybind list" }
+Lang.Strings.Overlays = { EN = "Overlays" }
+Lang.Strings.QuickBar = { EN = "Quick bar" }
+Lang.Strings.QuickBarDesc = { EN = "Floating buttons for toggles you pick" }
+Lang.Strings.Export = { EN = "Export" }
+Lang.Strings.Import = { EN = "Import" }
+Lang.Strings.ImportString = { EN = "Config string" }
+Lang.Strings.ImportPlaceholder = { EN = "Paste an exported config" }
+Lang.Strings.Exported = { EN = "Config copied to clipboard" }
+Lang.Strings.Imported = { EN = "Config imported" }
+Lang.Strings.ImportBroken = { EN = "That config string is not valid" }
+Lang.Strings.NoClipboard = { EN = "Clipboard is not available" }
+Lang.Strings.ConfirmUnload = { EN = "Tap again to unload" }
 Lang.Strings.NotifyCorners = {
     EN = { "Bottom right", "Top right", "Bottom left", "Top left" },
-    TH = { "ขวาล่าง", "ขวาบน", "ซ้ายล่าง", "ซ้ายบน" },
 }
-Lang.Strings.Version = { EN = "Version", TH = "เวอร์ชัน" }
+Lang.Strings.Version = { EN = "Version" }
 
 Window.Corners = { "BottomRight", "TopRight", "BottomLeft", "TopLeft" }
 
@@ -12092,9 +11915,6 @@ function Window:BuildHero(header)
     self.HeroText = Draw.Text({ Name = "HeroText", Size = UDim2.fromScale(1, 1), TextTruncate = Enum.TextTruncate.AtEnd, TextYAlignment = Enum.TextYAlignment.Bottom, Visible = false, Parent = hero }, "Display", chrome.Hero.Desktop, "TopbarText")
     Draw.Stroke(self.HeroText, "HeroInk", 2)
     self.HeaderDesc = Draw.Text({ Name = "Desc", TextTruncate = Enum.TextTruncate.AtEnd, TextTransparency = 0.15, ZIndex = z.HeaderContent, Parent = header }, "Desc", Util.TextSize("Desc"), "TopbarText")
-    Lang.OnChange(hero, function()
-        self:RenderHero(false)
-    end)
 end
 
 ---@return Frame  pooled letter slot with a Glyph label
@@ -12155,7 +11975,6 @@ end
 function Window:BuildTopButtons()
     local right = self.RightCluster
     self:BuildSearchSlot(right)
-    self:BuildLanguagePill(right)
     self.SearchButton = self:BlockButton("SearchButton", "search", 3, function()
         Search.OpenSheet(self)
     end)
@@ -12239,41 +12058,6 @@ function Window.SizeBlock(entry, size)
     for _, sprite in pairs(entry.Sprites) do
         sprite.Size = UDim2.fromOffset(inner, inner)
     end
-end
-
-function Window:BuildLanguagePill(parent)
-    local size = Config.Chrome.LangPill
-    local pill = Draw.Box("Frame", { Name = "Language", Size = UDim2.fromOffset(size.X, size.Y), BackgroundTransparency = Config.Chrome.PillAlpha, LayoutOrder = 2, Parent = parent }, "Shadow", "Outline", UDim.new(1, 0), 2)
-    local knob = Draw.Box("Frame", { Name = "Knob", Size = UDim2.fromScale(0.5, 1), Parent = pill }, "Coin", "Outline", UDim.new(1, 0), 2)
-    local labels = {}
-    for index, code in ipairs({ "EN", "TH" }) do
-        labels[code] = Draw.Text({
-            Text = code,
-            Position = UDim2.fromScale((index - 1) * 0.5, 0),
-            Size = UDim2.fromScale(0.5, 1),
-            TextXAlignment = Enum.TextXAlignment.Center,
-            ZIndex = Config.Chrome.Z.Raised,
-            Parent = pill,
-        }, "Body", Util.TextSize("Small"), "TopbarText")
-    end
-    local spring = { Damping = Config.Chrome.KnobDamping }
-    local function Render()
-        Motion.Spring(knob, "Position", UDim2.fromScale(State.Language == "TH" and 0.5 or 0, 0), "Fast", spring)
-        for code, label in pairs(labels) do
-            Theme.Bind(label, { TextColor3 = State.Language == code and "Ink" or "TopbarText" })
-        end
-    end
-    Gui.Clickable(pill, {
-        OnClick = function(input)
-            local left = input.Position.X - pill.AbsolutePosition.X < pill.AbsoluteSize.X / 2
-            Library:SetLanguage(left and "EN" or "TH")
-        end,
-    })
-    Lang.OnChange(pill, Render)
-    knob.Position = UDim2.fromScale(State.Language == "TH" and 0.5 or 0, 0)
-    Render()
-    self.LangPill = pill
-    table.insert(self.TopButtons, pill)
 end
 
 function Window:BuildDock()
@@ -13839,17 +13623,6 @@ function Window.ThemeScene(preview, palette, card)
 end
 
 function Window:BuildInterfaceGroup(group)
-    group:AddDropdown("m0puLanguage", {
-        Text = Lang.Strings.Language,
-        Values = { "English", "ไทย" },
-        Default = State.Language == "TH" and "ไทย" or "English",
-        NoSave = true,
-        Callback = function(value)
-            local code = value == "ไทย" and "TH" or "EN"
-            Library:SetLanguage(code)
-            Settings.Set("Language", code)
-        end,
-    })
     group:AddSlider("MarioScale", {
         Text = Lang.Strings.Scale, Min = Config.ScaleRange.Min * 100, Max = Config.ScaleRange.Max * 100,
         Default = State.UserScale * 100, Suffix = "%", Finished = true, NoSave = true,
@@ -14114,8 +13887,8 @@ Config.Intro = {
     StatusSize = 15,
 }
 
-Lang.Strings.IntroSkip = { EN = "Click to skip", TH = "คลิกเพื่อข้าม" }
-Lang.Strings.IntroSkipTouch = { EN = "Tap to skip", TH = "แตะเพื่อข้าม" }
+Lang.Strings.IntroSkip = { EN = "Click to skip" }
+Lang.Strings.IntroSkipTouch = { EN = "Tap to skip" }
 
 Intro.PopIn = { Damping = 0.45 }
 Intro.LetterPop = { Damping = 0.42 }
@@ -15445,11 +15218,10 @@ Keybinds.Modifiers = { LeftControl = true, RightControl = true, LeftShift = true
 
 ---@return {EN: string, TH: string}  Lang.Strings[key] formatted in both languages
 function Lang.Format(key, ...)
-    local spec = Lang.Strings[key] or { EN = key, TH = key }
+    local spec = Lang.Strings[key] or { EN = key }
     local args = table.pack(...)
     return {
         EN = string.format(spec.EN, table.unpack(args, 1, args.n)),
-        TH = string.format(spec.TH or spec.EN, table.unpack(args, 1, args.n)),
     }
 end
 
@@ -15913,7 +15685,7 @@ function Settings.ApplyBoot(options)
     if Settings.Get("Particles") ~= nil then
         Particles.SetEnabled(Settings.Get("Particles") == true)
     end
-    return Settings.Get("Theme", options.Theme or "Overworld"), Settings.Get("Language")
+    return Settings.Get("Theme", options.Theme or "Overworld")
 end
 
 function Settings.ApplyOverlays(window, options)
@@ -15937,7 +15709,7 @@ function Gui.Teardown()
     table.clear(State.KeyPickers)
     table.clear(State.Tasks)
     table.clear(Layout.Dirty)
-    for _, registry in ipairs({ Theme.Bound, Theme.InstanceRenderers, Theme.Renderers, Lang.Bound, Lang.InstanceListeners, Lang.Listeners, Fonts.Texts }) do
+    for _, registry in ipairs({ Theme.Bound, Theme.InstanceRenderers, Theme.Renderers, Lang.Bound, Fonts.Texts }) do
         table.clear(registry)
     end
     State.Drag, State.Binding, State.Popup, State.Sheet, State.Dialog, State.Window = nil, nil, nil, nil, nil, nil
@@ -16523,8 +16295,8 @@ do
 end
 
 
-function Kit.T(english, thai)
-    return Library:T(english, thai)
+function Kit.T(english)
+    return Library:T(english)
 end
 
 function Kit.Connect(signal, handler)
@@ -20657,20 +20429,12 @@ end
 function Library:CreateWindow(options)
     options = options or {}
     Settings.Load()
-    local themeName, savedLanguage = Settings.ApplyBoot(options)
-    local language = savedLanguage or options.Language
-    if language == "Auto" then
-        language = tostring(LocalPlayer.LocaleId):sub(1, 2) == "th" and "TH" or "EN"
-    end
-    State.Language = language == "TH" and "TH" or "EN"
+    local themeName = Settings.ApplyBoot(options)
     Platform.Detect(options.Layout)
     Assets.Configure(Config.DefaultAssets)
     Assets.Configure(options.Assets)
     Gui.Setup()
     Theme.Apply(themeName)
-    if State.Language == "TH" then
-        Fonts.LoadThaiAsync()
-    end
     Configs.SetFolder(options.ConfigFolder or options.Title or "m0pu")
     local window = Window.New(options)
     self.Window = window
@@ -20746,26 +20510,8 @@ function Library.Boot(window, options)
     })
 end
 
-function Library:T(english, thai)
-    return { EN = english, TH = thai or english }
-end
-
-function Library:SetLanguage(code)
-    if code ~= "EN" and code ~= "TH" then
-        return
-    end
-    Lang.Set(code)
-    local option = self.Options.m0puLanguage
-    local label = code == "TH" and "ไทย" or "English"
-    if option and option.Value ~= label and type(option.SetValue) == "function" then
-        option.Silent = true
-        Util.Try(option.SetValue, option, label)
-        option.Silent = nil
-    end
-end
-
-function Library:GetLanguage()
-    return State.Language
+function Library:T(english)
+    return { EN = english }
 end
 
 function Library:SetTheme(name)
@@ -20947,8 +20693,8 @@ function Library:LoadAutoloadConfig()
         return
     end
     local ok, reason = Configs.Load(name)
-    local message = ok and { EN = "Autoloaded: " .. name, TH = "โหลดอัตโนมัติ: " .. name }
-        or { EN = "Autoload failed: " .. tostring(reason), TH = "โหลดอัตโนมัติไม่สำเร็จ: " .. tostring(reason) }
+    local message = ok and { EN = "Autoloaded: " .. name .. name }
+        or { EN = "Autoload failed: " .. tostring(reason) .. tostring(reason) }
     self:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
 end
 
