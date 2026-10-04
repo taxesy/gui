@@ -30,8 +30,17 @@ local Config = {
     ConfigRoot = "m0pu/configs",
     KeyCache = "m0pu/key.txt",
     DefaultAssets = { logo = "https://raw.githubusercontent.com/taxesy/gui/main/logo.png" },
+    FontDir = "m0pu/fonts",
     HttpTimeout = 8,
     AssetWait = 0.25,
+    FontTimeout = 20,
+    PreloadTimeout = 5,
+    ThaiFont = {
+        Family = "MarioKanit",
+        Source = "https://raw.githubusercontent.com/google/fonts/main/ofl/kanit/Kanit-%s.ttf",
+        Weights = { [400] = "Regular", [500] = "Medium", [600] = "SemiBold" },
+    },
+    ThaiSizeBonus = { Body = 2, Desc = 2, Display = 1, Strong = 1 },
     Text = { Title = 26, Header = 22, Group = 16, Label = 15, Desc = 13, Small = 12, Button = 15, Watermark = 13, Section = 13 },
     TextBonus = { Desktop = 0, Tablet = 1, Phone = 1 },
     Platform = { PhoneMinSide = 500, PhoneMaxWidth = 640, Debounce = 0.2 },
@@ -230,6 +239,7 @@ local State = {
     Binding = nil,
     MenuKey = "LeftControl",
     ThemeName = "Overworld",
+    Language = "EN",
     UserScale = 1,
     Touch = false,
     KeyPickers = {},
@@ -243,7 +253,7 @@ local State = {
 local Platform = { Mode = "Desktop", Touch = false, Landscape = false, Console = false, Viewport = Vector2.new(1280, 720), Listeners = {}, ViewportListeners = {} }
 local Util = {}
 local Lang = { Bound = {}, Listeners = setmetatable({}, { __mode = "k" }), InstanceListeners = {} }
-local Fonts = { Texts = {} }
+local Fonts = { Texts = {}, Thai = nil }
 local Assets = { Overrides = {}, Cache = {}, Jobs = {} }
 local Sprite = {}
 local Theme = { Colors = {}, Bound = {}, Renderers = setmetatable({}, { __mode = "k" }), InstanceRenderers = {}, Chain = {} }
@@ -626,6 +636,7 @@ function Util.EnsureFolder(path)
     end
 end
 
+---@return string  keeps UTF-8 (Thai ok), strips path-illegal chars
 function Util.Sanitize(name)
     local clean = tostring(name):gsub('[%c/\\:%*%?"<>|]', ""):gsub("^%s+", ""):gsub("%s+$", "")
     return clean ~= "" and clean or "config"
@@ -679,61 +690,82 @@ function Util.FromHex(text)
 end
 
 Lang.Strings = {
-    Search = { EN = "Search..." },
-    Confirm = { EN = "Click again to confirm" },
-    None = { EN = "None" },
-    NoResults = { EN = "No matches" },
-    Settings = { EN = "Settings" },
-    SettingsDesc = { EN = "Interface and configs" },
-    Interface = { EN = "Interface" },
-
-    ThemeName = { EN = "Theme" },
-    Scale = { EN = "UI scale" },
-    MenuKey = { EN = "Menu key" },
-    Watermark = { EN = "Watermark" },
-    WatermarkDesc = { EN = "Hub name, FPS, ping and play time" },
-    FloatButton = { EN = "Mobile button" },
-    FloatDesc = { EN = "Floating block that opens the menu" },
-    Configs = { EN = "Configs" },
-    ConfigName = { EN = "Config name" },
-    SavedConfigs = { EN = "Saved configs" },
-    Save = { EN = "Save" },
-    Load = { EN = "Load" },
-    Delete = { EN = "Delete" },
-    Refresh = { EN = "Refresh" },
-    ResetAll = { EN = "Reset All" },
-    ResetTab = { EN = "Reset Tab" },
-    ResetDone = { EN = "Options reset: %d" },
-    SetAutoload = { EN = "Load on start" },
-    Autoload = { EN = "Autoload: %s" },
-    PickConfig = { EN = "Type or select a config name first" },
-    NoFileApi = { EN = "This executor cannot save files" },
-    ConfigMissing = { EN = "Config not found" },
-    ConfigBroken = { EN = "Config file is damaged" },
-    About = { EN = "About" },
-    Unload = { EN = "Unload hub" },
-    Rejoin = { EN = "Rejoin" },
-    KeyTitle = { EN = "ENTER KEY" },
-    KeyNote = { EN = "Paste your key to start the adventure." },
-    KeyPlaceholder = { EN = "Paste key here" },
-    GetKey = { EN = "Get key" },
-    CheckKey = { EN = "Check key" },
-    KeyCopied = { EN = "Key link copied" },
-    KeyChecking = { EN = "Checking..." },
-    KeyInvalid = { EN = "Invalid key" },
-    KeyValid = { EN = "Key accepted" },
+    Search = { EN = "Search...", TH = "ค้นหา..." },
+    Confirm = { EN = "Click again to confirm", TH = "กดอีกครั้งเพื่อยืนยัน" },
+    None = { EN = "None", TH = "ไม่มี" },
+    NoResults = { EN = "No matches", TH = "ไม่พบรายการ" },
+    Settings = { EN = "Settings", TH = "ตั้งค่า" },
+    SettingsDesc = { EN = "Interface, language and configs", TH = "หน้าตา ภาษา และคอนฟิก" },
+    Interface = { EN = "Interface", TH = "หน้าตา" },
+    Language = { EN = "Language", TH = "ภาษา" },
+    ThemeName = { EN = "Theme", TH = "ธีม" },
+    Scale = { EN = "UI scale", TH = "ขนาด UI" },
+    MenuKey = { EN = "Menu key", TH = "ปุ่มเปิดเมนู" },
+    Watermark = { EN = "Watermark", TH = "วอเตอร์มาร์ก" },
+    WatermarkDesc = { EN = "Hub name, FPS, ping and play time", TH = "ชื่อฮับ FPS ปิง และเวลาที่เล่น" },
+    FloatButton = { EN = "Mobile button", TH = "ปุ่มลอยมือถือ" },
+    FloatDesc = { EN = "Floating block that opens the menu", TH = "กล่อง ? ลอยสำหรับเปิดปิดเมนู" },
+    Configs = { EN = "Configs", TH = "คอนฟิก" },
+    ConfigName = { EN = "Config name", TH = "ชื่อคอนฟิก" },
+    SavedConfigs = { EN = "Saved configs", TH = "คอนฟิกที่บันทึกไว้" },
+    Save = { EN = "Save", TH = "บันทึก" },
+    Load = { EN = "Load", TH = "โหลด" },
+    Delete = { EN = "Delete", TH = "ลบ" },
+    Refresh = { EN = "Refresh", TH = "รีเฟรช" },
+    ResetAll = { EN = "Reset All", TH = "รีเซ็ตทั้งหมด" },
+    ResetTab = { EN = "Reset Tab", TH = "รีเซ็ตแท็บนี้" },
+    ResetDone = { EN = "Options reset: %d", TH = "รีเซ็ตแล้ว %d ค่า" },
+    SetAutoload = { EN = "Load on start", TH = "โหลดอัตโนมัติ" },
+    Autoload = { EN = "Autoload: %s", TH = "โหลดอัตโนมัติ: %s" },
+    PickConfig = { EN = "Type or select a config name first", TH = "พิมพ์หรือเลือกชื่อคอนฟิกก่อน" },
+    NoFileApi = { EN = "This executor cannot save files", TH = "executor นี้บันทึกไฟล์ไม่ได้" },
+    ConfigMissing = { EN = "Config not found", TH = "ไม่พบคอนฟิก" },
+    ConfigBroken = { EN = "Config file is damaged", TH = "ไฟล์คอนฟิกเสีย" },
+    About = { EN = "About", TH = "เกี่ยวกับ" },
+    Unload = { EN = "Unload hub", TH = "ปิดสคริปต์" },
+    Rejoin = { EN = "Rejoin", TH = "เข้าเซิร์ฟใหม่" },
+    KeyTitle = { EN = "ENTER KEY", TH = "ใส่คีย์" },
+    KeyNote = { EN = "Paste your key to start the adventure.", TH = "วางคีย์เพื่อเริ่มผจญภัย" },
+    KeyPlaceholder = { EN = "Paste key here", TH = "วางคีย์ที่นี่" },
+    GetKey = { EN = "Get key", TH = "รับคีย์" },
+    CheckKey = { EN = "Check key", TH = "ตรวจคีย์" },
+    KeyCopied = { EN = "Key link copied", TH = "คัดลอกลิงก์รับคีย์แล้ว" },
+    KeyChecking = { EN = "Checking...", TH = "กำลังตรวจ..." },
+    KeyInvalid = { EN = "Invalid key", TH = "คีย์ไม่ถูกต้อง" },
+    KeyValid = { EN = "Key accepted", TH = "คีย์ถูกต้อง" },
     IntroSteps = {
         EN = { "Warming up the warp pipe...", "Collecting coins...", "Building the castle...", "Let's-a go!" },
+        TH = { "กำลังอุ่นท่อวาร์ป...", "กำลังเก็บเหรียญ...", "กำลังสร้างปราสาท...", "ลุยกันเลย!" },
     },
-    Ready = { EN = "Ready. Press %s to toggle the menu." },
-    ReadyTouch = { EN = "Ready. Tap the ? block to toggle the menu." },
-    Hidden = { EN = "Menu hidden. Press %s to open." },
-    Session = { EN = "TIME" },
-    Empty = { EN = "Nothing here yet" },
-    Particles = { EN = "Ambient particles" },
-    ParticlesDesc = { EN = "Floating sparkles behind the menu" },
-    Device = { EN = "Device: %s" },
+    Ready = { EN = "Ready. Press %s to toggle the menu.", TH = "พร้อมแล้ว กด %s เพื่อเปิดปิดเมนู" },
+    ReadyTouch = { EN = "Ready. Tap the ? block to toggle the menu.", TH = "พร้อมแล้ว แตะกล่อง ? เพื่อเปิดปิดเมนู" },
+    Hidden = { EN = "Menu hidden. Press %s to open.", TH = "ซ่อนเมนูแล้ว กด %s เพื่อเปิด" },
+    Session = { EN = "TIME", TH = "เวลา" },
+    Empty = { EN = "Nothing here yet", TH = "ยังไม่มีรายการ" },
+    Particles = { EN = "Ambient particles", TH = "ละอองตกแต่ง" },
+    ParticlesDesc = { EN = "Floating sparkles behind the menu", TH = "ประกายลอยด้านหลังเมนู" },
+    Device = { EN = "Device: %s", TH = "อุปกรณ์: %s" },
 }
+
+function Lang.HasThai(text)
+    return text:find("\224[\184\185]") ~= nil
+end
+
+---@param spec any     string, { EN, TH } or "English · ไทย"
+---@return string     text in the current language
+function Lang.Resolve(spec)
+    if type(spec) == "table" then
+        return spec[State.Language] or spec.EN or spec.TH or ""
+    end
+    if type(spec) ~= "string" then
+        return spec == nil and "" or tostring(spec)
+    end
+    local english, thai = spec:match("^(.-)%s+·%s+(.+)$")
+    if english and Lang.HasThai(thai) then
+        return State.Language == "TH" and thai or english
+    end
+    return spec
+end
 
 function Lang.Get(key, ...)
     local text = Lang.Resolve(Lang.Strings[key] or key)
@@ -745,7 +777,7 @@ end
 
 function Lang.SearchText(spec)
     if type(spec) == "table" then
-        return tostring(spec.EN or spec[1] or ""):lower()
+        return ((spec.EN or "") .. " " .. (spec.TH or "")):lower()
     end
     return tostring(spec or ""):lower()
 end
@@ -767,35 +799,63 @@ function Lang.OnChange(owner, callback)
     registry[owner] = callback
 end
 
+function Lang.Set(code)
+    if code ~= "EN" and code ~= "TH" then
+        return
+    end
+    State.Language = code
+    if code == "TH" then
+        Fonts.LoadThaiAsync()
+    end
+    Theme.Prune()
+    for inst, binding in pairs(Lang.Bound) do
+        Lang.Apply(inst, binding)
+    end
+    Fonts.ApplyAll()
+    for _, registry in ipairs({ Lang.Listeners, Lang.InstanceListeners }) do
+        for _, callback in pairs(registry) do
+            Util.Try(callback, code)
+        end
+    end
+    Layout.MarkAll()
+end
+
 Fonts.Latin = {
-    Display = Enum.Font.LuckiestGuy,
-    Body = Enum.Font.FredokaOne,
-    Desc = Enum.Font.BuilderSansMedium,
-    Strong = Enum.Font.BuilderSansBold,
-    Logo = Enum.Font.LuckiestGuy,
-    Glyph = Enum.Font.BuilderSansBold,
+    Display = Enum.Font.LuckiestGuy, Body = Enum.Font.FredokaOne, Desc = Enum.Font.BuilderSansMedium,
+    Strong = Enum.Font.BuilderSansBold, Logo = Enum.Font.LuckiestGuy, Glyph = Enum.Font.BuilderSansBold,
 }
+Fonts.ThaiWeights = { Display = Enum.FontWeight.SemiBold, Body = Enum.FontWeight.Medium, Desc = Enum.FontWeight.Regular, Strong = Enum.FontWeight.SemiBold }
+Fonts.ThaiFallback = { Display = Enum.Font.BuilderSansBold, Body = Enum.Font.BuilderSansBold, Desc = Enum.Font.BuilderSansMedium, Strong = Enum.Font.BuilderSansBold }
 Fonts.Faces = {}
 
+---@return Font  Kanit for Thai once loaded
 function Fonts.Face(kind)
-    local key = tostring(kind)
+    local thai = State.Language == "TH" and Fonts.ThaiWeights[kind] ~= nil
+    local key = (thai and (Fonts.Thai and "TH" or "THF") or "EN") .. kind
     local cached = Fonts.Faces[key]
     if cached then
         return cached
     end
-    local face = Font.fromEnum(Fonts.Latin[kind] or Fonts.Latin.Body)
+    local face
+    if thai and Fonts.Thai then
+        face = Font.new(Fonts.Thai, Fonts.ThaiWeights[kind])
+    elseif thai then
+        face = Font.fromEnum(Fonts.ThaiFallback[kind])
+    else
+        face = Font.fromEnum(Fonts.Latin[kind] or Fonts.Latin.Body)
+    end
     Fonts.Faces[key] = face
     return face
 end
 
-function Fonts.Size(_, base)
-    return base
+function Fonts.Size(kind, base)
+    return base + (State.Language == "TH" and Config.ThaiSizeBonus[kind] or 0)
 end
 
 function Fonts.Style(label, kind, base)
     Fonts.Texts[label] = { Kind = kind, Base = base }
     label.FontFace = Fonts.Face(kind)
-    label.TextSize = base
+    label.TextSize = Fonts.Size(kind, base)
 end
 
 function Fonts.ApplyAll()
@@ -803,7 +863,101 @@ function Fonts.ApplyAll()
     Layout.MeasuredCount = 0
     for label, style in pairs(Fonts.Texts) do
         label.FontFace = Fonts.Face(style.Kind)
-        label.TextSize = style.Base
+        label.TextSize = Fonts.Size(style.Kind, style.Base)
+    end
+end
+
+function Fonts.FetchFace(weight, name)
+    local path = Config.FontDir .. "/kanit-" .. weight .. ".ttf"
+    local cached = Util.SafeFile(isfile, path) == true and Util.SafeFile(readfile, path)
+    if type(cached) ~= "string" or cached:sub(1, 4) ~= "\0\1\0\0" then
+        local body = Util.HttpGet(string.format(Config.ThaiFont.Source, name))
+        if type(body) ~= "string" or body:sub(1, 4) ~= "\0\1\0\0" then
+            return nil
+        end
+        Util.SafeFile(writefile, path, body)
+        local check = Util.SafeFile(readfile, path)
+        if type(check) ~= "string" or #check ~= #body then
+            Fonts.Disable("binary write")
+            return nil
+        end
+    end
+    local asset = Util.CustomAsset(path)
+    if not asset then
+        Fonts.Disable("getcustomasset ttf")
+        return nil
+    end
+    return string.format('{"name":"W%d","weight":%d,"style":"normal","assetId":"%s"}', weight, weight, asset)
+end
+
+function Fonts.Disable(reason)
+    Fonts.Broken = true
+    Util.SafeFile(writefile, Config.FontDir .. "/disabled", tostring(reason))
+    warn("[m0pu] Thai font off: " .. tostring(reason))
+end
+
+function Fonts.LoadThai()
+    if Fonts.Thai or Fonts.Broken or not Util.FileApi() or type(getcustomasset) ~= "function" then
+        return Fonts.Thai ~= nil
+    end
+    if Util.SafeFile(isfile, Config.FontDir .. "/disabled") == true then
+        Fonts.Broken = true
+        return false
+    end
+    Util.EnsureFolder(Config.FontDir)
+    local faces = {}
+    for weight, name in pairs(Config.ThaiFont.Weights) do
+        if Fonts.Broken or Library.Unloaded then
+            return false
+        end
+        table.insert(faces, Fonts.FetchFace(weight, name))
+    end
+    if #faces == 0 then
+        return false
+    end
+    local descriptor = Config.FontDir .. "/kanit.font"
+    if Util.SafeFile(isfile, descriptor) == true then
+        Util.SafeFile(delfile, descriptor)
+    end
+    Util.SafeFile(writefile, descriptor, '{"name":"' .. Config.ThaiFont.Family .. '","faces":[' .. table.concat(faces, ",") .. "]}")
+    local family = Util.CustomAsset(descriptor)
+    if not family then
+        Fonts.Disable("getcustomasset family")
+        return false
+    end
+    Fonts.Thai = family
+    table.clear(Fonts.Faces)
+    if State.Language == "TH" and State.Gui then
+        Fonts.ApplyAll()
+        Layout.MarkAll()
+    end
+    task.spawn(Fonts.Preload)
+    return true
+end
+
+function Fonts.LoadThaiAsync()
+    if Fonts.Thai or Fonts.Broken or Fonts.Loading then
+        return
+    end
+    Fonts.Loading = true
+    task.spawn(function()
+        local finished = Util.Await(Config.FontTimeout, Fonts.LoadThai)
+        Fonts.Loading = false
+        if not finished and not Fonts.Thai and not Fonts.Broken and not Library.Unloaded then
+            Fonts.Disable("timeout")
+        end
+    end)
+end
+
+function Fonts.Preload()
+    local provider = game:GetService("ContentProvider")
+    local probes = {}
+    for _, weight in pairs(Fonts.ThaiWeights) do
+        table.insert(probes, Draw.New("TextLabel", { Text = "ก", FontFace = Font.new(Fonts.Thai, weight) }))
+    end
+    Util.Await(Config.PreloadTimeout, provider.PreloadAsync, provider, probes)
+    for _, probe in ipairs(probes) do
+        probe:Destroy()
     end
 end
 
@@ -1521,6 +1675,11 @@ Sprite.Art.knife = {
     "..........k.", ".........kwk", "........kwek", ".......kwek.",
     "......kwek..", ".....kwek...", "...kkwek....", "..kqyek.....",
     "...kqk......", "..komk......", ".kBmk.......", "..kk........",
+}
+Sprite.Art.language = {
+    "....kkkk....", "..kkcccbkk..", ".kccgggbcbk.", ".kbggggbbCk.",
+    "kcbbggbgggbk", "kbbbbbbgggCk", "kbbbbbbbggCk", "kbggbbbbbbCk",
+    ".kbgggbbbCk.", ".kbCggbbCCk.", "..kkbCCCkk..", "....kkkk....",
 }
 Sprite.Art.left = {
     ".....k......", "....kbk.....", "...kcCk.....", "..kcbCkkkk..",
@@ -2407,6 +2566,7 @@ Sprite.Alias["duration"] = "timer"
 Sprite.Alias["dye"] = "palette"
 Sprite.Alias["dynamite"] = "bomb"
 Sprite.Alias["earth"] = "map"
+Sprite.Alias["earth-lock"] = "language"
 Sprite.Alias["east"] = "right"
 Sprite.Alias["eat"] = "mushroom"
 Sprite.Alias["edit-2"] = "edit"
@@ -2472,6 +2632,7 @@ Sprite.Alias["firerate"] = "rapidfire"
 Sprite.Alias["first-aid"] = "heal"
 Sprite.Alias["fishing"] = "fish"
 Sprite.Alias["fishing-rod"] = "fish"
+Sprite.Alias["flag-th"] = "language"
 Sprite.Alias["flag-triangle-right"] = "flag"
 Sprite.Alias["flame"] = "fire"
 Sprite.Alias["flames"] = "fire"
@@ -2669,6 +2830,9 @@ Sprite.Alias["koopa"] = "shell"
 Sprite.Alias["label"] = "nametag"
 Sprite.Alias["lag"] = "lowfps"
 Sprite.Alias["lamp"] = "fullbright"
+Sprite.Alias["lang"] = "language"
+Sprite.Alias["languages"] = "language"
+Sprite.Alias["languages-alt"] = "language"
 Sprite.Alias["laptop"] = "pc"
 Sprite.Alias["laugh"] = "troll"
 Sprite.Alias["launch"] = "fling"
@@ -2708,6 +2872,7 @@ Sprite.Alias["loader"] = "load"
 Sprite.Alias["loading"] = "load"
 Sprite.Alias["lobby"] = "home"
 Sprite.Alias["local"] = "player"
+Sprite.Alias["locale"] = "language"
 Sprite.Alias["localplayer"] = "player"
 Sprite.Alias["locate"] = "crosshair"
 Sprite.Alias["locate-fixed"] = "crosshair"
@@ -3178,6 +3343,7 @@ Sprite.Alias["tracers"] = "tracer"
 Sprite.Alias["tracker"] = "stats"
 Sprite.Alias["trade"] = "sell"
 Sprite.Alias["train"] = "upgrade"
+Sprite.Alias["translate"] = "language"
 Sprite.Alias["trash-2"] = "trash"
 Sprite.Alias["trash2"] = "trash"
 Sprite.Alias["treasure"] = "chest"
@@ -3602,6 +3768,7 @@ function Draw.List(parent, gap, horizontal, alignX, alignY)
     })
 end
 
+---@param spec any?  text spec, bound to the language system
 function Draw.Text(props, font, size, token, spec)
     props.BackgroundTransparency = 1
     props.Text = props.Text or ""
@@ -4684,7 +4851,7 @@ end
 ---@return Vector2  text bounds wrapped at width (cached)
 function Layout.Measure(text, size, fontKind, width)
     width = math.max(1, math.floor(width))
-    local key = table.concat({ text, size, fontKind, width }, "\0")
+    local key = table.concat({ text, size, fontKind, width, State.Language }, "\0")
     local cached = Layout.Measured[key]
     if cached then
         return cached
@@ -4721,6 +4888,7 @@ end
 Layout.TextService = game:GetService("TextService")
 Layout.EnumFonts = {}
 
+---@return Enum.Font?  the enum behind a built-in face; nil for a custom face (Thai), which needs the probe label
 function Layout.EnumFont(face)
     local cache = Layout.EnumFonts
     local key = face.Family .. "|" .. face.Weight.Name .. "|" .. face.Style.Name
@@ -4738,6 +4906,7 @@ function Layout.EnumFont(face)
     return cached or nil
 end
 
+---Off-screen TextLabel: GetTextSize only takes Enum.Font, so custom Thai faces need a real label.
 function Layout.Probe()
     local host = Layout.ProbeHost()
     local probe = Layout.ProbeLabel
@@ -5389,27 +5558,27 @@ Config.Widget = {
     },
 }
 
-Lang.Strings.All = { EN = "All" }
-Lang.Strings.Invert = { EN = "Invert" }
-Lang.Strings.Reset = { EN = "Reset to default" }
-Lang.Strings.Risky = { EN = "Risky" }
-Lang.Strings.Locked = { EN = "Working..." }
-Lang.Strings.ModeToggle = { EN = "Toggle" }
-Lang.Strings.ModeHold = { EN = "Hold" }
-Lang.Strings.ModeAlways = { EN = "Always" }
-Lang.Strings.KeyMode = { EN = "Key mode" }
-Lang.Strings.Keybind = { EN = "Keybind" }
-Lang.Strings.SetKey = { EN = "Change key" }
-Lang.Strings.ClearKey = { EN = "Remove key" }
-Lang.Strings.ModeToggleHint = { EN = "Toggle · press to turn on / off" }
-Lang.Strings.ModeHoldHint = { EN = "Hold · on while the key is held" }
-Lang.Strings.ModeAlwaysHint = { EN = "Always · always on" }
-Lang.Strings.DuplicateKey = { EN = "Key already in use" }
-Lang.Strings.DuplicateKeyText = { EN = "%s is also bound to %s" }
-Lang.Strings.MaxPicked = { EN = "Up to %d selections" }
-Lang.Strings.PickColor = { EN = "Pick a color" }
-Lang.Strings.Selected = { EN = "%d selected" }
-Lang.Strings.TapConfirm = { EN = "Tap again to confirm" }
+Lang.Strings.All = { EN = "All", TH = "ทั้งหมด" }
+Lang.Strings.Invert = { EN = "Invert", TH = "สลับ" }
+Lang.Strings.Reset = { EN = "Reset to default", TH = "คืนค่าเริ่มต้น" }
+Lang.Strings.Risky = { EN = "Risky", TH = "เสี่ยง" }
+Lang.Strings.Locked = { EN = "Working...", TH = "กำลังทำงาน..." }
+Lang.Strings.ModeToggle = { EN = "Toggle", TH = "กดสลับ" }
+Lang.Strings.ModeHold = { EN = "Hold", TH = "กดค้าง" }
+Lang.Strings.ModeAlways = { EN = "Always", TH = "ตลอดเวลา" }
+Lang.Strings.KeyMode = { EN = "Key mode", TH = "โหมดปุ่ม" }
+Lang.Strings.Keybind = { EN = "Keybind", TH = "ปุ่มลัด" }
+Lang.Strings.SetKey = { EN = "Change key", TH = "เปลี่ยนปุ่ม" }
+Lang.Strings.ClearKey = { EN = "Remove key", TH = "ลบปุ่ม" }
+Lang.Strings.ModeToggleHint = { EN = "Toggle · press to turn on / off", TH = "กดสลับ · กดเพื่อเปิด / ปิด" }
+Lang.Strings.ModeHoldHint = { EN = "Hold · on while the key is held", TH = "กดค้าง · ทำงานตอนกดค้างไว้" }
+Lang.Strings.ModeAlwaysHint = { EN = "Always · always on", TH = "ตลอดเวลา · เปิดตลอด" }
+Lang.Strings.DuplicateKey = { EN = "Key already in use", TH = "ปุ่มนี้ถูกใช้แล้ว" }
+Lang.Strings.DuplicateKeyText = { EN = "%s is also bound to %s", TH = "%s ผูกกับ %s อยู่แล้ว" }
+Lang.Strings.MaxPicked = { EN = "Up to %d selections", TH = "เลือกได้สูงสุด %d รายการ" }
+Lang.Strings.PickColor = { EN = "Pick a color", TH = "เลือกสี" }
+Lang.Strings.Selected = { EN = "%d selected", TH = "เลือก %d รายการ" }
+Lang.Strings.TapConfirm = { EN = "Tap again to confirm", TH = "แตะอีกครั้งเพื่อยืนยัน" }
 
 Widget.Waiting = {}
 Widget.Drag = {}
@@ -5523,7 +5692,7 @@ end
 ---@return any  stable compare/save key: a T() table collapses to its English text
 function Widget.Key(value)
     if type(value) == "table" then
-        return value.EN or value[1]
+        return value.EN or value.TH or value[1]
     end
     return value
 end
@@ -5557,7 +5726,7 @@ function Widget.SelectSet(values, picks, max)
     if type(picks) ~= "table" then
         return set
     end
-    if type(picks.EN) == "string" then
+    if type(picks.EN) == "string" or type(picks.TH) == "string" then
         picks = { picks }
     end
     local wanted = {}
@@ -6914,6 +7083,7 @@ function Dropdown:Normalize(value)
     if self.Multi then
         return Widget.SelectSet(self.Values, value, self.Max)
     end
+    if type(value) == "table" and value.EN == nil and value.TH == nil then
         value = value[1]
     end
     local entry = Widget.Canonical(self.Values, value)
@@ -7350,7 +7520,7 @@ end
 
 ---@return table  info table with Callback resolved (Callback, then V1 Func, then the positional callback)
 function Button.Normalize(info, callback)
-    if type(info) ~= "table" or info.EN then
+    if type(info) ~= "table" or info.EN or info.TH then
         info = { Text = info }
     end
     info.Callback = info.Callback or info.Func or callback
@@ -8143,11 +8313,11 @@ Config.Widget.Stat = { Size = 26, MinWindow = 10, Speed = 9 }
 Config.Widget.Teleport = { Rows = 6, Chip = 30, TouchChip = 52, Pill = 40, ChipInset = 4 }
 Config.Widget.Confirm = { Hold = 0.9, Style = "Danger" }
 
-Lang.Strings.RunNow = { EN = "Run now" }
-Lang.Strings.Mode = { EN = "Mode" }
-Lang.Strings.HoldConfirm = { EN = "Hold to confirm" }
-Lang.Strings.Teleport = { EN = "TP" }
-Lang.Strings.PerHour = { EN = "%s/h" }
+Lang.Strings.RunNow = { EN = "Run now", TH = "ทำเลย" }
+Lang.Strings.Mode = { EN = "Mode", TH = "โหมด" }
+Lang.Strings.HoldConfirm = { EN = "Hold to confirm", TH = "กดค้างเพื่อยืนยัน" }
+Lang.Strings.Teleport = { EN = "TP", TH = "วาร์ป" }
+Lang.Strings.PerHour = { EN = "%s/h", TH = "%s/ชม." }
 
 ---@return string  "Ink" or "White", whichever reads better on the color
 function Widget.InkFor(color)
@@ -8604,6 +8774,7 @@ function MultiChips:BuildBulk()
     end)
 end
 
+---Re-measures the All / None links, since their words change width with the language.
 function MultiChips:SizeBulk()
     local size = Util.TextSize("Small")
     local width = 0
@@ -9006,7 +9177,7 @@ end
 function Table.NormalizeColumns(columns)
     local normalized = {}
     for index, column in ipairs(columns or {}) do
-        local shorthand = type(column) ~= "table" or column.EN ~= nil
+        local shorthand = type(column) ~= "table" or column.EN ~= nil or column.TH ~= nil
         normalized[index] = shorthand and { Key = index, Text = column } or column
     end
     return normalized
@@ -9405,7 +9576,7 @@ end
 ---@return string?  same key for equal categories even when each entry built its own T() table
 function TeleportList.CategoryKey(spec)
     if type(spec) == "table" then
-        return tostring(spec.EN) .. "|" .. tostring(spec.EN)
+        return tostring(spec.EN) .. "|" .. tostring(spec.TH)
     end
     return spec ~= nil and tostring(spec) or nil
 end
@@ -9709,7 +9880,7 @@ function Feature.AttachNow(container, toggle, now)
     local spec = now
     if type(now) == "function" then
         spec = { Func = now }
-    elseif type(now) ~= "table" or now.EN then
+    elseif type(now) ~= "table" or now.EN or now.TH then
         spec = { Text = now }
     end
     toggle.Now = Button.Create(container, {
@@ -9767,12 +9938,12 @@ Config.Overlay = {
     Store = "m0pu/overlay.json", SaveDelay = 1,
 }
 
-Lang.Strings.OK = { EN = "OK" }
-Lang.Strings.Cancel = Lang.Strings.Cancel or { EN = "Cancel" }
-Lang.Strings.PromptNumber = { EN = "Enter a number" }
-Lang.Strings.PromptPick = { EN = "Pick one first" }
-Lang.Strings.Keybinds = { EN = "KEYBINDS" }
-Lang.Strings.NoKeybinds = { EN = "No keys bound" }
+Lang.Strings.OK = { EN = "OK", TH = "ตกลง" }
+Lang.Strings.Cancel = Lang.Strings.Cancel or { EN = "Cancel", TH = "ยกเลิก" }
+Lang.Strings.PromptNumber = { EN = "Enter a number", TH = "ใส่ตัวเลข" }
+Lang.Strings.PromptPick = { EN = "Pick one first", TH = "เลือกก่อน" }
+Lang.Strings.Keybinds = { EN = "KEYBINDS", TH = "ปุ่มลัด" }
+Lang.Strings.NoKeybinds = { EN = "No keys bound", TH = "ยังไม่ได้ตั้งปุ่ม" }
 
 Popup.Layers = {}
 Popup.Presence = { From = "Top", Distance = 8, Speed = "Fast" }
@@ -11513,6 +11684,7 @@ Config.Chrome = {
         Bubble = 1, DockIcon = 2, Raised = 2, SkyFar = 1, SkyNear = 2, Walker = 2, Particles = 2, Fx = 10, Flash = 5,
     },
     Emblem = 26, Brand = 18, LetterGap = 1, PillHeight = 22, PillPad = 10, PillAlpha = 0.45,
+    LangPill = Vector2.new(78, 28), Pad = 16, Gap = 8, BlockInset = 3,
     Header = { Desktop = 112, Tablet = 100, Phone = 58, Landscape = 52 }, HeaderPadY = 10, HeroGap = 4,
     Hero = { Desktop = 32, Tablet = 26 }, HeroStagger = 0.03, HeroDrop = { Height = 14, Damping = 0.5 }, HeroSpace = 0.32,
     DescKick = 14, DescDamping = 0.6,
@@ -11549,35 +11721,36 @@ Config.Chrome = {
 }
 
 
-Lang.Strings.SearchResults = { EN = "Search results" }
-Lang.Strings.SearchDesc = { EN = "Tap a result to jump to it" }
-Lang.Strings.More = { EN = "More" }
-Lang.Strings.MoreTabs = { EN = "More tabs" }
-Lang.Strings.PaletteHint = { EN = "Type a feature, Enter to run" }
-Lang.Strings.On = { EN = "ON" }
-Lang.Strings.Off = { EN = "OFF" }
-Lang.Strings.Transparency = { EN = "Window transparency" }
-Lang.Strings.ReduceMotion = { EN = "Reduce motion" }
-Lang.Strings.ReduceMotionDesc = { EN = "Snap instead of springing" }
-Lang.Strings.FloatSize = { EN = "Mobile button size" }
-Lang.Strings.NotifyPosition = { EN = "Notification corner" }
-Lang.Strings.KeybindList = { EN = "Keybind list" }
-Lang.Strings.Overlays = { EN = "Overlays" }
-Lang.Strings.QuickBar = { EN = "Quick bar" }
-Lang.Strings.QuickBarDesc = { EN = "Floating buttons for toggles you pick" }
-Lang.Strings.Export = { EN = "Export" }
-Lang.Strings.Import = { EN = "Import" }
-Lang.Strings.ImportString = { EN = "Config string" }
-Lang.Strings.ImportPlaceholder = { EN = "Paste an exported config" }
-Lang.Strings.Exported = { EN = "Config copied to clipboard" }
-Lang.Strings.Imported = { EN = "Config imported" }
-Lang.Strings.ImportBroken = { EN = "That config string is not valid" }
-Lang.Strings.NoClipboard = { EN = "Clipboard is not available" }
-Lang.Strings.ConfirmUnload = { EN = "Tap again to unload" }
+Lang.Strings.SearchResults = { EN = "Search results", TH = "ผลการค้นหา" }
+Lang.Strings.SearchDesc = { EN = "Tap a result to jump to it", TH = "แตะผลลัพธ์เพื่อไปยังตัวเลือกนั้น" }
+Lang.Strings.More = { EN = "More", TH = "เพิ่มเติม" }
+Lang.Strings.MoreTabs = { EN = "More tabs", TH = "แท็บอื่น" }
+Lang.Strings.PaletteHint = { EN = "Type a feature, Enter to run", TH = "พิมพ์ชื่อฟีเจอร์ แล้วกด Enter" }
+Lang.Strings.On = { EN = "ON", TH = "เปิด" }
+Lang.Strings.Off = { EN = "OFF", TH = "ปิด" }
+Lang.Strings.Transparency = { EN = "Window transparency", TH = "ความโปร่งใสหน้าต่าง" }
+Lang.Strings.ReduceMotion = { EN = "Reduce motion", TH = "ลดแอนิเมชัน" }
+Lang.Strings.ReduceMotionDesc = { EN = "Snap instead of springing", TH = "ขยับทันทีไม่เด้ง" }
+Lang.Strings.FloatSize = { EN = "Mobile button size", TH = "ขนาดปุ่มลอย" }
+Lang.Strings.NotifyPosition = { EN = "Notification corner", TH = "มุมการแจ้งเตือน" }
+Lang.Strings.KeybindList = { EN = "Keybind list", TH = "รายการปุ่มลัด" }
+Lang.Strings.Overlays = { EN = "Overlays", TH = "ส่วนแสดงบนจอ" }
+Lang.Strings.QuickBar = { EN = "Quick bar", TH = "แถบลัด" }
+Lang.Strings.QuickBarDesc = { EN = "Floating buttons for toggles you pick", TH = "ปุ่มลอยสำหรับ toggle ที่เลือก" }
+Lang.Strings.Export = { EN = "Export", TH = "ส่งออก" }
+Lang.Strings.Import = { EN = "Import", TH = "นำเข้า" }
+Lang.Strings.ImportString = { EN = "Config string", TH = "ข้อความคอนฟิก" }
+Lang.Strings.ImportPlaceholder = { EN = "Paste an exported config", TH = "วางคอนฟิกที่ส่งออกไว้" }
+Lang.Strings.Exported = { EN = "Config copied to clipboard", TH = "คัดลอกคอนฟิกแล้ว" }
+Lang.Strings.Imported = { EN = "Config imported", TH = "นำเข้าคอนฟิกแล้ว" }
+Lang.Strings.ImportBroken = { EN = "That config string is not valid", TH = "ข้อความคอนฟิกไม่ถูกต้อง" }
+Lang.Strings.NoClipboard = { EN = "Clipboard is not available", TH = "คัดลอกไม่ได้บน executor นี้" }
+Lang.Strings.ConfirmUnload = { EN = "Tap again to unload", TH = "แตะอีกครั้งเพื่อปิด" }
 Lang.Strings.NotifyCorners = {
     EN = { "Bottom right", "Top right", "Bottom left", "Top left" },
+    TH = { "ขวาล่าง", "ขวาบน", "ซ้ายล่าง", "ซ้ายบน" },
 }
-Lang.Strings.Version = { EN = "Version" }
+Lang.Strings.Version = { EN = "Version", TH = "เวอร์ชัน" }
 
 Window.Corners = { "BottomRight", "TopRight", "BottomLeft", "TopLeft" }
 
@@ -11933,6 +12106,7 @@ function Window.MakeLetter()
 end
 
 ---Tab name in the bouncy title font, one frame per letter so they can drop in one by one.
+---Thai has no Logo glyphs, so it falls back to one Display label.
 function Window:RenderHero(animate)
     local pool = Draw.Pool("HeroLetter", Window.MakeLetter)
     for _, slot in ipairs(self.HeroLetters) do
@@ -11942,7 +12116,13 @@ function Window:RenderHero(animate)
     table.clear(self.HeroLetters)
     local text = Lang.Resolve(self.HeroSpec or "")
     local size = self:HeroSize()
-    self.HeroText.Visible = false
+    local thai = Lang.HasThai(text)
+    self.HeroText.Visible = thai
+    if thai then
+        self.HeroText.Text = text
+        Fonts.Style(self.HeroText, "Display", size)
+        return
+    end
     for char in text:gmatch(utf8.charpattern) do
         local slot = pool.Acquire()
         local width = char == " " and math.floor(size * Config.Chrome.HeroSpace) or Layout.Measure(char, size, "Logo", 400).X
@@ -11975,6 +12155,7 @@ end
 function Window:BuildTopButtons()
     local right = self.RightCluster
     self:BuildSearchSlot(right)
+    self:BuildLanguagePill(right)
     self.SearchButton = self:BlockButton("SearchButton", "search", 3, function()
         Search.OpenSheet(self)
     end)
@@ -12058,6 +12239,41 @@ function Window.SizeBlock(entry, size)
     for _, sprite in pairs(entry.Sprites) do
         sprite.Size = UDim2.fromOffset(inner, inner)
     end
+end
+
+function Window:BuildLanguagePill(parent)
+    local size = Config.Chrome.LangPill
+    local pill = Draw.Box("Frame", { Name = "Language", Size = UDim2.fromOffset(size.X, size.Y), BackgroundTransparency = Config.Chrome.PillAlpha, LayoutOrder = 2, Parent = parent }, "Shadow", "Outline", UDim.new(1, 0), 2)
+    local knob = Draw.Box("Frame", { Name = "Knob", Size = UDim2.fromScale(0.5, 1), Parent = pill }, "Coin", "Outline", UDim.new(1, 0), 2)
+    local labels = {}
+    for index, code in ipairs({ "EN", "TH" }) do
+        labels[code] = Draw.Text({
+            Text = code,
+            Position = UDim2.fromScale((index - 1) * 0.5, 0),
+            Size = UDim2.fromScale(0.5, 1),
+            TextXAlignment = Enum.TextXAlignment.Center,
+            ZIndex = Config.Chrome.Z.Raised,
+            Parent = pill,
+        }, "Body", Util.TextSize("Small"), "TopbarText")
+    end
+    local spring = { Damping = Config.Chrome.KnobDamping }
+    local function Render()
+        Motion.Spring(knob, "Position", UDim2.fromScale(State.Language == "TH" and 0.5 or 0, 0), "Fast", spring)
+        for code, label in pairs(labels) do
+            Theme.Bind(label, { TextColor3 = State.Language == code and "Ink" or "TopbarText" })
+        end
+    end
+    Gui.Clickable(pill, {
+        OnClick = function(input)
+            local left = input.Position.X - pill.AbsolutePosition.X < pill.AbsoluteSize.X / 2
+            Library:SetLanguage(left and "EN" or "TH")
+        end,
+    })
+    Lang.OnChange(pill, Render)
+    knob.Position = UDim2.fromScale(State.Language == "TH" and 0.5 or 0, 0)
+    Render()
+    self.LangPill = pill
+    table.insert(self.TopButtons, pill)
 end
 
 function Window:BuildDock()
@@ -12428,6 +12644,7 @@ function Window:LayoutTopRow()
     self.SearchField.Visible = not phone
     self.SearchField.Size = UDim2.fromOffset(chrome.SearchWidth[mode] or chrome.SearchWidth.Desktop, box)
     self.SearchHint.Visible = mode == "Desktop" and self.SearchBox.Text == ""
+    self.LangPill.Visible = not phone
     self.SearchButton.Frame.Visible = phone
     self.MinimizeButton.Frame.Visible = not phone
     for _, entry in ipairs({ self.SearchButton, self.MinimizeButton, self.CloseButton }) do
@@ -13046,7 +13263,7 @@ end
 
 ---@param info any  name spec or { Name, Side = "Left"|"Right"|nil (full width), Icon, Collapsed }
 function Tab:AddGroupbox(info, icon)
-    if type(info) ~= "table" or info.EN then
+    if type(info) ~= "table" or info.EN or info.TH then
         local side = (icon == "Left" or icon == "Right") and icon or nil
         info = { Name = info, Icon = side == nil and icon or nil, Side = side }
     end
@@ -13622,6 +13839,17 @@ function Window.ThemeScene(preview, palette, card)
 end
 
 function Window:BuildInterfaceGroup(group)
+    group:AddDropdown("m0puLanguage", {
+        Text = Lang.Strings.Language,
+        Values = { "English", "ไทย" },
+        Default = State.Language == "TH" and "ไทย" or "English",
+        NoSave = true,
+        Callback = function(value)
+            local code = value == "ไทย" and "TH" or "EN"
+            Library:SetLanguage(code)
+            Settings.Set("Language", code)
+        end,
+    })
     group:AddSlider("MarioScale", {
         Text = Lang.Strings.Scale, Min = Config.ScaleRange.Min * 100, Max = Config.ScaleRange.Max * 100,
         Default = State.UserScale * 100, Suffix = "%", Finished = true, NoSave = true,
@@ -13692,11 +13920,11 @@ function Window:BuildOverlayGroup(group)
     local corners = Lang.Strings.NotifyCorners
     group:AddDropdown("m0puNotifyCorner", {
         Text = Lang.Strings.NotifyPosition,
-        Values = corners.EN,
+        Values = corners[State.Language] or corners.EN,
         Default = table.find(Window.Corners, Settings.Get("NotifyCorner", "BottomRight")) or 1,
         NoSave = true,
         Callback = function(value)
-            local index = table.find(corners.EN, value) or table.find(corners.EN, value) or 1
+            local index = table.find(corners.EN, value) or table.find(corners.TH, value) or 1
             Notify.SetPosition(Window.Corners[index])
             Settings.Set("NotifyCorner", Window.Corners[index])
         end,
@@ -13828,9 +14056,9 @@ function Window.RunConfig(ui, actionKey, handler)
         return
     end
     local ok, reason = handler(name)
-    local action = Lang.Resolve(Lang.Strings[actionKey] or actionKey)
-    local message = ok and (action .. ": " .. name)
-        or (action .. " failed: " .. tostring(reason))
+    local action = Lang.Strings[actionKey]
+    local message = ok and { EN = action.EN .. ": " .. name, TH = action.TH .. ": " .. name }
+        or { EN = action.EN .. " failed: " .. tostring(reason), TH = action.TH .. " ไม่สำเร็จ: " .. tostring(reason) }
     Library:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
     if ok and actionKey == "SetAutoload" then
         ui.Autoload:SetText(Lang.Format("Autoload", name))
@@ -13886,8 +14114,8 @@ Config.Intro = {
     StatusSize = 15,
 }
 
-Lang.Strings.IntroSkip = { EN = "Click to skip" }
-Lang.Strings.IntroSkipTouch = { EN = "Tap to skip" }
+Lang.Strings.IntroSkip = { EN = "Click to skip", TH = "คลิกเพื่อข้าม" }
+Lang.Strings.IntroSkipTouch = { EN = "Tap to skip", TH = "แตะเพื่อข้าม" }
 
 Intro.PopIn = { Damping = 0.45 }
 Intro.LetterPop = { Damping = 0.42 }
@@ -13950,7 +14178,7 @@ function Intro.RunSteps(settings, track)
             continue
         end
         step.Started = true
-        local labels = fallback.EN
+        local labels = fallback[State.Language] or fallback.EN
         Intro.Status(track, step.Label or labels[math.min(index, #labels)])
         if step.Run then
             Util.Await(Config.Intro.StepTimeout, step.Run)
@@ -14046,6 +14274,7 @@ function Intro.Coin(stage)
     return coin
 end
 
+---@return table[]  { Label, Scale } per glyph; Thai or non-Latin titles become one label
 function Intro.Logo(stage, title)
     local intro = Config.Intro
     local text = Lang.Resolve(title):upper()
@@ -14845,6 +15074,7 @@ end
 
 function Library.Visuals.Category()
     if not Kit.Esp.Categories.Visuals then
+        Kit.Esp.AddCategory("Visuals", { Text = Library:T("Targets", "เป้าหมาย"), Color = Color3.fromRGB(240, 92, 80), Source = Library.Visuals.Source, Enabled = true, Characters = true })
     end
     return Kit.Esp.Categories.Visuals
 end
@@ -14891,6 +15121,7 @@ Library.Visuals.Panel = {}
 function Library.Visuals.BuildView()
     local settings = Config.Preview
     local holder = Draw.New("Frame", { Name = "EspPreview", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) })
+    Draw.Text({ Name = "Title", Position = UDim2.fromOffset(settings.Pad, 2), Size = UDim2.new(1, -settings.Pad * 2, 0, settings.Title - 2), Parent = holder }, "Display", Util.TextSize("Group"), "Text", Library:T("ESP Preview", "ตัวอย่าง ESP"))
     local view = Draw.Box("ViewportFrame", {
         Name = "View",
         Position = UDim2.fromOffset(settings.Pad, settings.Title),
@@ -15189,12 +15420,14 @@ function Window:AddVisualsTab(options)
     Library.Visuals.Provider = options.Provider
     Library.Visuals.Preview = options.Preview == true
     Kit.Esp.FocusSource = options.Focus
+    local tab = self:AddTab(options.Name or Library:T("Visuals", "การมองเห็น"), options.Icon or "eye")
     Library.Visuals.Tab = tab
     if options.Provider then
         Library.Visuals.Category()
     end
     local _, look = Kit.Esp.Build(tab, { Players = options.Provider == nil, Kinds = options.Kinds, Categories = options.Categories })
     look:AddToggle("MarioEspPreview", {
+        Text = Library:T("Show Preview", "แสดงตัวอย่าง"),
         Default = Library.Visuals.Preview,
         Callback = function(on) Library.Visuals:SetPreview(on) end,
     })
@@ -15210,10 +15443,13 @@ Config.ExportPrefix = "MH2:"
 
 Keybinds.Modifiers = { LeftControl = true, RightControl = true, LeftShift = true, RightShift = true, LeftAlt = true, RightAlt = true }
 
+---@return {EN: string, TH: string}  Lang.Strings[key] formatted in both languages
 function Lang.Format(key, ...)
+    local spec = Lang.Strings[key] or { EN = key, TH = key }
     local args = table.pack(...)
     return {
         EN = string.format(spec.EN, table.unpack(args, 1, args.n)),
+        TH = string.format(spec.TH or spec.EN, table.unpack(args, 1, args.n)),
     }
 end
 
@@ -15452,6 +15688,7 @@ function Configs.Find(file)
     return nil
 end
 
+---@return boolean  tab matches a name given as plain text, either language, or a "EN · TH" spec
 function Configs.TabNamed(tab, name)
     if type(tab) ~= "table" or tab.Name == nil then
         return false
@@ -15459,7 +15696,7 @@ function Configs.TabNamed(tab, name)
     local wanted = name:lower()
     local spec = tab.Name
     if type(spec) == "table" then
-        return (spec.EN or ""):lower() == wanted
+        return (spec.EN or ""):lower() == wanted or (spec.TH or ""):lower() == wanted
     end
     return tostring(spec):lower() == wanted or Lang.Resolve(spec):lower() == wanted
 end
@@ -15676,7 +15913,7 @@ function Settings.ApplyBoot(options)
     if Settings.Get("Particles") ~= nil then
         Particles.SetEnabled(Settings.Get("Particles") == true)
     end
-    return Settings.Get("Theme", options.Theme or "Overworld")
+    return Settings.Get("Theme", options.Theme or "Overworld"), Settings.Get("Language")
 end
 
 function Settings.ApplyOverlays(window, options)
@@ -16286,15 +16523,1010 @@ do
 end
 
 
-function Kit.T(english)
-    return english
+function Kit.T(english, thai)
+    return Library:T(english, thai)
 end
 
-function Kit.Ui.Notify(english, _, kind)
-    Library:Notify("m0pu", english, 3, kind or "Info")
+function Kit.Connect(signal, handler)
+    return Kit.Maid:Give(signal:Connect(handler))
 end
 
+---@return table?  response { StatusCode, Body }, nil if no request API or past the deadline
+function Util.Send(options)
+    if not Util.Request then
+        return nil
+    end
+    local finished, response = Util.Await(Config.HttpTimeout, Util.Request, options)
+    return finished and type(response) == "table" and response or nil
+end
 
+---Undoes a hook on `target`: the executor's own `restorefunction` first (leaves `isfunctionhooked` false), else hooks `original` back in.
+---@param rehook function  fallback that reinstalls `original`
+function Util.Unhook(target, rehook)
+    local api = Util
+    if target and api.RestoreFunction and pcall(api.RestoreFunction, target) then
+        if not api.IsFunctionHooked then return end
+        local ok, still = pcall(api.IsFunctionHooked, target)
+        if ok and not still then return end
+    end
+    rehook()
+end
+
+---Hooks one metamethod; the original is restored on unload or by the returned restore.
+---@return function?  original, nil if the executor can't hook
+---@return function?  restore, puts the original back now and drops it from the unload list
+function Util.HookMeta(object, method, handler)
+    local api = Util
+    local wrapped = api.NewCClosure and api.NewCClosure(handler) or handler
+    local original, putBack
+    if api.HookMetamethod then
+        local ok, previous = pcall(api.HookMetamethod, object, method, wrapped)
+        if ok and type(previous) == "function" then
+            original = previous
+            local meta = api.GetRawMetatable and api.GetRawMetatable(object)
+            local hooked = meta and rawget(meta, method)
+            putBack = function()
+                api.Unhook(hooked, function()
+                    api.HookMetamethod(object, method, original)
+                end)
+            end
+        end
+    end
+    if not original then
+        if not (api.GetRawMetatable and api.SetReadonly) then
+            return nil
+        end
+        local meta = api.GetRawMetatable(object)
+        original = meta[method]
+        api.SetReadonly(meta, false)
+        meta[method] = wrapped
+        api.SetReadonly(meta, true)
+        putBack = function()
+            api.SetReadonly(meta, false)
+            meta[method] = original
+            api.SetReadonly(meta, true)
+        end
+    end
+    table.insert(api.Restores, putBack)
+    local function restore()
+        local index = table.find(api.Restores, putBack)
+        if not index then return end
+        table.remove(api.Restores, index)
+        Util.Try(putBack)
+    end
+    return original, restore
+end
+
+function Util.RestoreAll()
+    for index = #Util.Restores, 1, -1 do
+        Util.Try(Util.Restores[index])
+    end
+    table.clear(Util.Restores)
+end
+
+function Util.ReadFile(path)
+    if not Util.FileApi() or not Util.SafeFile(isfile, path) then
+        return nil
+    end
+    local text = Util.SafeFile(readfile, path)
+    return type(text) == "string" and text or nil
+end
+
+function Util.WriteFile(path, text)
+    if not Util.FileApi() then
+        return false
+    end
+    local folder = path:match("^(.*)/[^/]+$")
+    if folder then
+        Util.SafeFile(Util.EnsureFolder, folder)
+    end
+    return Util.SafeFile(writefile, path, text) ~= nil
+end
+
+Kit.Caps = setmetatable({ Probes = {} }, {
+    __index = function(caps, name)
+        local probe = rawget(caps, "Probes")[name]
+        if not probe then
+            return nil
+        end
+        local finished, works = Util.Await(Kit.Config.ProbeTimeout, probe)
+        local has = finished and works == true
+        rawset(caps, name, has)
+        return has
+    end,
+})
+
+Kit.Caps.Probes.Hook = function()
+    local api = Util
+    if not (api.HookFunction and api.GetNamecallMethod and (api.HookMetamethod or api.GetRawMetatable)) then
+        return false
+    end
+    local target = function()
+        return "plain"
+    end
+    local original = api.HookFunction(target, function()
+        return "hooked"
+    end)
+    local works = target() == "hooked"
+    if type(original) == "function" then
+        pcall(api.HookFunction, target, original)
+    end
+    return works
+end
+
+Kit.Caps.Probes.Connections = function()
+    if not Util.GetConnections then
+        return false
+    end
+    local event = Instance.new("BindableEvent")
+    local conn = event.Event:Connect(function() end)
+    local list = Util.GetConnections(event.Event)
+    conn:Disconnect()
+    event:Destroy()
+    return type(list) == "table" and #list >= 1
+end
+
+Kit.Caps.Probes.Gc = function()
+    if not Util.GetGc then
+        return false
+    end
+    local found = Util.GetGc()
+    return type(found) == "table" and #found > 0
+end
+
+Kit.Caps.Probes.Upvalues = function()
+    if not Util.GetUpvalue then
+        return false
+    end
+    local marker = {}
+    local function Holder()
+        return marker
+    end
+    return Util.GetUpvalue(Holder, 1) == marker
+end
+
+Kit.Caps.Probes.Drawing = function()
+    if type(Drawing) ~= "table" and type(Drawing) ~= "userdata" then
+        return false
+    end
+    local line = Drawing.new("Line")
+    local remove = line.Remove or line.Destroy
+    remove(line)
+    return true
+end
+
+Kit.Caps.Probes.FileSystem = function()
+    local stamp = tostring(os.clock())
+    return Util.WriteFile(Kit.Config.ProbeFile, stamp) and Util.ReadFile(Kit.Config.ProbeFile) == stamp
+end
+
+Kit.Caps.Probes.Hui = function()
+    return type(gethui) == "function" and typeof(gethui()) == "Instance"
+end
+
+Kit.Caps.Probes.Http = function()
+    return Util.Request ~= nil
+end
+
+Kit.Caps.Probes.Queue = function()
+    return Util.QueueOnTeleport ~= nil
+end
+
+Kit.Caps.Probes.Clipboard = function()
+    return type(setclipboard or toclipboard) == "function"
+end
+
+Kit.Caps.Probes.Signals = function()
+    return Util.FireSignal ~= nil
+end
+
+Kit.Caps.Probes.Prompt = function()
+    return Util.FirePrompt ~= nil
+end
+
+Kit.Caps.Probes.Touch = function()
+    return Util.FireTouch ~= nil
+end
+
+---Flips a toggle back off with a notice when the executor lacks `cap`.
+---@param option table|string  widget or its idx
+function Kit.Caps.NeedCap(option, cap)
+    option = type(option) == "string" and Library.Options[option] or option
+    if type(option) ~= "table" or type(option.OnChanged) ~= "function" then
+        return
+    end
+    option:OnChanged(function(value)
+        if value ~= true or Kit.Caps[cap] then
+            return
+        end
+        local feature = Lang.Resolve(option.Info and option.Info.Text or option.Idx)
+        Library:Notify("m0pu", Kit.T(feature .. " is not supported on this executor", feature .. " ใช้กับ executor นี้ไม่ได้"), 4, "Warn")
+        task.defer(option.SetValue, option, false)
+    end)
+end
+
+Kit.Override = { Groups = {} }
+
+function Kit.Override.Write(entry, value)
+    entry.Writing = true
+    local ok = pcall(function()
+        entry.Instance[entry.Property] = value
+    end)
+    entry.Writing = false
+    return ok
+end
+
+---Sets a property and remembers the value it had first, so Restore puts back exactly that.
+---@param enforce boolean?  re-apply whenever the game changes it
+function Kit.Override.Set(group, inst, prop, value, enforce)
+    local entries = Kit.Override.Groups[group]
+    if not entries then
+        entries = {}
+        Kit.Override.Groups[group] = entries
+    end
+    local entry
+    for _, existing in ipairs(entries) do
+        if existing.Instance == inst and existing.Property == prop then
+            entry = existing
+            break
+        end
+    end
+    if not entry then
+        local ok, original = pcall(function()
+            return inst[prop]
+        end)
+        if not ok then
+            return false
+        end
+        entry = { Instance = inst, Property = prop, Original = original }
+        entries[#entries + 1] = entry
+        entry.Gone = inst.Destroying:Connect(function()
+            Kit.Override.Drop(entries, entry)
+        end)
+    end
+    entry.Value = value
+    local written = Kit.Override.Write(entry, value)
+    if enforce and not entry.Conn then
+        entry.Conn = inst:GetPropertyChangedSignal(prop):Connect(function()
+            if entry.Writing or inst[prop] == entry.Value then return end
+            Kit.Override.Write(entry, entry.Value)
+        end)
+    end
+    return written
+end
+
+function Kit.Override.Release(entry)
+    for _, key in ipairs({ "Conn", "Gone", "Return" }) do
+        if entry[key] then
+            entry[key]:Disconnect()
+            entry[key] = nil
+        end
+    end
+end
+
+---Forgets a destroyed instance; one that is only unparented keeps its entry so it still restores.
+function Kit.Override.Drop(entries, entry)
+    Kit.Override.Release(entry)
+    local index = table.find(entries, entry)
+    if index then
+        table.remove(entries, index)
+    end
+end
+
+---Puts the original back; an instance the game has pulled out of the tree gets it the moment it is re-parented.
+function Kit.Override.PutBack(entry)
+    Kit.Override.Release(entry)
+    local inst = entry.Instance
+    if inst.Parent ~= nil and Kit.Override.Write(entry, entry.Original) then return end
+    Kit.Override.Write(entry, entry.Original)
+    entry.Return = inst.AncestryChanged:Connect(function(_, parent)
+        if parent == nil then return end
+        Kit.Override.Release(entry)
+        Kit.Override.Write(entry, entry.Original)
+    end)
+    entry.Gone = inst.Destroying:Connect(function()
+        Kit.Override.Release(entry)
+    end)
+end
+
+function Kit.Override.Restore(group)
+    local entries = Kit.Override.Groups[group]
+    if not entries then
+        return
+    end
+    Kit.Override.Groups[group] = nil
+    for index = #entries, 1, -1 do
+        Kit.Override.PutBack(entries[index])
+    end
+end
+
+function Kit.Override.RestoreAll()
+    for group in pairs(Kit.Override.Groups) do
+        Kit.Override.Restore(group)
+    end
+end
+
+Kit.Scheduler = { Jobs = {}, Lanes = { Tick = {}, Render = {}, Physics = {} }, Snapshots = { Tick = {}, Render = {}, Physics = {} }, Bound = {} }
+
+---@param options table?  { Interval = 0, Lane = "Tick"|"Render"|"Physics", Priority = 0, Async = false, Timeout = 30 }
+---@return table  job; Render runs after the camera, Physics before the physics step
+function Kit.Scheduler.Add(name, run, options)
+    options = options or {}
+    Kit.Scheduler.Remove(name)
+    local job = {
+        Name = name, Run = run, Next = 0, Errors = 0,
+        Interval = options.Interval or 0,
+        Lane = Kit.Scheduler.Lanes[options.Lane] and options.Lane or "Tick",
+        Priority = options.Priority or 0,
+        Async = options.Async == true,
+        Timeout = options.Timeout or Kit.Config.JobTimeout,
+    }
+    Kit.Scheduler.Jobs[name] = job
+    local lane = Kit.Scheduler.Lanes[job.Lane]
+    lane[#lane + 1] = job
+    table.sort(lane, function(left, right)
+        return left.Priority > right.Priority
+    end)
+    Kit.Scheduler.Bind(job.Lane)
+    return job
+end
+
+function Kit.Scheduler.Remove(name)
+    local job = Kit.Scheduler.Jobs[name]
+    if not job then
+        return
+    end
+    Kit.Scheduler.Jobs[name] = nil
+    job.Removed = true
+    local lane = Kit.Scheduler.Lanes[job.Lane]
+    local index = table.find(lane, job)
+    if index then
+        table.remove(lane, index)
+    end
+    if job.Thread and job.Thread ~= coroutine.running() then
+        pcall(task.cancel, job.Thread)
+    end
+    if #lane == 0 then
+        Kit.Scheduler.Unbind(job.Lane)
+    end
+end
+
+function Kit.Scheduler.Has(name)
+    return Kit.Scheduler.Jobs[name] ~= nil
+end
+
+function Kit.Scheduler.SetInterval(name, interval)
+    local job = Kit.Scheduler.Jobs[name]
+    if job then
+        job.Interval = interval
+    end
+end
+
+function Kit.Scheduler.Bind(laneName)
+    local bound = Kit.Scheduler.Bound
+    if bound[laneName] then
+        return
+    end
+    if laneName == "Render" then
+        RunService:BindToRenderStep(Kit.Config.RenderStep, Enum.RenderPriority.Camera.Value + 1, function(deltaTime)
+            Kit.Scheduler.Step("Render", deltaTime)
+        end)
+        bound.Render = true
+    elseif laneName == "Physics" then
+        bound.Physics = RunService.Stepped:Connect(function(_, deltaTime)
+            Kit.Scheduler.Step("Physics", deltaTime)
+        end)
+    else
+        bound.Tick = RunService.Heartbeat:Connect(function(deltaTime)
+            Kit.Scheduler.Step("Tick", deltaTime)
+        end)
+    end
+end
+
+function Kit.Scheduler.Unbind(laneName)
+    local bound = Kit.Scheduler.Bound[laneName]
+    if not bound then
+        return
+    end
+    Kit.Scheduler.Bound[laneName] = nil
+    if laneName == "Render" then
+        RunService:UnbindFromRenderStep(Kit.Config.RenderStep)
+    else
+        bound:Disconnect()
+    end
+end
+
+function Kit.Scheduler.Step(laneName, deltaTime)
+    local lane = Kit.Scheduler.Lanes[laneName]
+    local snapshot = Kit.Scheduler.Snapshots[laneName]
+    local now = os.clock()
+    table.clear(snapshot)
+    table.move(lane, 1, #lane, 1, snapshot)
+    for _, job in ipairs(snapshot) do
+        if job.Removed or now < job.Next then continue end
+        job.Next = now + job.Interval
+        if job.Async then
+            Kit.Scheduler.Spawn(job, deltaTime, now)
+        else
+            Kit.Scheduler.Call(job, deltaTime)
+        end
+    end
+end
+
+function Kit.Scheduler.Spawn(job, deltaTime, now)
+    local thread = job.Thread
+    if thread and coroutine.status(thread) ~= "dead" then
+        if now - job.Started < job.Timeout then return end
+        pcall(task.cancel, thread)
+        Kit.Log:Warn(job.Name, "timed out, restarted")
+    end
+    job.Started = now
+    job.Thread = task.spawn(Kit.Scheduler.Call, job, deltaTime)
+end
+
+function Kit.Scheduler.Call(job, deltaTime)
+    local ok, err = pcall(job.Run, deltaTime)
+    if ok then
+        job.Errors = 0
+        return
+    end
+    job.Errors += 1
+    Kit.Log:Error(job.Name, err)
+    if job.Errors >= Kit.Config.MaxJobErrors and not job.Removed then
+        Kit.Log:Warn(job.Name, "stopped after repeated errors")
+        Kit.Scheduler.Remove(job.Name)
+    end
+end
+
+function Kit.Scheduler.Status()
+    local count = 0
+    for _ in pairs(Kit.Scheduler.Jobs) do
+        count += 1
+    end
+    return count == 0 and "Idle" or (count .. " jobs")
+end
+
+function Kit.Scheduler.Stop()
+    for name in pairs(Kit.Scheduler.Jobs) do
+        Kit.Scheduler.Remove(name)
+    end
+    for laneName in pairs(Kit.Scheduler.Lanes) do
+        Kit.Scheduler.Unbind(laneName)
+    end
+end
+
+Kit.Fsm = {}
+Kit.Fsm.__index = Kit.Fsm
+
+---@param spec table  { Name, Initial = "Idle", States = { [name] = { Enter(fsm), Step(fsm, dt) -> next?, note?, Exit(fsm, next), Timeout, OnTimeout } } }
+function Kit.Fsm.new(spec)
+    local machine = setmetatable({
+        Name = spec.Name or "Fsm",
+        States = spec.States,
+        Initial = spec.Initial or "Idle",
+        Context = spec.Context or {},
+    }, Kit.Fsm)
+    machine:Go(machine.Initial)
+    return machine
+end
+
+function Kit.Fsm:Go(name, note)
+    local state = self.States[name]
+    if not state then
+        Kit.Log:Warn(self.Name, "unknown state", name)
+        return false
+    end
+    local current = self.State and self.States[self.State]
+    if current and current.Exit then
+        Util.Try(current.Exit, self, name)
+    end
+    self.State, self.Entered, self.Note = name, os.clock(), note
+    if state.Enter then
+        Util.Try(state.Enter, self)
+    end
+    return true
+end
+
+function Kit.Fsm:Elapsed()
+    return os.clock() - self.Entered
+end
+
+function Kit.Fsm:Step(deltaTime)
+    local state = self.States[self.State]
+    if state.Timeout and self:Elapsed() > state.Timeout then
+        return self:Go(state.OnTimeout or self.Initial, "timeout")
+    end
+    if not state.Step then
+        return false
+    end
+    local ok, nextState, note = pcall(state.Step, self, deltaTime)
+    if not ok then
+        Kit.Log:Error(self.Name .. "." .. self.State, nextState)
+        return self:Go(self.Initial, "error")
+    end
+    if nextState and nextState ~= self.State then
+        return self:Go(nextState, note)
+    end
+    if note ~= nil then
+        self.Note = note
+    end
+    return false
+end
+
+function Kit.Fsm:Reset()
+    self:Go(self.Initial)
+end
+
+function Kit.Fsm:Status()
+    return self.Note and (self.State .. " · " .. tostring(self.Note)) or self.State
+end
+
+Kit.Arbiter = {
+    Claims = {},
+    Sequence = 0,
+    Priority = { Escape = 100, Heal = 100, Event = 80, Boss = 80, Quest = 60, Farm = 40, Collect = 20 },
+}
+
+---@param claim table  { Name, Priority = number|"Event", Return = true, OnPause(claim), OnResume(claim) }
+---@return boolean  true when this claim now drives the character
+function Kit.Arbiter.Request(claim)
+    local claims = Kit.Arbiter.Claims
+    if table.find(claims, claim) then
+        return claims[1] == claim
+    end
+    if type(claim.Priority) ~= "number" then
+        claim.Priority = Kit.Arbiter.Priority[claim.Priority] or 0
+    end
+    Kit.Arbiter.Sequence += 1
+    claim.Sequence = Kit.Arbiter.Sequence
+    local previous = claims[1]
+    claims[#claims + 1] = claim
+    table.sort(claims, function(left, right)
+        if left.Priority ~= right.Priority then
+            return left.Priority > right.Priority
+        end
+        return left.Sequence < right.Sequence
+    end)
+    if claims[1] ~= claim then
+        return false
+    end
+    claim.Origin = Kit.Player and Kit.Player.Root and Kit.Player.Root.CFrame or nil
+    claim.Preempted = previous ~= nil
+    if previous then
+        Util.Try(previous.OnPause, previous)
+    end
+    return true
+end
+
+---Drops a claim; a claim that cut in walks the character back before the paused task resumes.
+function Kit.Arbiter.Release(claim)
+    local claims = Kit.Arbiter.Claims
+    local index = table.find(claims, claim)
+    if not index then
+        return
+    end
+    table.remove(claims, index)
+    if index ~= 1 then
+        return
+    end
+    if claim.Preempted and claim.Return ~= false and claim.Origin and Kit.Teleport then
+        Kit.Teleport.To(claim.Origin, { Ground = false, Stream = false, Mode = "Instant" })
+    end
+    local resumed = claims[1]
+    if resumed then
+        Util.Try(resumed.OnResume, resumed)
+    end
+end
+
+function Kit.Arbiter.Owns(claim)
+    return Kit.Arbiter.Claims[1] == claim
+end
+
+function Kit.Arbiter.Current()
+    return Kit.Arbiter.Claims[1]
+end
+
+function Kit.Arbiter.Status()
+    local top = Kit.Arbiter.Claims[1]
+    return top and tostring(top.Name) or "Idle"
+end
+
+function Kit.Arbiter.Stop()
+    table.clear(Kit.Arbiter.Claims)
+end
+
+Kit.Game = { Modules = {} }
+
+---@param path string  "ReplicatedStorage.Remotes.Buy" or "Remotes/Buy" (from ReplicatedStorage)
+function Kit.Game.Resolve(path, root)
+    local node = root
+    for segment in path:gmatch("[^%./]+") do
+        if not node then
+            local ok, service = pcall(game.FindService, game, segment)
+            node = ok and service or game:GetService("ReplicatedStorage"):FindFirstChild(segment)
+        else
+            node = node:FindFirstChild(segment)
+        end
+        if not node then
+            return nil
+        end
+    end
+    return node
+end
+
+---@return table?  nil if it isn't a ModuleScript or require errored (cached either way)
+function Kit.Game.Require(target)
+    if type(target) == "string" then
+        target = Kit.Game.Resolve(target)
+    end
+    if typeof(target) ~= "Instance" or not target:IsA("ModuleScript") then
+        return nil
+    end
+    local cached = Kit.Game.Modules[target]
+    if cached ~= nil then
+        return cached or nil
+    end
+    local ok, value = pcall(require, target)
+    if not ok then
+        Kit.Log:Error("require", target:GetFullName(), value)
+    end
+    Kit.Game.Modules[target] = ok and value or false
+    return ok and value or nil
+end
+
+function Kit.Game.HasKeys(candidate, keys)
+    for _, key in ipairs(keys) do
+        if rawget(candidate, key) == nil then
+            return false
+        end
+    end
+    return true
+end
+
+---@param keys string[]  every key must be present
+---@return table?  first live table in the GC with all keys
+function Kit.Game.FindTable(keys)
+    if Util.FilterGc then
+        local ok, found = pcall(Util.FilterGc, "table", { Keys = keys }, true)
+        if ok and type(found) == "table" then
+            return found
+        end
+    end
+    if not Kit.Caps.Gc then
+        return nil
+    end
+    for _, value in ipairs(Util.GetGc(true)) do
+        if type(value) == "table" and Kit.Game.HasKeys(value, keys) then
+            return value
+        end
+    end
+    return nil
+end
+
+---@return function?  first Luau function in the GC with this debug name
+function Kit.Game.FindFunction(name)
+    if Util.FilterGc then
+        local ok, found = pcall(Util.FilterGc, "function", { Name = name, IgnoreExecutor = true }, true)
+        if ok and type(found) == "function" then
+            return found
+        end
+    end
+    if not Kit.Caps.Gc then
+        return nil
+    end
+    for _, value in ipairs(Util.GetGc()) do
+        if type(value) == "function" and debug.info(value, "s") ~= "[C]" and debug.info(value, "n") == name then
+            return value
+        end
+    end
+    return nil
+end
+
+function Kit.Game.Upvalue(fn, index)
+    if not Util.GetUpvalue then
+        return nil
+    end
+    local ok, value = pcall(Util.GetUpvalue, fn, index)
+    return ok and value or nil
+end
+
+function Kit.Game.SetUpvalue(fn, index, value)
+    if not Util.SetUpvalue then
+        return false
+    end
+    return (pcall(Util.SetUpvalue, fn, index, value))
+end
+
+Kit.Remote = { Cache = {}, Gates = {}, Classes = { RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true } }
+
+---@param query string|Instance  remote name (searched under ReplicatedStorage) or dotted path
+function Kit.Remote.Find(query, root)
+    if typeof(query) == "Instance" then
+        return query
+    end
+    local cached = Kit.Remote.Cache[query]
+    if cached and cached.Parent then
+        return cached
+    end
+    local found
+    if query:find("[%./]") then
+        found = Kit.Game.Resolve(query, root)
+    else
+        found = Kit.Remote.Search(query, root or game:GetService("ReplicatedStorage"))
+    end
+    if found and not Kit.Remote.Classes[found.ClassName] then
+        found = nil
+    end
+    Kit.Remote.Cache[query] = found
+    return found
+end
+
+function Kit.Remote.Search(name, root)
+    local quick = root:FindFirstChild(name, true)
+    if quick and Kit.Remote.Classes[quick.ClassName] then
+        return quick
+    end
+    for _, descendant in ipairs(root:GetDescendants()) do
+        if descendant.Name == name and Kit.Remote.Classes[descendant.ClassName] then
+            return descendant
+        end
+    end
+    return nil
+end
+
+function Kit.Remote.Gate(remote)
+    local gate = Kit.Remote.Gates[remote]
+    if not gate then
+        gate = { Cooldown = 0, Floor = 0, Last = 0, LastAccepted = 0 }
+        Kit.Remote.Gates[remote] = gate
+    end
+    return gate
+end
+
+function Kit.Remote.SetCooldown(query, seconds)
+    local remote = Kit.Remote.Find(query)
+    if not remote then
+        return
+    end
+    local gate = Kit.Remote.Gate(remote)
+    gate.Cooldown, gate.Floor = seconds, seconds
+end
+
+function Kit.Remote.Ready(query)
+    local remote = Kit.Remote.Find(query)
+    local gate = remote and Kit.Remote.Gates[remote]
+    return not gate or os.clock() - gate.Last >= gate.Cooldown
+end
+
+---Feed back whether the server accepted the last call; the cooldown backs off on rejects and creeps down on accepts.
+---@param floor number?  never go below this
+function Kit.Remote.Report(query, accepted, floor)
+    local remote = Kit.Remote.Find(query)
+    if not remote then
+        return
+    end
+    local gate = Kit.Remote.Gate(remote)
+    local now = os.clock()
+    if floor then
+        gate.Floor = floor
+    end
+    if accepted then
+        gate.LastAccepted = now
+        gate.Cooldown = math.max(gate.Floor, gate.Cooldown * Kit.Config.RemoteShrink)
+        return
+    end
+    gate.Cooldown = math.max(gate.Cooldown * Kit.Config.RemoteBackoff, now - gate.LastAccepted, gate.Floor)
+end
+
+---@return boolean ok, string? reason  "missing" | "cooldown" | error text
+function Kit.Remote.Fire(query, ...)
+    local remote = Kit.Remote.Find(query)
+    if not remote then
+        return false, "missing"
+    end
+    if not Kit.Remote.Ready(remote) then
+        return false, "cooldown"
+    end
+    Kit.Remote.Gate(remote).Last = os.clock()
+    local ok, err = pcall(remote.FireServer, remote, ...)
+    return ok, not ok and tostring(err) or nil
+end
+
+---@return boolean ok, any ...  false on missing remote, cooldown, error or deadline
+function Kit.Remote.Invoke(query, ...)
+    local remote = Kit.Remote.Find(query)
+    if not remote or not remote:IsA("RemoteFunction") then
+        return false, "missing"
+    end
+    if not Kit.Remote.Ready(remote) then
+        return false, "cooldown"
+    end
+    Kit.Remote.Gate(remote).Last = os.clock()
+    return Util.Await(Kit.Config.InvokeTimeout, remote.InvokeServer, remote, ...)
+end
+
+Kit.Stats = { Tracked = {} }
+
+function Kit.Stats.Entry(name)
+    local entry = Kit.Stats.Tracked[name]
+    if not entry then
+        entry = { Value = 0, Start = 0, StartTime = os.clock() }
+        Kit.Stats.Tracked[name] = entry
+    end
+    return entry
+end
+
+---Samples `read()` every few seconds for a per-hour rate; pass the AddStat widget to keep it live.
+function Kit.Stats.Track(name, read, widget)
+    local entry = Kit.Stats.Entry(name)
+    entry.Read, entry.Widget = read, widget
+    local ok, value = pcall(read)
+    if ok and type(value) == "number" then
+        entry.Value, entry.Start, entry.StartTime = value, value, os.clock()
+    end
+    if not Kit.Scheduler.Has("KitStats") then
+        Kit.Scheduler.Add("KitStats", Kit.Stats.Sample, { Interval = Kit.Config.StatsInterval })
+    end
+    Kit.Stats.Push(entry)
+end
+
+function Kit.Stats.Add(name, amount, widget)
+    local entry = Kit.Stats.Entry(name)
+    entry.Widget = widget or entry.Widget
+    entry.Value += amount
+    Kit.Stats.Push(entry)
+end
+
+function Kit.Stats.Push(entry)
+    if entry.Widget and entry.Widget.SetValue then
+        Util.Try(entry.Widget.SetValue, entry.Widget, entry.Value)
+    end
+end
+
+function Kit.Stats.Sample()
+    for _, entry in pairs(Kit.Stats.Tracked) do
+        if not entry.Read then continue end
+        local ok, value = pcall(entry.Read)
+        if ok and type(value) == "number" and value ~= entry.Value then
+            entry.Value = value
+            Kit.Stats.Push(entry)
+        end
+    end
+end
+
+---@return number value, number gained, number perHour
+function Kit.Stats.Get(name)
+    local entry = Kit.Stats.Tracked[name]
+    if not entry then
+        return 0, 0, 0
+    end
+    local gained = entry.Value - entry.Start
+    local hours = math.max(os.clock() - entry.StartTime, 1) / 3600
+    return entry.Value, gained, gained / hours
+end
+
+function Kit.Stats.Reset(name)
+    local entry = Kit.Stats.Tracked[name]
+    if entry then
+        entry.Start, entry.StartTime = entry.Value, os.clock()
+    end
+end
+
+function Kit.Stats.Stop()
+    table.clear(Kit.Stats.Tracked)
+end
+
+Kit.Overlay = {}
+
+function Kit.Overlay.Screen()
+    local screen = Kit.Overlay.Gui
+    if screen and screen.Parent then
+        return screen
+    end
+    screen = Instance.new("ScreenGui")
+    screen.Name = "MarioKit"
+    screen.IgnoreGuiInset = true
+    screen.ResetOnSpawn = false
+    screen.DisplayOrder = Config.Layer.Kit
+    screen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screen.Parent = Util.GuiParent()
+    Kit.Overlay.Gui = screen
+    return screen
+end
+
+function Kit.Overlay.Folder()
+    local folder = Kit.Overlay.Holder
+    if folder and folder.Parent then
+        return folder
+    end
+    folder = Instance.new("Folder")
+    folder.Name = "MarioKitWorld"
+    folder.Parent = Util.GuiParent()
+    Kit.Overlay.Holder = folder
+    return folder
+end
+
+function Kit.Overlay.Stop()
+    for _, key in ipairs({ "Gui", "Holder" }) do
+        if Kit.Overlay[key] then
+            Kit.Overlay[key]:Destroy()
+            Kit.Overlay[key] = nil
+        end
+    end
+end
+
+Kit.Ui = {}
+
+---Tab → new groupbox on `side`; groupbox → itself, with a heading once it already holds a Kit section.
+function Kit.Ui.Group(target, side, name, icon)
+    if type(target.AddLeftGroupbox) ~= "function" then
+        if target.KitUsed then
+            target:AddSeparatorText(name)
+        end
+        target.KitUsed = true
+        return target
+    end
+    return side == "Right" and target:AddRightGroupbox(name, icon) or target:AddLeftGroupbox(name, icon)
+end
+
+function Kit.Ui.Notify(english, thai, kind)
+    Library:Notify("m0pu", Kit.T(english, thai), 3, kind or "Info")
+end
+
+---Adds the standard Toggle/Hold/Always keybind; touch screens get a floating button instead of a key.
+function Kit.Ui.Key(toggle, idx, default)
+    toggle:AddKeyPicker(idx, { Default = Platform.Touch and "None" or (default or "None"), Mode = "Toggle", FloatButton = true })
+    return toggle
+end
+
+---Installs Set/Refresh/Stop/Status on a module with `Features[name] = { Enable, Disable }` and `Active`.
+function Kit.Switchable(module)
+    module.Active = module.Active or {}
+
+    function module.Set(name, enabled)
+        local feature = module.Features[name]
+        if not feature then
+            Kit.Log:Warn("unknown feature", name)
+            return false
+        end
+        enabled = enabled == true
+        if (module.Active[name] == true) == enabled then
+            return true
+        end
+        module.Active[name] = enabled or nil
+        if enabled and module.Ready and not module.Ready() then
+            return true
+        end
+        local ok = Util.Try(enabled and feature.Enable or feature.Disable)
+        return ok
+    end
+
+    function module.Refresh(name)
+        local feature = module.Features[name]
+        if feature and module.Active[name] and (not module.Ready or module.Ready()) then
+            Util.Try(feature.Enable)
+        end
+    end
+
+    function module.Stop()
+        for name in pairs(module.Active) do
+            Util.Try(module.Features[name].Disable)
+        end
+        table.clear(module.Active)
+    end
+
+    function module.Status()
+        local names = {}
+        for name in pairs(module.Active) do
+            names[#names + 1] = name
+        end
+        table.sort(names)
+        return #names == 0 and "Idle" or table.concat(names, ", ")
+    end
+
+    table.insert(Kit.Modules, module)
+    return module
+end
 
 function Kit.Cleanup()
     for _, module in ipairs(Kit.Modules) do
@@ -16596,42 +17828,56 @@ Kit.Switchable(Kit.Player)
 function Kit.Player.Build(target)
     local T = Kit.T
     local config = Kit.Config.Player
+    local move = Kit.Ui.Group(target, "Left", T("Movement", "การเคลื่อนที่"), "speed")
 
     Kit.Ui.Key(move:AddToggle("KitWalkSpeed", {
+        Text = T("WalkSpeed", "ความเร็วเดิน"), Icon = "speed",
         Callback = function(on) Kit.Player.Set("WalkSpeed", on) end,
     }), "KitWalkSpeedKey")
     move:AddSlider("KitWalkSpeedValue", {
+        Text = T("Speed", "ความเร็ว"), Icon = "speed", Min = 16, Max = config.MaxWalkSpeed, Default = config.WalkSpeed, Step = 1,
         Callback = function(value) Kit.Player.SetValue("WalkSpeed", value) end,
     })
 
     Kit.Ui.Key(move:AddToggle("KitJumpPower", {
+        Text = T("JumpPower", "พลังกระโดด"), Icon = "jump",
         Callback = function(on) Kit.Player.Set("JumpPower", on) end,
     }), "KitJumpPowerKey")
     move:AddSlider("KitJumpPowerValue", {
+        Text = T("Power", "พลัง"), Icon = "jump", Min = 50, Max = config.MaxJumpPower, Default = config.JumpPower, Step = 1,
         Callback = function(value) Kit.Player.SetValue("JumpPower", value) end,
     })
 
     Kit.Ui.Key(move:AddToggle("KitFly", {
+        Text = T("Fly", "บิน"), Icon = "fly",
+        Description = T("Space/E up, Q down", "Space/E ขึ้น, Q ลง"),
         Callback = function(on) Kit.Player.Set("Fly", on) end,
     }), "KitFlyKey", "F")
     move:AddSlider("KitFlySpeed", {
+        Text = T("Fly Speed", "ความเร็วบิน"), Icon = "fly", Min = 10, Max = config.MaxFlySpeed, Default = config.FlySpeed, Step = 5,
         Callback = function(value) Kit.Player.SetValue("FlySpeed", value) end,
     })
 
     Kit.Ui.Key(move:AddToggle("KitNoclip", {
+        Text = T("Noclip", "ทะลุกำแพง"), Icon = "noclip",
         Callback = function(on) Kit.Player.Set("Noclip", on) end,
     }), "KitNoclipKey")
     move:AddToggle("KitInfJump", {
+        Text = T("Infinite Jump", "กระโดดไม่จำกัด"), Icon = "infjump",
         Callback = function(on) Kit.Player.Set("InfJump", on) end,
     })
 
+    local body = Kit.Ui.Group(target, "Right", T("Character", "ตัวละคร"), "player")
     body:AddToggle("KitWalkOnWater", {
+        Text = T("Walk on Water", "เดินบนน้ำ"), Icon = "walkwater",
         Callback = function(on) Kit.Player.Set("WalkOnWater", on) end,
     })
     body:AddToggle("KitNoFall", {
+        Text = T("No Fall Damage", "ไม่เจ็บตอนตก"), Icon = "nofall",
         Callback = function(on) Kit.Player.Set("NoFall", on) end,
     })
     body:AddToggle("KitAntiAfk", {
+        Text = T("Anti AFK", "กันหลุด AFK"), Icon = "antiafk",
         Callback = function(on)
             if on then Kit.AntiAfk.Start() else Kit.AntiAfk.Stop() end
         end,
@@ -16734,10 +17980,17 @@ end
 
 function Kit.World.Build(target)
     local T = Kit.T
+    local group = Kit.Ui.Group(target, "Right", T("World", "โลก"), "sun")
+    group:AddToggle("KitFullbright", { Text = T("Fullbright", "สว่างทั้งแมพ"), Icon = "fullbright", Callback = function(on) Kit.World.Set("Fullbright", on) end })
+    group:AddToggle("KitNoFog", { Text = T("No Fog", "ไม่มีหมอก"), Icon = "fog", Callback = function(on) Kit.World.Set("NoFog", on) end })
     group:AddToggle("KitFpsBoost", {
+        Text = T("FPS Boost", "เพิ่ม FPS"), Icon = "fpsboost",
+        Description = T("Lower graphics and effects", "ลดกราฟิกและเอฟเฟกต์"),
         Callback = function(on) Kit.World.Set("FpsBoost", on) end,
     })
+    group:AddToggle("KitTimeLock", { Text = T("Lock Time", "ล็อกเวลา"), Icon = "clock", Callback = function(on) Kit.World.Set("TimeLock", on) end })
     group:AddSlider("KitTimeValue", {
+        Text = T("Time", "เวลา"), Icon = "clock", Min = 0, Max = 24, Default = Kit.Config.World.Time, Step = 0.5, Suffix = "h",
         Callback = Kit.World.SetTime,
     })
     return group
@@ -16834,6 +18087,7 @@ end
 function Kit.Server.Hop(mode)
     local servers = Kit.Server.List()
     if not servers then
+        Kit.Ui.Notify("No other server found", "ไม่เจอเซิร์ฟอื่น", "Warn")
         return false
     end
     local pick
@@ -16885,17 +18139,24 @@ table.insert(Kit.Modules, Kit.Server)
 
 function Kit.Server.Build(target)
     local T = Kit.T
+    local group = Kit.Ui.Group(target, "Right", T("Server", "เซิร์ฟเวอร์"), "server")
     group:AddToggle("KitAutoRejoin", {
+        Text = T("Auto Rejoin", "เข้าใหม่อัตโนมัติ"), Icon = "rejoin",
+        Description = T("Rejoins after a kick or disconnect", "เข้าใหม่เองเมื่อโดนเตะหรือหลุด"),
         Callback = function(on)
             if on then Kit.Server.Start() else Kit.Server.Stop() end
         end,
     })
     group:AddDropdown("KitHopMode", {
+        Text = T("Hop To", "ย้ายไป"), Icon = "hop",
         Values = { "Low", "Random" },
         Default = "Low",
     })
+    group:AddButton({ Text = T("Server Hop", "ย้ายเซิร์ฟ"), Icon = "hop" }, function()
         local mode = Library.Options.KitHopMode and Library.Options.KitHopMode.Value
         task.spawn(Kit.Server.Hop, mode)
+    end):AddButton({ Text = T("Rejoin", "เข้าใหม่"), Icon = "rejoin" }, Kit.Server.Rejoin)
+    group:AddButton({ Text = T("Copy Job ID", "คัดลอก Job ID"), Icon = "copy" }, function()
         if not Util.Clipboard(game.JobId) then
             Kit.Ui.Notify(game.JobId, game.JobId)
         end
@@ -17133,6 +18394,7 @@ function Kit.Esp.RawName(entry)
     return entry.Model.Name
 end
 
+---Drawing fonts only carry Latin glyphs, so CJK/Thai names would print as "??": fall back to the ASCII username, else the kind.
 function Kit.Esp.Name(entry)
     local name = Kit.Esp.RawName(entry)
     if Kit.Esp.Mode ~= "Drawing" or not name:find("[\128-\255]") then return name end
@@ -17967,6 +19229,7 @@ function Kit.Esp.ApplyPreset(name)
         local option = Library.Toggles[idx] or Library.Options[idx]
         if option then option:SetValue(value) end
     end
+    Kit.Ui.Notify("ESP preset: " .. name, "ตั้งค่า ESP: " .. name, "Success")
 end
 
 ---Element toggle; its sub-options pass `DependsOn = Kit.Esp.Under(key)` so they only show while it is on.
@@ -17982,6 +19245,7 @@ function Kit.Esp.BuildMain(target, T)
     local tuning = Kit.Esp.Settings
     local main = Kit.Ui.Group(target, "Left", T("ESP", "ESP"), "eye")
     Kit.Ui.Key(main:AddToggle("KitEsp", {
+        Text = T("Enabled", "เปิดใช้"),
         Callback = function(on)
             if on then Kit.Esp.Start() else Kit.Esp.Stop() end
         end,
@@ -17997,33 +19261,61 @@ function Kit.Esp.BuildMain(target, T)
             Callback = function(color) Kit.Esp.SetColor(name, color) end,
         })
     end
+    main:AddToggle("KitEspTeamCheck", { Text = T("Team Check", "ไม่แสดงทีมเดียวกัน"), Callback = Kit.Esp.Setter("TeamCheck") })
+    main:AddToggle("KitEspVisibleOnly", { Text = T("Visible Only", "เฉพาะที่มองเห็น"), Callback = Kit.Esp.Setter("VisibleOnly") })
     main:AddSlider("KitEspDistance", {
+        Text = T("Max Distance", "ระยะสูงสุด"), Min = 50, Max = 5000, Step = 50, Default = tuning.MaxDistance, Suffix = "m",
         Callback = Kit.Esp.Setter("MaxDistance"),
     })
+    main:AddSeparatorText(T("Presets", "ค่าสำเร็จรูป"))
+    main:AddButton({ Text = T("Legit", "เนียน"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Legit") end)
+        :AddButton({ Text = T("Full", "เต็ม"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Full") end)
+        :AddButton({ Text = T("Mobile", "มือถือ"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Mobile") end)
     return main
 end
 
 function Kit.Esp.BuildBox(target, T)
     local tuning = Kit.Esp.Settings
+    local group = Kit.Ui.Group(target, "Left", T("Box", "กรอบ"), "box")
+    Kit.Esp.Element(group, "Box", T("Box", "กรอบ"))
+    group:AddSegmented("KitEspBoxStyle", { Text = T("Style", "แบบ"), Values = { "2D", "Corner", "3D" }, Default = "2D", DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxStyle") })
+    group:AddToggle("KitEspBoxOutline", { Text = T("Outline", "ขอบดำ"), Default = true, DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxOutline") })
+    group:AddToggle("KitEspBoxFill", { Text = T("Filled", "ทึบ"), DependsOn = Kit.Esp.Under("Box"), Callback = Kit.Esp.Setter("BoxFill") })
     group:AddSlider("KitEspBoxFillAlpha", {
+        Text = T("Fill Opacity", "ความทึบพื้น"), Min = 5, Max = 80, Default = tuning.BoxFillAlpha * 100, Suffix = "%",
         DependsOn = { "KitEspBoxFill", true }, Callback = Kit.Esp.Setter("BoxFillAlpha", 100),
     })
+    group:AddSlider("KitEspThickness", { Text = T("Line Thickness", "ความหนาเส้น"), Min = 1, Max = 4, Step = 0.5, Rounding = 1, Default = tuning.Thickness, Callback = Kit.Esp.Setter("Thickness") })
 end
 
 function Kit.Esp.BuildChams(target, T)
     local tuning = Kit.Esp.Settings
+    local group = Kit.Ui.Group(target, "Left", T("Chams", "ไฮไลต์ตัว"), "chams")
+    Kit.Esp.Element(group, "Chams", T("Chams", "ไฮไลต์ตัว"))
     group:AddDropdown("KitEspChamsMode", {
+        Text = T("Show", "แสดง"), Default = "Always", DependsOn = Kit.Esp.Under("Chams"),
+        Values = { T("Always", "ตลอด"), T("Visible", "เฉพาะที่เห็น"), T("Behind Wall", "เฉพาะหลังกำแพง") }, Callback = Kit.Esp.Setter("ChamsMode"),
     })
+    group:AddSlider("KitEspChamsFill", { Text = T("Fill Opacity", "ความทึบไส้"), Min = 0, Max = 100, Default = tuning.ChamsFill * 100, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsFill", 100) })
+    group:AddSlider("KitEspChamsOutline", { Text = T("Outline Transparency", "ความโปร่งขอบ"), Min = 0, Max = 100, Default = 0, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsOutline", 100) })
 end
 
 function Kit.Esp.BuildHealth(target, T)
+    local group = Kit.Ui.Group(target, "Left", T("Health", "เลือด"), "health")
+    Kit.Esp.Element(group, "Health", T("Health Bar", "แถบเลือด"))
+    Kit.Esp.Element(group, "Armor", T("Armor Bar", "แถบเกราะ"))
     group:AddSegmented("KitEspBarSide", {
+        Text = T("Bar Side", "ตำแหน่งแถบ"), Default = "Left",
+        Values = { T("Left", "ซ้าย"), T("Right", "ขวา"), T("Top", "บน"), T("Bottom", "ล่าง") }, Callback = Kit.Esp.Setter("BarSide"),
     })
 end
 
 function Kit.Esp.BuildText(target, T)
     local tuning = Kit.Esp.Settings
+    local group = Kit.Ui.Group(target, "Right", T("Text", "ข้อความ"), "edit")
     group:AddMultiChips("KitEspText", {
+        Text = T("Show", "แสดง"), Default = { "Name", "Distance" },
+        Values = { T("Name", "ชื่อ"), T("Distance", "ระยะ"), T("Health", "เลือด"), T("Weapon", "อาวุธ"), T("Status", "สถานะ") },
         Callback = function(set)
             local show = Kit.Esp.Settings.Show
             for _, key in pairs(Kit.Esp.TextKeys) do show[key] = false end
@@ -18034,47 +19326,78 @@ function Kit.Esp.BuildText(target, T)
             Kit.Esp.Changed()
         end,
     })
+    group:AddSlider("KitEspTextSize", { Text = T("Size", "ขนาด"), Min = 8, Max = 24, Step = 1, Default = tuning.TextSize, Callback = Kit.Esp.Setter("TextSize") })
 end
 
 function Kit.Esp.BuildLines(target, T)
     local tuning = Kit.Esp.Settings
+    local group = Kit.Ui.Group(target, "Right", T("Tracer & Body", "เส้นและโครง"), "tracer")
+    Kit.Esp.Element(group, "Tracer", T("Tracer", "เส้นชี้"))
     group:AddDropdown("KitEspTracerOrigin", {
+        Text = T("From", "เริ่มจาก"), Default = "Bottom", DependsOn = Kit.Esp.Under("Tracer"),
+        Values = { T("Bottom", "ล่างจอ"), T("Center", "กลางจอ"), T("Top", "บนจอ"), T("Mouse", "เมาส์") }, Callback = Kit.Esp.Setter("TracerOrigin"),
     })
+    Kit.Esp.Element(group, "Skeleton", T("Skeleton", "โครงกระดูก"))
+    Kit.Esp.Element(group, "HeadDot", T("Head Dot", "จุดที่หัว"))
 end
 
 function Kit.Esp.BuildOffscreen(target, T)
     local tuning = Kit.Esp.Settings
+    local group = Kit.Ui.Group(target, "Right", T("Off-screen & Radar", "นอกจอและเรดาร์"), "radar")
+    Kit.Esp.Element(group, "Arrows", T("Off-screen Arrows", "ลูกศรนอกจอ"))
+    group:AddSlider("KitEspArrowRadius", { Text = T("Distance From Center", "ระยะจากกลางจอ"), Min = 60, Max = 400, Step = 10, Default = tuning.ArrowRadius, Suffix = "px", DependsOn = Kit.Esp.Under("Arrows"), Callback = Kit.Esp.Setter("ArrowRadius") })
+    group:AddSlider("KitEspArrowSize", { Text = T("Arrow Size", "ขนาดลูกศร"), Min = 6, Max = 30, Default = tuning.ArrowSize, Suffix = "px", DependsOn = Kit.Esp.Under("Arrows"), Callback = Kit.Esp.Setter("ArrowSize") })
+    Kit.Esp.Element(group, "Radar", T("Radar", "เรดาร์"))
+    group:AddSlider("KitEspRadarSize", { Text = T("Radar Size", "ขนาดเรดาร์"), Min = 100, Max = 300, Step = 10, Default = tuning.RadarSize, Suffix = "px", DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarSize") })
+    group:AddSlider("KitEspRadarRange", { Text = T("Radar Range", "ระยะเรดาร์"), Min = 50, Max = 1000, Step = 25, Default = tuning.RadarRange, Suffix = "m", DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRange") })
     group:AddDropdown("KitEspRadarCorner", {
+        Text = T("Position", "ตำแหน่ง"), Default = "Top Left", DependsOn = Kit.Esp.Under("Radar"),
+        Values = { T("Top Left", "ซ้ายบน"), T("Top Right", "ขวาบน"), T("Bottom Left", "ซ้ายล่าง"), T("Bottom Right", "ขวาล่าง") },
         Callback = Kit.Esp.Setter("RadarCorner"),
     })
+    group:AddToggle("KitEspRadarRotate", { Text = T("Rotate With Camera", "หมุนตามกล้อง"), Default = true, DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRotate") })
 end
 
 function Kit.Esp.BuildColors(target, T)
+    local group = Kit.Ui.Group(target, "Right", T("Colors", "สี"), "palette")
     local colors = Kit.Esp.Settings.Colors
     group:AddDropdown("KitEspColorMode", {
+        Text = T("Color By", "ใช้สีตาม"), Default = "Relation",
+        Values = { T("Relation", "ศัตรู/ทีม/บอท"), T("Team", "สีทีม"), T("Health", "เลือด") },
         Callback = Kit.Esp.Setter("ColorMode"),
     })
     local pairsList = {
+        { "Enemy", T("Enemy  ·  Visible / Behind Wall", "ศัตรู · เห็น / หลังกำแพง") },
+        { "Team", T("Team  ·  Visible / Behind Wall", "ทีม · เห็น / หลังกำแพง") },
+        { "Bot", T("Bot  ·  Visible / Behind Wall", "บอท · เห็น / หลังกำแพง") },
     }
     for _, spec in ipairs(pairsList) do
         group:AddLabel({ Text = spec[2] })
             :AddColorPicker("KitEspColor" .. spec[1] .. "Visible", { Default = colors[spec[1] .. "Visible"], Callback = Kit.Esp.ColorSetter(spec[1] .. "Visible") })
             :AddColorPicker("KitEspColor" .. spec[1] .. "Hidden", { Default = colors[spec[1] .. "Hidden"], Callback = Kit.Esp.ColorSetter(spec[1] .. "Hidden") })
     end
+    group:AddLabel({ Text = T("Aim Target", "เป้าที่ล็อก") }):AddColorPicker("KitEspColorFocus", { Default = colors.Focus, Callback = Kit.Esp.ColorSetter("Focus") })
+    group:AddToggle("KitEspLowHealth", { Text = T("Low Health Color", "สีเมื่อเลือดต่ำ"), Callback = Kit.Esp.Setter("LowHealth") })
         :AddColorPicker("KitEspColorLowHealth", { Default = colors.LowHealth, Callback = Kit.Esp.ColorSetter("LowHealth") })
     group:AddSlider("KitEspLowHealthAt", {
+        Text = T("Below", "ต่ำกว่า"), Min = 5, Max = 90, Step = 5, Default = 30, Suffix = "%",
         DependsOn = { "KitEspLowHealth", true }, Callback = Kit.Esp.Setter("LowHealthAt"),
     })
+    group:AddLabel({ Text = T("Health Bar  ·  Full / Empty", "แถบเลือด · เต็ม / หมด") })
         :AddColorPicker("KitEspElementHealthHigh", { Default = colors.HealthHigh, Callback = Kit.Esp.ColorSetter("HealthHigh") })
         :AddColorPicker("KitEspElementHealthLow", { Default = colors.HealthLow, Callback = Kit.Esp.ColorSetter("HealthLow") })
+    group:AddLabel({ Text = T("Armor Bar", "แถบเกราะ") }):AddColorPicker("KitEspElementArmor", { Default = colors.Armor, Callback = Kit.Esp.ColorSetter("Armor") })
 end
 
 function Kit.Esp.BuildAdvanced(target, T, kinds)
     local tuning = Kit.Esp.Settings
+    local group = Kit.Ui.Group(target, "Left", T("Advanced", "ขั้นสูง"), "filter")
+    local values, picked = { T("Players", "ผู้เล่น"), T("Bots", "บอท") }, { "Players", "Bots" }
     for _, kind in ipairs(kinds or {}) do
         values[#values + 1], picked[#picked + 1] = kind, kind
     end
     group:AddMultiChips("KitEspKinds", {
+        Text = T("Show Types", "ประเภทที่แสดง"), Values = values, Default = picked,
         Callback = function(set)
             local kindSet = {}
             for entry, on in pairs(set or {}) do
@@ -18083,13 +19406,17 @@ function Kit.Esp.BuildAdvanced(target, T, kinds)
             Kit.Esp.Set("Kinds", kindSet)
         end,
     })
+    group:AddToggle("KitEspHideDead", { Text = T("Hide Dead", "ซ่อนตัวที่ตาย"), Default = true, Callback = Kit.Esp.Setter("HideDead") })
     group:AddToggle("KitEspWatch", {
+        Text = T("Warn When Watched", "เตือนเมื่อถูกมอง"), Description = T("Marks enemies looking at you", "เปลี่ยนสีศัตรูที่หันมาทางคุณ"),
         Callback = Kit.Esp.Setter("Watch"),
     }):AddColorPicker("KitEspColorWatching", { Default = tuning.Colors.Watching, Callback = Kit.Esp.ColorSetter("Watching") })
     group:AddSlider("KitEspWatchAngle", {
+        Text = T("Watch Angle", "มุมที่นับว่ามอง"), Min = 2, Max = 30, Default = tuning.WatchAngle, Suffix = "°",
         DependsOn = { "KitEspWatch", true }, Callback = Kit.Esp.Setter("WatchAngle"),
     })
     group:AddSlider("KitEspRate", {
+        Text = T("Update Rate", "อัปเดตทุก"), Min = 0.05, Max = 2, Step = 0.05, Rounding = 2, Default = tuning.Rate, Suffix = "s",
         Callback = Kit.Esp.Setter("Rate"),
     })
 end
@@ -18105,6 +19432,7 @@ function Kit.Esp.Build(target, options)
     local T = Kit.T
     Kit.Esp.Defaults()
     if options.Players ~= false and not Kit.Esp.Categories.Players then
+        Kit.Esp.AddCategory("Players", { Text = T("Players", "ผู้เล่น"), Color = Color3.fromRGB(240, 92, 80), Source = Kit.Esp.PlayerSource, Characters = true })
     end
     for _, spec in ipairs(options.Categories or {}) do
         Kit.Esp.AddCategory(spec.Name, spec)
@@ -18622,18 +19950,23 @@ function Kit.Aim.BuildBase(group, which, text, extra)
         Kit.Caps.NeedCap(toggle, extra.Cap)
     end
     system.Key = group:AddKeybind(id .. "Key", {
+        Text = T("Aim Key", "ปุ่มเล็ง"),
         Default = "None",
         Mode = "Always",
         FloatButton = true,
     })
+    group:AddToggle(id .. "TeamCheck", { Text = T("Team Check", "ไม่เล็งทีมเดียวกัน"), Callback = Kit.Aim.Bind(system, "TeamCheck") })
     if tuning.VisibleOnly ~= nil then
+        group:AddToggle(id .. "Visible", { Text = T("Visible Only", "เฉพาะที่มองเห็น"), Callback = Kit.Aim.Bind(system, "VisibleOnly") })
     end
     if tuning.Priority then
         group:AddDropdown(id .. "Priority", {
+            Text = T("Priority", "เลือกเป้าตาม"), Values = { "Crosshair", "Distance", "Health" }, Default = tuning.Priority,
             Callback = Kit.Aim.Bind(system, "Priority"),
         })
     end
     group:AddSlider(id .. "Distance", {
+        Text = T("Max Distance", "ระยะสูงสุด"), Min = 50, Max = 3000, Step = 50, Default = tuning.MaxDistance, Suffix = "m",
         Callback = Kit.Aim.Bind(system, "MaxDistance"),
     })
     return toggle
@@ -18645,15 +19978,18 @@ function Kit.Aim.BuildFov(group, which)
     local tuning = system.Settings
     local id = "Kit" .. which
     group:AddToggle(id .. "ShowFov", {
+        Text = T("Show FOV", "แสดงวง FOV"),
         Callback = Kit.Aim.Bind(system, "ShowFov"),
     }):AddColorPicker(id .. "FovColor", { Default = tuning.FovColor, Callback = Kit.Aim.Bind(system, "FovColor") })
     group:AddSlider(id .. "Fov", {
+        Text = T("FOV", "ขนาด FOV"), Min = 20, Max = 600, Step = 5, Default = tuning.Fov, Suffix = "px",
         Callback = Kit.Aim.Bind(system, "Fov"),
     })
 end
 
 function Kit.Aim.BuildPart(group, which)
     group:AddDropdown("Kit" .. which .. "Part", {
+        Text = Kit.T("Aim Part", "จุดเล็ง"), Values = { "Head", "Torso" }, Default = Kit.Aim[which].Settings.Part,
         Callback = Kit.Aim.Bind(Kit.Aim[which], "Part"),
     })
 end
@@ -18668,21 +20004,30 @@ function Kit.Aim.Build(target, options)
     end
     Kit.Aim.Aimbot.Settings.ShowFov, Kit.Aim.Silent.Settings.ShowFov = false, false
 
+    local aimbot = Kit.Ui.Group(target, "Left", T("Aimbot", "ล็อกเป้า"), "aimbot")
+    Kit.Aim.BuildBase(aimbot, "Aimbot", T("Aimbot", "ล็อกเป้า"))
     Kit.Aim.BuildPart(aimbot, "Aimbot")
     aimbot:AddSlider("KitAimbotSmooth", {
+        Text = T("Smoothness", "ความนุ่ม"), Min = 0, Max = 0.95, Step = 0.05, Default = Kit.Aim.Aimbot.Settings.Smoothness,
         Callback = Kit.Aim.Bind(Kit.Aim.Aimbot, "Smoothness"),
     })
+    aimbot:AddToggle("KitAimbotSticky", { Text = T("Sticky Target", "ล็อกเป้าเดิม"), Callback = Kit.Aim.Bind(Kit.Aim.Aimbot, "Sticky") })
     Kit.Aim.BuildFov(aimbot, "Aimbot")
 
     local silent
     if options.Silent then
+        silent = Kit.Ui.Group(target, "Right", T("Silent Aim", "ยิงเข้าเป้า"), "silentaim")
+        Kit.Aim.BuildBase(silent, "Silent", T("Silent Aim", "ยิงเข้าเป้า"), { Cap = "Hook", Risky = true })
         silent:AddDropdown("KitSilentMethod", {
+            Text = T("Method", "วิธี"), Values = { "Both", "Raycast", "Mouse" }, Default = Kit.Aim.Silent.Settings.Method,
             Callback = Kit.Aim.SetSilentMethod,
         })
         silent:AddSlider("KitSilentHit", {
+            Text = T("Hit Chance", "โอกาสโดน"), Min = 0, Max = 100, Step = 1, Default = 100, Suffix = "%",
             Callback = Kit.Aim.Bind(Kit.Aim.Silent, "HitChance"),
         })
         silent:AddSlider("KitSilentHead", {
+            Text = T("Headshot Chance", "โอกาสเข้าหัว"), Min = 0, Max = 100, Step = 1, Default = 50, Suffix = "%",
             Callback = Kit.Aim.Bind(Kit.Aim.Silent, "HeadChance"),
         })
         Kit.Aim.BuildFov(silent, "Silent")
@@ -18690,18 +20035,25 @@ function Kit.Aim.Build(target, options)
 
     local trigger
     if options.Trigger ~= false then
+        trigger = Kit.Ui.Group(target, options.Silent and "Left" or "Right", T("Triggerbot", "ยิงอัตโนมัติ"), "triggerbot")
+        Kit.Aim.BuildBase(trigger, "Trigger", T("Triggerbot", "ยิงอัตโนมัติ"))
         trigger:AddSlider("KitTriggerDelay", {
+            Text = T("Reaction Delay", "หน่วงก่อนยิง"), Min = 0, Max = 0.5, Step = 0.01, Default = 0.05, Suffix = "s",
             Callback = Kit.Aim.Bind(Kit.Aim.Trigger, "Delay"),
         })
         trigger:AddSlider("KitTriggerChance", {
+            Text = T("Fire Chance", "โอกาสยิง"), Min = 0, Max = 100, Step = 1, Default = 100, Suffix = "%",
             Callback = Kit.Aim.Bind(Kit.Aim.Trigger, "Chance"),
         })
     end
 
     local rage
     if options.Rage ~= false then
+        rage = Kit.Ui.Group(target, "Right", T("Ragebot", "ยิงล็อกทุกทิศ"), "ragebot")
+        Kit.Aim.BuildBase(rage, "Rage", T("Ragebot", "ยิงล็อกทุกทิศ"), { Risky = true })
         Kit.Aim.BuildPart(rage, "Rage")
         rage:AddSlider("KitRageGap", {
+            Text = T("Fire Interval", "ยิงทุก"), Min = 0.02, Max = 1, Step = 0.01, Default = Kit.Aim.Rage.Settings.FireGap, Suffix = "s",
             Callback = Kit.Aim.Bind(Kit.Aim.Rage, "FireGap"),
         })
     end
@@ -18904,12 +20256,18 @@ table.insert(Kit.Modules, Kit.Guns)
 
 function Kit.Guns.Build(target)
     local T = Kit.T
+    local group = Kit.Ui.Group(target, "Left", T("Gun Mods", "ปรับปืน"), "fullauto")
     local mods = {
+        { "NoRecoil", T("No Recoil", "ไม่มีแรงถีบ") },
+        { "NoSpread", T("No Spread", "กระสุนไม่กระจาย") },
+        { "FullAuto", T("Full Auto", "ยิงรัว") },
+        { "RapidFire", T("Rapid Fire", "ยิงเร็ว") },
     }
     for _, mod in ipairs(mods) do
         group:AddToggle("KitGuns" .. mod[1], { Text = mod[2], Risky = true, Callback = function(on) Kit.Guns.Set(mod[1], on) end })
     end
     group:AddSlider("KitGunsRapidScale", {
+        Text = T("Fire Rate Boost", "เร่งอัตรายิง"), Min = 1.5, Max = 10, Step = 0.5, Default = Kit.Guns.Settings.RapidScale, Suffix = "x",
         Callback = Kit.Guns.SetRapidScale,
     })
     return group
@@ -19127,8 +20485,11 @@ function Kit.Teleport.Build(target, providers)
         list[#list + 1] = provider
     end
     if providers.Players ~= false then
+        list[#list + 1] = Kit.Teleport.FromPlayers(T("Players", "ผู้เล่น"))
     end
+    local group = Kit.Ui.Group(target, "Left", T("Teleport", "วาร์ป"), "teleport")
     group:AddTeleportList("KitTeleport", {
+        Text = T("Places", "สถานที่"), Icon = "waypoint",
         Source = function()
             return Kit.Teleport.Collect(list)
         end,
@@ -19139,14 +20500,17 @@ function Kit.Teleport.Build(target, providers)
         end,
     })
     group:AddDropdown("KitTeleportMode", {
+        Text = T("Mode", "รูปแบบ"), Icon = "teleport",
         Values = { "Instant", "Tween" },
         Default = Kit.Teleport.Mode,
         Callback = function(mode) Kit.Teleport.Mode = mode end,
     })
     group:AddSlider("KitTeleportSpeed", {
+        Text = T("Tween Speed", "ความเร็วเคลื่อน"), Icon = "speed", Min = 30, Max = 600, Step = 10, Default = Kit.Teleport.Speed,
         DependsOn = { "KitTeleportMode", "Tween" },
         Callback = function(speed) Kit.Teleport.Speed = speed end,
     })
+    group:AddButton({ Text = T("Go Back", "กลับจุดเดิม"), Icon = "waypoint" }, function()
         task.spawn(Kit.Teleport.Back)
     end)
     return group
@@ -19239,21 +20603,28 @@ table.insert(Kit.Modules, Kit.Webhook)
 
 function Kit.Webhook.Build(target)
     local T = Kit.T
+    local group = Kit.Ui.Group(target, "Right", T("Webhook", "เว็บฮุค"), "webhook")
     local toggle = group:AddToggle("KitWebhook", {
+        Text = T("Webhook", "เว็บฮุค"), Icon = "webhook",
+        Description = T("Send alerts to your Discord channel", "ส่งแจ้งเตือนเข้าห้อง Discord"),
         Callback = function(on) Kit.Webhook.Enabled = on end,
     })
     Kit.Caps.NeedCap(toggle, "Http")
     group:AddInput("KitWebhookUrl", {
+        Text = T("Webhook URL", "ลิงก์เว็บฮุค"), Icon = "link",
         Placeholder = T("https://discord.com/api/webhooks/...", "https://discord.com/api/webhooks/..."),
         Finished = true,
         Callback = function(url)
             Kit.Webhook.Url = url
             if url ~= "" and not Kit.Webhook.Valid(url) then
+                Kit.Ui.Notify("That is not a Discord webhook link", "ลิงก์นี้ไม่ใช่เว็บฮุค Discord", "Warn")
             end
         end,
     })
+    group:AddButton({ Text = T("Send Test", "ส่งทดสอบ"), Icon = "webhook" }, function()
         local sent = Kit.Webhook.Send({ Title = "m0pu", Description = "Webhook test from " .. LocalPlayer.Name })
         if not sent then
+            Kit.Ui.Notify("Check the link and executor support", "เช็คลิงก์และ executor อีกครั้ง", "Warn")
         end
     end)
     return group
@@ -19264,6 +20635,7 @@ Kit.Discord = {}
 function Kit.Discord.Copy(link)
     link = link or Kit.Config.Discord
     if Util.Clipboard(link) then
+        Kit.Ui.Notify("Discord link copied", "คัดลอกลิงก์ Discord แล้ว", "Success")
     else
         Library:Notify("Discord", link, Kit.Config.DiscordNotify, "Info")
     end
@@ -19274,6 +20646,7 @@ function Kit.Discord.Build(target, link)
     link = link or Kit.Config.Discord
     local group = Kit.Ui.Group(target, "Right", "Discord", "discord")
     group:AddLabel((link:gsub("^https://", "")))
+    group:AddButton({ Text = T("Copy Discord Link", "คัดลอกลิงก์ Discord"), Icon = "copy" }, function()
         Kit.Discord.Copy(link)
     end)
     return group
@@ -19284,12 +20657,20 @@ end
 function Library:CreateWindow(options)
     options = options or {}
     Settings.Load()
-    local themeName = Settings.ApplyBoot(options)
+    local themeName, savedLanguage = Settings.ApplyBoot(options)
+    local language = savedLanguage or options.Language
+    if language == "Auto" then
+        language = tostring(LocalPlayer.LocaleId):sub(1, 2) == "th" and "TH" or "EN"
+    end
+    State.Language = language == "TH" and "TH" or "EN"
     Platform.Detect(options.Layout)
     Assets.Configure(Config.DefaultAssets)
     Assets.Configure(options.Assets)
     Gui.Setup()
     Theme.Apply(themeName)
+    if State.Language == "TH" then
+        Fonts.LoadThaiAsync()
+    end
     Configs.SetFolder(options.ConfigFolder or options.Title or "m0pu")
     local window = Window.New(options)
     self.Window = window
@@ -19354,10 +20735,10 @@ function Library.Boot(window, options)
         Title = window.Title,
         SubTitle = window.SubTitle,
         Steps = {
-            { Label = steps.EN[1] },
-            { Label = steps.EN[2] },
-            { Label = steps.EN[3], Run = WaitBuilt },
-            { Label = steps.EN[4] },
+            { Label = { EN = steps.EN[1], TH = steps.TH[1] } },
+            { Label = { EN = steps.EN[2], TH = steps.TH[2] } },
+            { Label = { EN = steps.EN[3], TH = steps.TH[3] }, Run = WaitBuilt },
+            { Label = { EN = steps.EN[4], TH = steps.TH[4] } },
         },
         OnDone = function()
             Library.Reveal(window)
@@ -19365,8 +20746,26 @@ function Library.Boot(window, options)
     })
 end
 
-function Library:T(english)
-    return english
+function Library:T(english, thai)
+    return { EN = english, TH = thai or english }
+end
+
+function Library:SetLanguage(code)
+    if code ~= "EN" and code ~= "TH" then
+        return
+    end
+    Lang.Set(code)
+    local option = self.Options.m0puLanguage
+    local label = code == "TH" and "ไทย" or "English"
+    if option and option.Value ~= label and type(option.SetValue) == "function" then
+        option.Silent = true
+        Util.Try(option.SetValue, option, label)
+        option.Silent = nil
+    end
+end
+
+function Library:GetLanguage()
+    return State.Language
 end
 
 function Library:SetTheme(name)
@@ -19385,7 +20784,7 @@ end
 ---@param action table?    { Text, Callback } button on the card
 ---@return table?          { Dismiss }
 function Library:Notify(info, content, duration, kind, action)
-    if type(info) == "table" and not info.EN then
+    if type(info) == "table" and not info.EN and not info.TH then
         info, content, duration, kind, action = info.Title, info.Content or info.Description, info.Duration, info.Kind or info.Type or info.Icon, info.Action
     end
     if self.Unloaded or type(Notify.Push) ~= "function" then
@@ -19548,8 +20947,8 @@ function Library:LoadAutoloadConfig()
         return
     end
     local ok, reason = Configs.Load(name)
-    local message = ok and { EN = "Autoloaded: " .. name }
-        or { EN = "Autoload failed: " .. tostring(reason) }
+    local message = ok and { EN = "Autoloaded: " .. name, TH = "โหลดอัตโนมัติ: " .. name }
+        or { EN = "Autoload failed: " .. tostring(reason), TH = "โหลดอัตโนมัติไม่สำเร็จ: " .. tostring(reason) }
     self:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
 end
 
