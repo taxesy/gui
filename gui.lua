@@ -4696,7 +4696,7 @@ function Layout.Measure(text, size, fontKind, width)
         probe.Text = text
         bounds = probe.TextBounds
         if probe.AbsoluteSize.X ~= width then
-            local fallback = Fonts.ThaiFallback[fontKind] or Enum.Font.BuilderSansBold
+            local fallback = Enum.Font.BuilderSansBold
             return Layout.TextService:GetTextSize(text, size, fallback, Vector2.new(width, 100000))
         end
     end
