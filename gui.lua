@@ -20414,6 +20414,13 @@ function Library:Pin(idx, pinned)
     return QuickBar.Has(idx)
 end
 
+function Library:SetOverlay(name, visible)
+    local overlay = ({ Watermark = Watermark, KeybindList = KeybindList, Float = Float })[name]
+    if overlay then
+        overlay.SetVisible(visible == true)
+    end
+end
+
 function Library:SetWatermarkTitle(title)
     Watermark.SetTitle(title)
 end
