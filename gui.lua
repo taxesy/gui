@@ -23,7 +23,7 @@ local Config = {
     ConfigRoot = "m0pu/configs",
     KeyCache = "m0pu/key.txt",
     DiscordInvite = "https://discord.gg/sl8",
-    DefaultAssets = { logo = "https://raw.githubusercontent.com/taxesy/gui/main/img/logo.png" },
+    DefaultAssets = { logo = "https://raw.githubusercontent.com/xDTaraZz/Roblox-Scripts/main/logo.png" },
     HttpTimeout = 8,
     Text = { Title = 26, Header = 22, Group = 16, Label = 15, Desc = 13, Small = 12, Button = 15, Watermark = 13, Section = 13 },
     Window = {
