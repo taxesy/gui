@@ -626,7 +626,7 @@ function Util.EnsureFolder(path)
     end
 end
 
----@return string  keeps UTF-8 (Thai ok), strips path-illegal chars
+---@return string  strips path-illegal characters, strips path-illegal chars
 function Util.Sanitize(name)
     local clean = tostring(name):gsub('[%c/\\:%*%?"<>|]', ""):gsub("^%s+", ""):gsub("%s+$", "")
     return clean ~= "" and clean or "config"
@@ -4713,7 +4713,7 @@ function Layout.Measure(text, size, fontKind, width)
         probe.Text = text
         bounds = probe.TextBounds
         if probe.AbsoluteSize.X ~= width then
-            local fallback = Fonts.ThaiFallback[fontKind] or Enum.Font.BuilderSansBold
+            local fallback = Enum.Font.BuilderSansBold
             return Layout.TextService:GetTextSize(text, size, fallback, Vector2.new(width, 100000))
         end
     end
@@ -4728,7 +4728,7 @@ end
 Layout.TextService = game:GetService("TextService")
 Layout.EnumFonts = {}
 
----@return Enum.Font?  the enum behind a built-in face; nil for a custom face (Thai), which needs the probe label
+---@return Enum.Font?  the enum behind a built-in face; nil for a custom face
 function Layout.EnumFont(face)
     local cache = Layout.EnumFonts
     local key = face.Family .. "|" .. face.Weight.Name .. "|" .. face.Style.Name
@@ -4746,7 +4746,7 @@ function Layout.EnumFont(face)
     return cached or nil
 end
 
----Off-screen TextLabel: GetTextSize only takes Enum.Font, so custom Thai faces need a real label.
+---Off-screen TextLabel: GetTextSize only takes Enum.Font, so custom faces need a real label.
 function Layout.Probe()
     local host = Layout.ProbeHost()
     local probe = Layout.ProbeLabel
@@ -5532,7 +5532,7 @@ end
 ---@return any  stable compare/save key: a T() table collapses to its English text
 function Widget.Key(value)
     if type(value) == "table" then
-        return value.EN or value.TH or value[1]
+        return value.EN or value[1]
     end
     return value
 end
@@ -5566,7 +5566,7 @@ function Widget.SelectSet(values, picks, max)
     if type(picks) ~= "table" then
         return set
     end
-    if type(picks.EN) == "string" or type(picks.TH) == "string" then
+    if type(picks.EN) == "string" then
         picks = { picks }
     end
     local wanted = {}
@@ -6916,7 +6916,7 @@ function Dropdown:Normalize(value)
     if self.Multi then
         return Widget.SelectSet(self.Values, value, self.Max)
     end
-    if type(value) == "table" and value.EN == nil and value.TH == nil then
+    if type(value) == "table" and value.EN == nil then
         value = value[1]
     end
     local entry = Widget.Canonical(self.Values, value)
@@ -7353,7 +7353,7 @@ end
 
 ---@return table  info table with Callback resolved (Callback, then V1 Func, then the positional callback)
 function Button.Normalize(info, callback)
-    if type(info) ~= "table" or info.EN or info.TH then
+    if type(info) ~= "table" or info.EN then
         info = { Text = info }
     end
     info.Callback = info.Callback or info.Func or callback
@@ -9004,7 +9004,7 @@ end
 function Table.NormalizeColumns(columns)
     local normalized = {}
     for index, column in ipairs(columns or {}) do
-        local shorthand = type(column) ~= "table" or column.EN ~= nil or column.TH ~= nil
+        local shorthand = type(column) ~= "table" or column.EN ~= nil
         normalized[index] = shorthand and { Key = index, Text = column } or column
     end
     return normalized
@@ -9400,7 +9400,7 @@ end
 ---@return string?  same key for equal categories even when each entry built its own T() table
 function TeleportList.CategoryKey(spec)
     if type(spec) == "table" then
-        return tostring(spec.EN) .. "|" .. tostring(spec.TH)
+        return tostring(spec.EN)
     end
     return spec ~= nil and tostring(spec) or nil
 end
@@ -9704,7 +9704,7 @@ function Feature.AttachNow(container, toggle, now)
     local spec = now
     if type(now) == "function" then
         spec = { Func = now }
-    elseif type(now) ~= "table" or now.EN or now.TH then
+    elseif type(now) ~= "table" or now.EN then
         spec = { Text = now }
     end
     toggle.Now = Button.Create(container, {
@@ -11926,7 +11926,6 @@ function Window.MakeLetter()
 end
 
 ---Tab name in the bouncy title font, one frame per letter so they can drop in one by one.
----Thai has no Logo glyphs, so it falls back to one Display label.
 function Window:RenderHero(animate)
     local pool = Draw.Pool("HeroLetter", Window.MakeLetter)
     for _, slot in ipairs(self.HeroLetters) do
@@ -11936,13 +11935,8 @@ function Window:RenderHero(animate)
     table.clear(self.HeroLetters)
     local text = Lang.Resolve(self.HeroSpec or "")
     local size = self:HeroSize()
-    local thai = Lang.HasThai(text)
-    self.HeroText.Visible = thai
-    if thai then
-        self.HeroText.Text = text
-        Fonts.Style(self.HeroText, "Display", size)
-        return
-    end
+    self.HeroText.Visible = false
+    self.HeroText.Text = ""
     for char in text:gmatch(utf8.charpattern) do
         local slot = pool.Acquire()
         local width = char == " " and math.floor(size * Config.Chrome.HeroSpace) or Layout.Measure(char, size, "Logo", 400).X
@@ -12428,8 +12422,7 @@ function Window:LayoutTopRow()
     self.SearchField.Visible = not phone
     self.SearchField.Size = UDim2.fromOffset(chrome.SearchWidth[mode] or chrome.SearchWidth.Desktop, box)
     self.SearchHint.Visible = mode == "Desktop" and self.SearchBox.Text == ""
-    self.LangPill.Visible = not phone
-    self.SearchButton.Frame.Visible = phone
+        self.SearchButton.Frame.Visible = phone
     self.MinimizeButton.Frame.Visible = not phone
     for _, entry in ipairs({ self.SearchButton, self.MinimizeButton, self.CloseButton }) do
         Window.SizeBlock(entry, box)
@@ -13047,7 +13040,7 @@ end
 
 ---@param info any  name spec or { Name, Side = "Left"|"Right"|nil (full width), Icon, Collapsed }
 function Tab:AddGroupbox(info, icon)
-    if type(info) ~= "table" or info.EN or info.TH then
+    if type(info) ~= "table" or info.EN then
         local side = (icon == "Left" or icon == "Right") and icon or nil
         info = { Name = info, Icon = side == nil and icon or nil, Side = side }
     end
@@ -13544,16 +13537,11 @@ end
 
 function Window:AddSettingsTab()
     local tab = self:AddTab(Lang.Strings.Settings, "settings", Lang.Strings.SettingsDesc)
-    self:BuildThemeGroup(tab:AddLeftGroupbox(Lang.Strings.ThemeName, "theme"))
-    self:BuildInterfaceGroup(tab:AddLeftGroupbox(Lang.Strings.Interface, "pc"))
-    self:BuildOverlayGroup(tab:AddLeftGroupbox(Lang.Strings.Overlays, "eye"))
-    Window.BuildConfigGroup(tab:AddRightGroupbox(Lang.Strings.Configs, "config"))
-    self:BuildQuickBarGroup(tab:AddRightGroupbox(Lang.Strings.QuickBar, "pin"))
-    self:BuildAboutGroup(tab:AddRightGroupbox(Lang.Strings.About, "info"))
+    Window.BuildConfigGroup(tab:AddLeftGroupbox(Lang.Strings.Configs, "config"))
+    self:BuildThemeGroup(tab:AddRightGroupbox(Lang.Strings.ThemeName, "theme"))
     self.SettingsTab = tab
     return tab
 end
-
 function Window:BuildThemeGroup(group)
     local columns = Config.Chrome.ThemeCard.Columns
     local cards = {}
@@ -13620,149 +13608,6 @@ function Window.ThemeScene(preview, palette, card)
     Block(panel, palette.Muted, UDim2.fromScale(0.08, 0.56), UDim2.fromScale(0.4, 0.14), UDim.new(1, 0))
     local switch = Block(panel, palette.Good, UDim2.fromScale(0.64, 0.48), UDim2.fromScale(0.26, 0.32), UDim.new(1, 0))
     Block(switch, Color3.new(1, 1, 1), UDim2.fromScale(0.52, 0.12), UDim2.fromScale(0.36, 0.76), UDim.new(1, 0))
-end
-
-function Window:BuildInterfaceGroup(group)
-    group:AddSlider("MarioScale", {
-        Text = Lang.Strings.Scale, Min = Config.ScaleRange.Min * 100, Max = Config.ScaleRange.Max * 100,
-        Default = State.UserScale * 100, Suffix = "%", Finished = true, NoSave = true,
-        Callback = function(value)
-            self:SetScale(value / 100)
-            Settings.Set("Scale", State.UserScale)
-        end,
-    })
-    group:AddSlider("MarioTransparency", {
-        Text = Lang.Strings.Transparency, Min = 0, Max = 60, Default = math.floor((Settings.Get("Transparency", 0)) * 100), Suffix = "%", NoSave = true,
-        Callback = function(value)
-            self:SetTransparency(value / 100)
-            Settings.Set("Transparency", value / 100)
-        end,
-    })
-    group:AddToggle("m0puReduceMotion", {
-        Text = Lang.Strings.ReduceMotion, Description = Lang.Strings.ReduceMotionDesc, Default = Motion.UserReduced, NoSave = true,
-        Callback = function(enabled)
-            Motion.SetReduced(enabled)
-            Settings.Set("ReduceMotion", enabled)
-        end,
-    })
-    group:AddToggle("MarioParticles", {
-        Text = Lang.Strings.Particles, Description = Lang.Strings.ParticlesDesc, Default = Particles.Enabled, NoSave = true,
-        Callback = function(enabled)
-            Particles.SetEnabled(enabled)
-            Settings.Set("Particles", enabled)
-        end,
-    })
-    group:AddKeybind("MarioMenuKey", {
-        Text = Lang.Strings.MenuKey, Default = State.MenuKey, Mode = "Always", KeyOnly = true, NoSave = true,
-        ChangedCallback = function(name)
-            State.MenuKey = name
-            Settings.Set("MenuKey", name)
-        end,
-    })
-end
-
-function Window:BuildOverlayGroup(group)
-    group:AddToggle("m0puWatermark", {
-        Text = Lang.Strings.Watermark, Description = Lang.Strings.WatermarkDesc, Default = Settings.Get("Watermark", true) == true, NoSave = true,
-        Callback = function(enabled)
-            Watermark.SetVisible(enabled)
-            Settings.Set("Watermark", enabled)
-        end,
-    })
-    group:AddToggle("m0puKeybindList", {
-        Text = Lang.Strings.KeybindList, Default = Settings.Get("KeybindList", false) == true, NoSave = true,
-        Callback = function(enabled)
-            KeybindList.SetVisible(enabled)
-            Settings.Set("KeybindList", enabled)
-        end,
-    })
-    group:AddToggle("m0puFloat", {
-        Text = Lang.Strings.FloatButton, Description = Lang.Strings.FloatDesc, Default = Settings.Get("Float", Platform.Touch) == true, NoSave = true,
-        Callback = function(enabled)
-            Float.SetVisible(enabled)
-            Settings.Set("Float", enabled)
-        end,
-    })
-    group:AddSlider("m0puFloatSize", {
-        Text = Lang.Strings.FloatSize, Min = 40, Max = 80, Default = Settings.Get("FloatSize", 56), Suffix = "px", Finished = true, NoSave = true,
-        Callback = function(value)
-            Float.SetSize(value)
-            Settings.Set("FloatSize", value)
-        end,
-    })
-    local corners = Lang.Strings.NotifyCorners
-    group:AddDropdown("m0puNotifyCorner", {
-        Text = Lang.Strings.NotifyPosition,
-        Values = corners[State.Language] or corners.EN,
-        Default = table.find(Window.Corners, Settings.Get("NotifyCorner", "BottomRight")) or 1,
-        NoSave = true,
-        Callback = function(value)
-            local index = table.find(corners.EN, value) or table.find(corners.TH, value) or 1
-            Notify.SetPosition(Window.Corners[index])
-            Settings.Set("NotifyCorner", Window.Corners[index])
-        end,
-    })
-end
-
----@return string[] names, table<string, string> nameToIdx  every toggle the user can put on the quick bar
-function Window.ToggleChoices()
-    local names, lookup = {}, {}
-    for idx, option in pairs(Library.Toggles) do
-        if type(idx) == "string" and not idx:find("^Mario") then
-            local name = Lang.Resolve(option.Text or idx)
-            if lookup[name] then
-                name = name .. " (" .. idx .. ")"
-            end
-            lookup[name] = idx
-            table.insert(names, name)
-        end
-    end
-    table.sort(names)
-    return names, lookup
-end
-
-function Window:BuildQuickBarGroup(group)
-    local choices = {}
-    choices.Names, choices.Lookup = Window.ToggleChoices()
-    local dropdown = group:AddDropdown("MarioQuickBar", {
-        Text = Lang.Strings.QuickBar, Description = Lang.Strings.QuickBarDesc, Values = choices.Names, Multi = true, NoSave = true,
-        Callback = function(selected)
-            Window.ApplyQuickBar(selected, choices)
-        end,
-    })
-    Gui.Button(group, {
-        Text = Lang.Strings.Refresh,
-        Icon = "refresh",
-        Width = 1,
-        Callback = function()
-            choices.Names, choices.Lookup = Window.ToggleChoices()
-            dropdown:SetValues(choices.Names)
-        end,
-    })
-end
-
----Pins follow the dropdown's value order; QuickBar persists its own pins.
----@param selected table  dropdown multi value (set of names)
----@param choices table   { Names, Lookup = name -> idx }
-function Window.ApplyQuickBar(selected, choices)
-    local wanted = {}
-    for _, name in ipairs(choices.Names) do
-        local idx = choices.Lookup[name]
-        if idx and selected and selected[name] then
-            wanted[idx] = true
-        end
-    end
-    for _, idx in pairs(choices.Lookup) do
-        if not wanted[idx] and QuickBar.Has(idx) then
-            QuickBar.Remove(idx)
-        end
-    end
-    for _, name in ipairs(choices.Names) do
-        local idx = choices.Lookup[name]
-        if wanted[idx] and not QuickBar.Has(idx) then
-            QuickBar.Add(idx)
-        end
-    end
 end
 
 function Window.BuildConfigGroup(group)
@@ -13849,32 +13694,6 @@ function Window.ImportConfig(input)
     Library:Notify(Lang.Strings.Configs, ok and Lang.Strings.Imported or Lang.Strings.ImportBroken, 3, ok and "Success" or "Error")
 end
 
-function Window:BuildAboutGroup(group)
-    group:AddLabel(string.format("%s · %s %s", self.Title, Lang.Get("Version"), Library.Version))
-    group:AddLabel(Lang.Format("Device", Platform.Mode))
-    local armed = 0
-    Gui.Button(group, {
-        Text = Lang.Strings.Unload,
-        Icon = "power",
-        Style = "Danger",
-        Width = 1,
-        Callback = function(handle)
-            if os.clock() - armed > Config.ConfirmWindow then
-                armed = os.clock()
-                handle:Set(Lang.Strings.ConfirmUnload)
-                Motion.Shake(handle.Face)
-                task.delay(Config.ConfirmWindow, function()
-                    if handle.Label.Parent then
-                        handle:Set(Lang.Strings.Unload)
-                    end
-                end)
-                return
-            end
-            Library:Unload()
-        end,
-    })
-end
-
 ---@author m0pu  m0pu UI
 Config.Intro = {
     Width = 440, Height = 236, Margin = 16, MaxScale = 1.35, Scrim = 0.12,
@@ -13951,7 +13770,7 @@ function Intro.RunSteps(settings, track)
             continue
         end
         step.Started = true
-        local labels = fallback[State.Language] or fallback.EN
+        local labels = fallback.EN
         Intro.Status(track, step.Label or labels[math.min(index, #labels)])
         if step.Run then
             Util.Await(Config.Intro.StepTimeout, step.Run)
@@ -14047,7 +13866,7 @@ function Intro.Coin(stage)
     return coin
 end
 
----@return table[]  { Label, Scale } per glyph; Thai or non-Latin titles become one label
+---@return table[]  { Label, Scale } per glyph; non-Latin titles become one label
 function Intro.Logo(stage, title)
     local intro = Config.Intro
     local text = Lang.Resolve(title):upper()
@@ -15216,7 +15035,7 @@ Config.ExportPrefix = "MH2:"
 
 Keybinds.Modifiers = { LeftControl = true, RightControl = true, LeftShift = true, RightShift = true, LeftAlt = true, RightAlt = true }
 
----@return {EN: string, TH: string}  Lang.Strings[key] formatted in both languages
+---@return table  Lang.Strings[key] formatted in both languages
 function Lang.Format(key, ...)
     local spec = Lang.Strings[key] or { EN = key }
     local args = table.pack(...)
@@ -15460,7 +15279,7 @@ function Configs.Find(file)
     return nil
 end
 
----@return boolean  tab matches a name given as plain text, either language, or a "EN · TH" spec
+---@return boolean  tab matches a name given as plain text
 function Configs.TabNamed(tab, name)
     if type(tab) ~= "table" or tab.Name == nil then
         return false
@@ -15468,7 +15287,7 @@ function Configs.TabNamed(tab, name)
     local wanted = name:lower()
     local spec = tab.Name
     if type(spec) == "table" then
-        return (spec.EN or ""):lower() == wanted or (spec.TH or ""):lower() == wanted
+        return (spec.EN or ""):lower() == wanted
     end
     return tostring(spec):lower() == wanted or Lang.Resolve(spec):lower() == wanted
 end
@@ -18166,7 +17985,7 @@ function Kit.Esp.RawName(entry)
     return entry.Model.Name
 end
 
----Drawing fonts only carry Latin glyphs, so CJK/Thai names would print as "??": fall back to the ASCII username, else the kind.
+---Drawing fonts only carry Latin glyphs, so non-ASCII names would print as "??": fall back to the ASCII username, else the kind.
 function Kit.Esp.Name(entry)
     local name = Kit.Esp.RawName(entry)
     if Kit.Esp.Mode ~= "Drawing" or not name:find("[\128-\255]") then return name end
@@ -20530,7 +20349,7 @@ end
 ---@param action table?    { Text, Callback } button on the card
 ---@return table?          { Dismiss }
 function Library:Notify(info, content, duration, kind, action)
-    if type(info) == "table" and not info.EN and not info.TH then
+    if type(info) == "table" and not info.EN then
         info, content, duration, kind, action = info.Title, info.Content or info.Description, info.Duration, info.Kind or info.Type or info.Icon, info.Action
     end
     if self.Unloaded or type(Notify.Push) ~= "function" then
@@ -20595,22 +20414,6 @@ function Library:Pin(idx, pinned)
     return QuickBar.Has(idx)
 end
 
-Library.OverlayToggles = { Watermark = "m0puWatermark", KeybindList = "m0puKeybindList", Float = "m0puFloat" }
-
----Goes through the Settings toggle when it exists so the menu and the saved choice stay in sync.
----@param name string  Watermark | KeybindList | Float
-function Library:SetOverlay(name, visible)
-    local option = self.Options[Library.OverlayToggles[name] or ""]
-    if option then
-        option:SetValue(visible == true)
-        return
-    end
-    local overlay = ({ Watermark = Watermark, KeybindList = KeybindList, Float = Float })[name]
-    if overlay then
-        overlay.SetVisible(visible == true)
-    end
-end
-
 function Library:SetWatermarkTitle(title)
     Watermark.SetTitle(title)
 end
@@ -20660,26 +20463,13 @@ end
 
 ---Goes through the Settings controls when they exist so the menu and the saved choice stay in sync.
 function Library:SetReduceMotion(enabled)
-    local option = self.Options.m0puReduceMotion
-    if option then
-        option:SetValue(enabled == true)
-        return
-    end
     Motion.SetReduced(enabled == true)
 end
 
----@param corner string  BottomRight | TopRight | BottomLeft | TopLeft
 function Library:SetNotifyPosition(corner)
-    local index = table.find(Window.Corners, corner)
-    if not index then
-        return
+    if table.find(Window.Corners, corner) then
+        Notify.SetPosition(corner)
     end
-    local option = self.Options.m0puNotifyCorner
-    if option then
-        option:SetValue(option.Values[index])
-        return
-    end
-    Notify.SetPosition(corner)
 end
 
 ---@return table[]  the window's tabs in sidebar order (a copy; adding goes through Window:AddTab)
