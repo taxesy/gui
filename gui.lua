@@ -3497,6 +3497,10 @@ function Theme.Reachable(inst, root, parked, memo)
 end
 
 function Theme.PruneRegistry(registry, root, parked, memo)
+    if type(registry) ~= "table" then
+        return
+    end
+
     for inst in pairs(registry) do
         if not Theme.Reachable(inst, root, parked, memo) then
             registry[inst] = nil
