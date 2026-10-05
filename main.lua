@@ -1,6 +1,8 @@
-local URL = "https://raw.githubusercontent.com/taxesy/gui/main/gui.lua"
+local BaseURL = "https://raw.githubusercontent.com/taxesy/gui/main/gui.lua"
 
 local function Fetch()
+    local URL = BaseURL .. "?m0pu=" .. tostring(os.time())
+
     local ok, body = pcall(function()
         return game:HttpGet(URL)
     end)
@@ -9,36 +11,41 @@ local function Fetch()
         return body
     end
 
-    if type(request) == "function" then
-        local success, response = pcall(request, {
+    local function requestBody(requester)
+        if type(requester) ~= "function" then
+            return nil
+        end
+
+        local success, response = pcall(requester, {
             Url = URL,
             Method = "GET",
+            Headers = {
+                ["Cache-Control"] = "no-cache, no-store, must-revalidate",
+                ["Pragma"] = "no-cache",
+            },
         })
 
         if success and response and response.StatusCode == 200 and type(response.Body) == "string" and response.Body ~= "" then
             return response.Body
         end
+
+        return nil
     end
 
-    if type(http_request) == "function" then
-        local success, response = pcall(http_request, {
-            Url = URL,
-            Method = "GET",
-        })
+    local bodyFromRequest = requestBody(request)
+    if bodyFromRequest then
+        return bodyFromRequest
+    end
 
-        if success and response and response.StatusCode == 200 and type(response.Body) == "string" and response.Body ~= "" then
-            return response.Body
-        end
+    local bodyFromHttpRequest = requestBody(http_request)
+    if bodyFromHttpRequest then
+        return bodyFromHttpRequest
     end
 
     if syn and type(syn.request) == "function" then
-        local success, response = pcall(syn.request, {
-            Url = URL,
-            Method = "GET",
-        })
-
-        if success and response and response.StatusCode == 200 and type(response.Body) == "string" and response.Body ~= "" then
-            return response.Body
+        local bodyFromSyn = requestBody(syn.request)
+        if bodyFromSyn then
+            return bodyFromSyn
         end
     end
 
@@ -57,7 +64,11 @@ if not chunk then
     error("m0pu: gui.lua compile failed: " .. tostring(compileError))
 end
 
-local library = chunk()
+local ok, library = pcall(chunk)
+
+if not ok then
+    error("m0pu: gui.lua initialization failed: " .. tostring(library))
+end
 
 if type(library) ~= "table" then
     error("m0pu: gui.lua did not return a library")
