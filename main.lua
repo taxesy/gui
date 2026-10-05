@@ -1,4 +1,4 @@
-local URL = "https://raw.githubusercontent.com/taxesy/gui/bee0a13bde63808b2ba949cc1aec19f432c98c01/gui.lua"
+local URL = "https://raw.githubusercontent.com/taxesy/gui/main/gui.lua"
 
 local function Fetch()
     local ok, body = pcall(function()
