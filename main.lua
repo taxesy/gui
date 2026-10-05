@@ -55,23 +55,23 @@ end
 local body = Fetch()
 
 if not body then
-    error("m0pu: failed to fetch gui.lua")
+    error("failed to fetch interface source")
 end
 
-local chunk, compileError = loadstring(body, "m0pu/gui.lua")
+local chunk, compileError = loadstring(body, "gui.lua")
 
 if not chunk then
-    error("m0pu: gui.lua compile failed: " .. tostring(compileError))
+    error("interface compile failed: " .. tostring(compileError))
 end
 
 local ok, library = pcall(chunk)
 
 if not ok then
-    error("m0pu: gui.lua initialization failed: " .. tostring(library))
+    error("interface initialization failed: " .. tostring(library))
 end
 
 if type(library) ~= "table" then
-    error("m0pu: gui.lua did not return a library")
+    error("interface source did not return a library")
 end
 
 return library
