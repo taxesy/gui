@@ -689,7 +689,7 @@ Lang.Strings = {
     Scale = { EN = "UI scale" },
     MenuKey = { EN = "Menu key" },
     Watermark = { EN = "Watermark" },
-    WatermarkDesc = { EN = "Name, FPS, ping and play time" },
+    WatermarkDesc = { EN = "m0pu name, FPS, ping and play time" },
     FloatButton = { EN = "Mobile button" },
     FloatDesc = { EN = "Floating block that opens the menu" },
     Configs = { EN = "Configs" },
@@ -709,7 +709,7 @@ Lang.Strings = {
     ConfigMissing = { EN = "Config not found" },
     ConfigBroken = { EN = "Config file is damaged" },
     About = { EN = "About" },
-    Unload = { EN = "Unload" },
+    Unload = { EN = "Unload m0pu" },
     Rejoin = { EN = "Rejoin" },
     KeyTitle = { EN = "ENTER KEY" },
     KeyNote = { EN = "Paste your key to start the adventure." },
@@ -10369,7 +10369,7 @@ function Dialog.Prompt(ask)
         return true
     end
     return Dialog.Open({
-        Title = ask.Title or "UI",
+        Title = ask.Title or "m0pu",
         Content = ask.Content,
         Icon = ask.Icon or (ask.Choices and "list" or "edit"),
         OnClose = ask.OnClose,
@@ -10608,7 +10608,7 @@ function Notify.Options(title, content, duration, kind, action)
     local source = Notify.IsOptions(title) and title or { Title = title, Content = content, Duration = duration, Kind = kind, Action = action }
     local kindName = Notify.Aliases[source.Kind] or source.Kind
     return {
-        Title = source.Title or "UI",
+        Title = source.Title or "m0pu",
         Content = source.Content or "",
         Duration = tonumber(source.Duration) or Config.Notify.Duration,
         Kind = Notify.Kinds[kindName] and kindName or "Info",
@@ -11603,7 +11603,7 @@ function Window.New(options)
         size = Vector2.new(size.X.Offset, size.Y.Offset)
     end
     local self = setmetatable({
-        Title = options.Title or "Interface",
+        Title = options.Title or "m0pu",
         SubTitle = options.SubTitle or "",
         Desired = size,
         Size = size,
@@ -13808,7 +13808,7 @@ function Intro.Build(settings)
     parts.Scale = Draw.New("UIScale", { Scale = fit * 0.9, Parent = stage })
     parts.Block = Intro.Block(stage)
     parts.Coin = Intro.Coin(stage)
-    parts.Letters = Intro.Logo(stage, settings.Title or "UI")
+    parts.Letters = Intro.Logo(stage, settings.Title or "m0pu")
     parts.Sub = Intro.Subtitle(stage, settings.SubTitle)
     parts.Track = Intro.Track(stage)
     parts.Skip = Intro.SkipHint(screen, layer)
