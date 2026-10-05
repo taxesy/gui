@@ -1,6 +1,6 @@
-local BaseURL = "https://raw.githubusercontent.com/taxesy/gui/main/gui.lua"
+local SourceURL = "https://raw.githubusercontent.com/taxesy/gui/main/gui.lua"
 local function Fetch()
-    local URL = BaseURL .. "?v=" .. tostring(os.time())
+    local URL = SourceURL .. "?v=" .. tostring(os.time())
     local ok, body = pcall(function()
         return game:HttpGet(URL)
     end)
@@ -24,18 +24,18 @@ local function Fetch()
         end
         return nil
     end
-    local bodyFromRequest = requestBody(request)
-    if bodyFromRequest then
-        return bodyFromRequest
+    local responseBody = requestBody(request)
+    if responseBody then
+        return responseBody
     end
-    local bodyFromHttpRequest = requestBody(http_request)
-    if bodyFromHttpRequest then
-        return bodyFromHttpRequest
+    responseBody = requestBody(http_request)
+    if responseBody then
+        return responseBody
     end
     if syn and type(syn.request) == "function" then
-        local bodyFromSyn = requestBody(syn.request)
-        if bodyFromSyn then
-            return bodyFromSyn
+        responseBody = requestBody(syn.request)
+        if responseBody then
+            return responseBody
         end
     end
     return nil
