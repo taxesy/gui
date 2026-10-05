@@ -242,7 +242,7 @@ local State = {
 
 local Platform = { Mode = "Desktop", Touch = false, Landscape = false, Console = false, Viewport = Vector2.new(1280, 720), Listeners = {}, ViewportListeners = {} }
 local Util = {}
-local Lang = { Bound = {} }
+local Lang = { Bound = {}, InstanceListeners = {} }
 local Fonts = { Texts = {} }
 local Assets = { Overrides = {}, Cache = {}, Jobs = {} }
 local Sprite = {}
