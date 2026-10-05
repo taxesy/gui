@@ -1,6 +1,6 @@
--- m0pu's gui · made by m0pu · .gg/sl8
+-- m0pu · .gg/sl8
 -- (c) m0pu. Do not reupload or rebrand without credit. build 2026-10-03
----@author m0pu  m0pu UI
+---@author m0pu
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -339,7 +339,7 @@ local Configs = { Folder = Config.ConfigRoot .. "/default" }
 local Settings = {}
 local Kit = {}
 
----@author m0pu  m0pu UI
+---@author m0pu
 
 ---@return Vector2
 function Platform.ReadViewport()
@@ -475,7 +475,7 @@ end
 
 table.insert(State.UnloadHooks, Platform.UnbindCamera)
 
----@author m0pu  m0pu UI
+---@author m0pu
 function Util.Try(callback, ...)
     if type(callback) ~= "function" then
         return false
@@ -691,7 +691,7 @@ Lang.Strings = {
     Scale = { EN = "UI scale" },
     MenuKey = { EN = "Menu key" },
     Watermark = { EN = "Watermark" },
-    WatermarkDesc = { EN = "Hub name, FPS, ping and play time" },
+    WatermarkDesc = { EN = "m0pu name, FPS, ping and play time" },
     FloatButton = { EN = "Mobile button" },
     FloatDesc = { EN = "Floating block that opens the menu" },
     Configs = { EN = "Configs" },
@@ -711,7 +711,7 @@ Lang.Strings = {
     ConfigMissing = { EN = "Config not found" },
     ConfigBroken = { EN = "Config file is damaged" },
     About = { EN = "About" },
-    Unload = { EN = "Unload hub" },
+    Unload = { EN = "Unload m0pu" },
     Rejoin = { EN = "Rejoin" },
     KeyTitle = { EN = "ENTER KEY" },
     KeyNote = { EN = "Paste your key to start the adventure." },
@@ -1093,7 +1093,7 @@ function Sprite.New(parent, name, size)
     return sprite
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Sprite.Palette.A = Color3.fromRGB(190, 60, 110)
 Sprite.Palette.C = Color3.fromRGB(0, 92, 164)
 Sprite.Palette.O = Color3.fromRGB(196, 84, 0)
@@ -3395,7 +3395,7 @@ function Library:HasIcon(name)
     return Sprite.Has(name)
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Theme.Tokens = {
     "Backdrop", "BackdropAlt", "Topbar", "TopbarText", "Sidebar", "SidebarAlt", "SidebarText", "SidebarMuted",
     "TabActive", "TabActiveText", "Panel", "PanelHeader", "Element", "Hover", "Pressed", "Outline", "Shadow",
@@ -3557,7 +3557,7 @@ function Theme.OnRender(owner, render)
     Util.Try(render)
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 function Draw.New(className, props)
     local inst = Instance.new(className)
     local parent = props and props.Parent
@@ -3778,7 +3778,7 @@ function Draw.Pool(key, factory)
     return pool
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Motion.Springs = {}
 Motion.ByInst = {}
 Motion.Free = {}
@@ -4211,7 +4211,7 @@ end
 
 table.insert(State.UnloadHooks, Motion.Stop)
 
----@author m0pu  m0pu UI
+---@author m0pu
 function Fx.MakeSpark()
     return Draw.Text({ Name = "Spark", AnchorPoint = Vector2.new(0.5, 0.5), TextXAlignment = Enum.TextXAlignment.Center }, "Glyph", 12, "Coin")
 end
@@ -4336,7 +4336,7 @@ function Fx.Rise(frame)
     Motion.Spring(Fx.ScaleOf(frame), "Scale", 1, "Normal", Fx.RiseOptions)
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 function Container.New(host, options)
     options = options or {}
     local self = setmetatable({
@@ -4880,7 +4880,7 @@ end
 table.insert(State.UnloadHooks, Layout.DropProbeGui)
 Platform.OnViewport(Layout.MarkAll)
 
----@author m0pu  m0pu UI
+---@author m0pu
 Gui.TextKinds = { Body = "Label", Desc = "Desc", Strong = "Label", Display = "Header" }
 Gui.Press = { Active = false, Token = 0 }
 
@@ -5368,7 +5368,7 @@ function Gui.Icon(container, name, size)
     return { Frame = holder, Sprite = sprite, Item = container:Add(holder, { Width = size, Height = size }) }
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Config.Widget = {
     HoverPad = 6,
     HoverAlpha = 0.5,
@@ -8132,7 +8132,7 @@ function WidgetHost:AddColorPicker(idx, info)
     return ColorPicker.New(row, idx, info)
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Config.Widget.Segment = { Damping = 0.72, Inset = 3 }
 Config.Widget.Stepper = { Value = 54, Big = 10 }
 Config.Widget.Chip = { Height = 28, TouchHeight = 44, PadX = 10, Gap = 6, Dot = 8, Depth = 2 }
@@ -9748,7 +9748,7 @@ function Feature.BuildOptions(container, idx, build)
     return child
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Config.Overlay = {
     Margin = 12, Shadow = 4, Stroke = 3, Radius = 12, Dim = 0.45,
     PopupGap = 6, PopupPad = 6, PopupMaxHeight = 320, PopupMin = 96,
@@ -11500,7 +11500,7 @@ function KeybindList.SetVisible(visible)
     KeybindList.Refresh()
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 
 Config.Chrome = {
     Z = {
@@ -13697,7 +13697,7 @@ function Window.ImportConfig(input)
     Library:Notify(Lang.Strings.Configs, ok and Lang.Strings.Imported or Lang.Strings.ImportBroken, 3, ok and "Success" or "Error")
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Config.Intro = {
     Width = 440, Height = 236, Margin = 16, MaxScale = 1.35, Scrim = 0.12,
     MinShow = 1.5, MaxShow = 2.2, Exit = 0.32, Flourish = 0.12, Hold = 0, StepTimeout = 15,
@@ -14185,7 +14185,7 @@ function KeyGate.Pass(gate)
     end)
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Config.Decor = {
     Tick = 0.5, MinWidth = 420, MinHeight = 80, DriftEvery = 8, Drift = 18, DriftSpeed = 1.1,
     TwinkleSpeed = 3, TwinkleAlpha = 0.85, StarAlpha = 0.2, Twinkles = 2,
@@ -15031,7 +15031,7 @@ function Window:AddVisualsTab(options)
     return tab
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 
 Config.Settings = { File = Config.Root .. "/settings.json", SaveDelay = 0.5, PruneInterval = 20 }
 Config.ExportPrefix = "MH2:"
@@ -15546,7 +15546,7 @@ function Gui.Teardown()
     end
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Lib = { Config = { LogFolder = "m0pu/logs", RetryBase = 0.5, RetryMax = 8, FindTimeout = 5 } }
 Library.Lib = Kit.Lib
 
@@ -16039,7 +16039,7 @@ function Kit.Lib.Status(idx, fn, interval)
     end, { Interval = interval or 1 })
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Library.Kit = Kit
 
 ---Same table as the UI's `Platform` ({ Mode, Touch, Console, Viewport }), exposed so hub scripts branch PC/mobile without reaching into UI internals.
@@ -16083,7 +16083,7 @@ Kit.Config = {
         ServersUrl = "https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&excludeFullGames=true&limit=100%s",
     },
     Webhook = { MinGap = 2, QueueLimit = 20, Color = 0xD45446, Name = "m0pu" },
-    Discord = "https://.gg/sl8",
+    Discord = "https://discord.gg/sl8",
     DiscordNotify = 8,
 }
 
@@ -17137,7 +17137,7 @@ end
 
 Kit.Lib.Root:Give(Kit.Cleanup)
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Player = {
     Parts = {},
     CharConns = {},
@@ -17758,7 +17758,7 @@ function Kit.Server.Build(target)
     return group
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Esp = {
     Categories = {},
     Order = {},
@@ -18248,7 +18248,7 @@ end
 
 table.insert(Kit.Modules, Kit.Esp)
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Esp.Shape = {}
 
 ---Writes only on change: every Drawing write crosses the executor bridge, every Instance write dirties layout.
@@ -18494,7 +18494,7 @@ function Kit.Esp.Bounds(entry, frame, camera)
     return bounds
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Esp.Edges = { { 1, 2 }, { 3, 4 }, { 5, 6 }, { 7, 8 }, { 1, 3 }, { 2, 4 }, { 5, 7 }, { 6, 8 }, { 1, 5 }, { 2, 6 }, { 3, 7 }, { 4, 8 } }
 Kit.Esp.Outline = Color3.new(0, 0, 0)
 
@@ -18772,7 +18772,7 @@ function Kit.Esp.Radar.Destroy()
     end
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Esp.TextKeys = { Name = "Name", Distance = "Distance", Health = "HealthText", Weapon = "Weapon", Status = "Flags" }
 Kit.Esp.KindKeys = { Players = "Player", Bots = "Bot" }
 
@@ -19043,7 +19043,7 @@ function Kit.Esp.Build(target, options)
     return main, main
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Aim = {
     Players = {},
     Ignore = {},
@@ -19867,7 +19867,7 @@ function Kit.Guns.Build(target)
     return group
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 Kit.Teleport = { Mode = "Instant", Speed = Kit.Config.Teleport.TweenSpeed, Ignore = {} }
 
 ---@param target any  Vector3 | CFrame | BasePart | Model | Attachment | Player
@@ -20246,7 +20246,7 @@ function Kit.Discord.Build(target, link)
     return group
 end
 
----@author m0pu  m0pu UI
+---@author m0pu
 
 function Library:CreateWindow(options)
     options = options or {}
