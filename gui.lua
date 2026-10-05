@@ -12319,6 +12319,22 @@ function Window:AddSettingsTab()
     return tab
 end
 function Window:BuildThemeGroup(group)
+    local selector = group:AddDropdown("ThemeOption", {
+        Text = "Theme",
+        Values = Themes.Order,
+        Default = State.ThemeName,
+        NoSave = true,
+        Callback = function(name)
+            if type(name) ~= "string" or Themes[name] == nil then
+                return
+            end
+            if name ~= State.ThemeName then
+                Library:SetTheme(name)
+            end
+            Settings.Set("Theme", name)
+        end,
+    })
+    Library.Options.ThemeOption = selector
     local columns = Config.Chrome.ThemeCard.Columns
     local cards = {}
     for index, name in ipairs(Themes.Order) do
