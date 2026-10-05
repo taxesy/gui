@@ -10498,7 +10498,7 @@ Config.Chrome = {
     Warp = { From = Vector2.new(0.16, 0.02), OpenX = 13, OpenY = 19, OpenDamping = 0.5, CloseX = 24, CloseY = 15, CloseDamping = 0.95 },
     Pipe = { Width = 76, Lip = 18, LipOut = 8, Body = 30, Rise = 40, Stroke = 3, Shine = 0.55 },
     MinimizeSpring = { Damping = 0.55 },
-    SearchWidth = { Desktop = 220, Tablet = 168 }, SearchIcon = 16, SearchPad = 10, Hint = "Ctrl K",
+    SearchWidth = { Desktop = 220, Tablet = 168 }, SearchIcon = 16, SearchPad = 10,
     PhoneMargin = 6,
     ResultLimit = 40, ResultRow = 40,
     Palette = { Width = 480, Rows = 8, Top = 0.2, Dim = 0.45, Pad = 12, MinScore = 6 },
@@ -10909,15 +10909,11 @@ function Window:BuildSearchSlot(parent)
     local field, box = Search.Field()
     field.LayoutOrder = 1
     field.Parent = parent
-    local hintSize = Util.TextSize("Small")
-    local hintWidth = Gui.TextWidth(chrome.Hint, hintSize, "Strong")
-    local hint = Draw.Text({ Name = "Hint", Text = chrome.Hint, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -chrome.SearchPad, 0.5, 0), Size = UDim2.fromOffset(hintWidth, hintSize + 4), TextXAlignment = Enum.TextXAlignment.Right, Parent = field }, "Strong", hintSize, "Muted")
     local textX = chrome.SearchPad + chrome.SearchIcon + Config.Button.IconGap
-    box.Size = UDim2.new(1, -(textX + chrome.SearchPad * 2 + hintWidth), 1, 0)
-    self.SearchBox, self.SearchField, self.SearchHint = box, field, hint
+    box.Size = UDim2.new(1, -(textX + chrome.SearchPad), 1, 0)
+    self.SearchBox, self.SearchField, self.SearchHint = box, field, nil
     table.insert(self.TopButtons, field)
     Util.Connect(box:GetPropertyChangedSignal("Text"), function()
-        hint.Visible = box.Text == "" and self.Mode == "Desktop"
         self:SetQuery(box.Text)
     end)
 end
@@ -11311,7 +11307,6 @@ function Window:LayoutTopRow()
     local box, gap = Platform.Metric("Box"), chrome.Gap
     self.SearchField.Visible = not phone
     self.SearchField.Size = UDim2.fromOffset(chrome.SearchWidth[mode] or chrome.SearchWidth.Desktop, box)
-    self.SearchHint.Visible = mode == "Desktop" and self.SearchBox.Text == ""
         self.SearchButton.Frame.Visible = phone
     self.MinimizeButton.Frame.Visible = not phone
     for _, entry in ipairs({ self.SearchButton, self.MinimizeButton, self.CloseButton }) do
@@ -13768,10 +13763,6 @@ function Gui.OnInputBegan(input, processed)
     if name == "Escape" and Popup.CloseTop() then
         return
     end
-    if Keybinds.IsPalette(input) then
-        Palette.Toggle(State.Window)
-        return
-    end
     if name == State.MenuKey then
         Keybinds.MenuDown()
     end
@@ -13805,12 +13796,6 @@ function Gui.OnInputEnded(input)
 end
 function Keybinds.Short(name)
     return Config.Widget.KeyShort[name] or tostring(name)
-end
-function Keybinds.IsPalette(input)
-    if input.KeyCode ~= Enum.KeyCode.K or Platform.Mode ~= "Desktop" then
-        return false
-    end
-    return UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
 end
 function Keybinds.MenuDown()
     if Keybinds.Modifiers[State.MenuKey] then
