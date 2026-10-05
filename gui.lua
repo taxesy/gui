@@ -1,5 +1,4 @@
 
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -9,9 +8,7 @@ local GuiService = game:GetService("GuiService")
 local CoreGui = game:GetService("CoreGui")
 local Stats = game:GetService("Stats")
 local Workspace = game:GetService("Workspace")
-
 local LocalPlayer = Players.LocalPlayer
-
 local Library = {
     Version = "2.1",
     Options = {},
@@ -19,7 +16,6 @@ local Library = {
     Unloaded = false,
     Window = nil,
 }
-
 local Config = {
     GuiAttribute = "UI",
     Root = "UI",
@@ -103,16 +99,12 @@ local Config = {
     },
     TitleColors = { "Accent", "Coin", "Good", "Info" },
 }
-
 local Themes = { Order = { "Overworld", "Light", "Dark", "Underground", "Castle", "Star Road" } }
-
 do
     local function FromHex(hex)
         return Color3.fromRGB(tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16))
     end
-
     local derived = { "Good", "Warn", "Bad", "Info", "Coin" }
-
     local function Palette(spec)
         local palette = {}
         for token, value in pairs(spec) do
@@ -134,9 +126,7 @@ do
         end
         return palette
     end
-
     Themes.Shared = Palette({ White = "FFFFFF", Black = "000000", Ink = "2E2838", HeroInk = "2E2838", Knob = "FFFFFF" })
-
     Themes.Overworld = Palette({
         Backdrop = "C9DAEE", BackdropAlt = "E4EBF4", Topbar = "7896CC", TopbarText = "FFFFFF",
         Sidebar = "9A5D44", SidebarAlt = "844E39", SidebarText = "FCF2E6", SidebarMuted = "E3C7B3",
@@ -149,7 +139,6 @@ do
         Brick = "A66446", BrickDark = "6A3D2A", Glow = "FFF0C2",
         Decor = { "Clouds" }, Particle = { "✦", false, "F3D88A" },
     })
-
     Themes.Light = Palette({
         Backdrop = "F2EEE7", BackdropAlt = "FAF8F4", Topbar = "ECE4D6", TopbarText = "4A3F35", HeroInk = "FFFFFF",
         Sidebar = "E9E2D5", SidebarAlt = "DDD4C4", SidebarText = "4A3F35", SidebarMuted = "9B8F80",
@@ -162,7 +151,6 @@ do
         Brick = "D7B590", BrickDark = "AE8B66", Glow = "FFE7B8",
         Decor = { "Clouds" }, Particle = { "•", false, "E08C82" },
     })
-
     Themes.Dark = Palette({
         Backdrop = "1E1F26", BackdropAlt = "25262F", Topbar = "18191F", TopbarText = "ECEAF4",
         Sidebar = "22232B", SidebarAlt = "1B1C22", SidebarText = "E8E6F0", SidebarMuted = "8D8A9C",
@@ -175,7 +163,6 @@ do
         Brick = "2F3039", BrickDark = "18191F", Glow = "F3D27A",
         Decor = { "Stars", "✦", "EFC75A" }, Particle = { "✦", false, "EFC75A" },
     })
-
     Themes.Underground = Palette({
         Backdrop = "161C36", BackdropAlt = "1F2850", Topbar = "10152F", TopbarText = "ECF0FF",
         Sidebar = "24337A", SidebarAlt = "1C2863", SidebarText = "ECF0FF", SidebarMuted = "9AA9DE",
@@ -188,7 +175,6 @@ do
         Brick = "3149A4", BrickDark = "162159", Glow = "A9BEFF",
         Decor = { "Stars", "✦", "93AAFA" }, Particle = { "✦", false, "93AAFA" },
     })
-
     Themes.Castle = Palette({
         Backdrop = "1F1919", BackdropAlt = "31211D", Topbar = "161010", TopbarText = "FFF1E6",
         Sidebar = "4A4040", SidebarAlt = "3A3232", SidebarText = "FFF1E6", SidebarMuted = "C8B1A5",
@@ -201,7 +187,6 @@ do
         Brick = "5A5050", BrickDark = "2B2323", Glow = "FFB37A",
         Decor = { "Stars", "•", "F59A5C" }, Particle = { "•", false, "F59A5C" },
     })
-
     Themes["Star Road"] = Palette({
         Backdrop = "1D1436", BackdropAlt = "2C1E52", Topbar = "150D2A", TopbarText = "FFF7FF",
         Sidebar = "3A2672", SidebarAlt = "2D1C5A", SidebarText = "FFF7FF", SidebarMuted = "CBBAEE",
@@ -215,7 +200,6 @@ do
         Decor = { "Stars", "★", "F8D86A" }, Particle = { "★", false, "F8D86A" },
     })
 end
-
 local State = {
     Gui = nil,
     Stage = nil,
@@ -235,7 +219,6 @@ local State = {
     Fps = 60,
     StartTime = os.clock(),
 }
-
 local Platform = { Mode = "Desktop", Touch = false, Landscape = false, Console = false, Viewport = Vector2.new(1280, 720), Listeners = {}, ViewportListeners = {} }
 local Util = {}
 local Lang = { Bound = {}, InstanceListeners = {} }
@@ -248,16 +231,13 @@ local Motion = { Reduced = false, UserReduced = false }
 local Fx = { Homes = {} }
 local Layout = { Dirty = {}, All = setmetatable({}, { __mode = "k" }), Measured = {}, MeasuredCount = 0, Visible = {}, Batch = {}, WarmBatch = {} }
 local Gui = { Stack = {} }
-
 local WidgetHost = {}
 local Container = setmetatable({}, { __index = WidgetHost })
 Container.__index = Container
-
 local Widget = {}
 Widget.__index = Widget
 local Row = {}
 Row.__index = Row
-
 local Toggle = setmetatable({}, { __index = Widget })
 Toggle.__index = Toggle
 local Checkbox = setmetatable({}, { __index = Widget })
@@ -306,7 +286,6 @@ local Progress = {}
 Progress.__index = Progress
 local Divider = {}
 Divider.__index = Divider
-
 local Popup = {}
 local Sheet = {}
 local Tooltip = {}
@@ -316,7 +295,6 @@ local Float = {}
 local QuickBar = {}
 local Watermark = {}
 local KeybindList = {}
-
 local Window = {}
 Window.__index = Window
 local Tab = {}
@@ -325,7 +303,6 @@ local Groupbox = setmetatable({}, { __index = Container })
 Groupbox.__index = Groupbox
 local Search = {}
 local Palette = {}
-
 local Intro = {}
 local KeyGate = {}
 local Decor = {}
@@ -334,12 +311,10 @@ local Keybinds = {}
 local Configs = { Folder = Config.ConfigRoot .. "/default" }
 local Settings = {}
 local Kit = {}
-
 function Platform.ReadViewport()
     local camera = Workspace.CurrentCamera
     return camera and camera.ViewportSize or Platform.Viewport
 end
-
 function Platform.Classify(viewport)
     if Platform.Forced == "Desktop" then
         return "Desktop"
@@ -359,11 +334,9 @@ function Platform.Classify(viewport)
     end
     return "Tablet"
 end
-
 function Platform.IsLandscape(mode, viewport)
     return mode == "Phone" and viewport.X > viewport.Y and viewport.Y < Config.Platform.PhoneMinSide
 end
-
 function Platform.Detect(forced)
     if forced ~= nil then
         Platform.Forced = forced ~= "Auto" and forced or nil
@@ -379,7 +352,6 @@ function Platform.Detect(forced)
     Platform.Watch()
     return Platform.Mode
 end
-
 function Platform.Watch()
     if Platform.Watching then
         return
@@ -388,7 +360,6 @@ function Platform.Watch()
     Util.Connect(Workspace:GetPropertyChangedSignal("CurrentCamera"), Platform.BindCamera)
     Platform.BindCamera()
 end
-
 function Platform.BindCamera()
     Platform.UnbindCamera()
     local camera = Workspace.CurrentCamera
@@ -398,7 +369,6 @@ function Platform.BindCamera()
     Platform.ViewportConn = camera:GetPropertyChangedSignal("ViewportSize"):Connect(Platform.OnResize)
     Platform.OnResize()
 end
-
 function Platform.UnbindCamera()
     local conn = Platform.ViewportConn
     Platform.ViewportConn = nil
@@ -406,7 +376,6 @@ function Platform.UnbindCamera()
         conn:Disconnect()
     end
 end
-
 function Platform.OnResize()
     Platform.Viewport = Platform.ReadViewport()
     if Platform.Pending then
@@ -415,7 +384,6 @@ function Platform.OnResize()
     Platform.Pending = true
     task.delay(Config.Platform.Debounce, Platform.Settle)
 end
-
 function Platform.Settle()
     Platform.Pending = false
     if Library.Unloaded then
@@ -436,25 +404,19 @@ function Platform.Settle()
         Util.Try(listener, mode)
     end
 end
-
 function Platform.OnChange(callback)
     table.insert(Platform.Listeners, callback)
 end
-
 function Platform.OnViewport(callback)
     table.insert(Platform.ViewportListeners, callback)
 end
-
 function Platform.Metric(name)
     return Config.Metrics[Platform.Mode][name]
 end
-
 function Platform.TouchMin()
     return Platform.Touch and Config.Metrics[Platform.Mode].Hit or 0
 end
-
 table.insert(State.UnloadHooks, Platform.UnbindCamera)
-
 function Util.Try(callback, ...)
     if type(callback) ~= "function" then
         return false
@@ -465,50 +427,40 @@ function Util.Try(callback, ...)
     end
     return ok, message
 end
-
 function Util.Connect(signal, callback)
     local connection = signal:Connect(callback)
     table.insert(State.Connections, connection)
     return connection
 end
-
 function Util.Every(interval, callback)
     table.insert(State.Tasks, { Interval = interval, Elapsed = 0, Run = callback, Inline = true })
 end
-
 Util.Metric = Platform.Metric
-
 function Util.TextSize(kind)
     return Config.Text[kind] + Config.TextBonus[Platform.Mode]
 end
-
 function Util.IsPointer(input)
     return input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch
 end
-
 function Util.IsMove(input)
     return input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch
 end
-
 function Util.InputName(input)
     if input.UserInputType == Enum.UserInputType.Keyboard then
         return input.KeyCode.Name
     end
     return Config.MouseNames[input.UserInputType]
 end
-
 function Util.KeyName(key)
     if typeof(key) == "EnumItem" then
         return key.Name
     end
     return type(key) == "string" and key or nil
 end
-
 function Util.Inside(guiObject, position)
     local origin, size = guiObject.AbsolutePosition, guiObject.AbsoluteSize
     return position.X >= origin.X and position.X <= origin.X + size.X and position.Y >= origin.Y and position.Y <= origin.Y + size.Y
 end
-
 function Util.GuiParent()
     if type(gethui) == "function" then
         local ok, hidden = pcall(gethui)
@@ -521,7 +473,6 @@ function Util.GuiParent()
     end)
     return ok and CoreGui or LocalPlayer:WaitForChild("PlayerGui", 10) or LocalPlayer:FindFirstChildOfClass("PlayerGui")
 end
-
 function Util.Await(timeout, callback, ...)
     local box = { done = false }
     local args = table.pack(...)
@@ -538,7 +489,6 @@ function Util.Await(timeout, callback, ...)
     end
     return true, table.unpack(box.values, 2, box.values.n)
 end
-
 function Util.FetchBody(url)
     local ok, body = pcall(game.HttpGet, game, url)
     if ok and type(body) == "string" then
@@ -551,12 +501,10 @@ function Util.FetchBody(url)
     local sent, response = pcall(requester, { Url = url, Method = "GET" })
     return sent and type(response) == "table" and response.Body or nil
 end
-
 function Util.HttpGet(url)
     local finished, body = Util.Await(Config.HttpTimeout, Util.FetchBody, url)
     return finished and type(body) == "string" and body or nil
 end
-
 function Util.CustomAsset(path)
     if type(getcustomasset) ~= "function" then
         return nil
@@ -564,7 +512,6 @@ function Util.CustomAsset(path)
     local finished, asset = Util.Await(Config.HttpTimeout, getcustomasset, path)
     return finished and type(asset) == "string" and asset:find("^rbxasset") and asset or nil
 end
-
 function Util.SafeFile(fn, ...)
     if type(fn) ~= "function" then
         return nil
@@ -575,7 +522,6 @@ function Util.SafeFile(fn, ...)
     end
     return value == nil and true or value
 end
-
 function Util.Clipboard(text)
     local setter = setclipboard or toclipboard or (syn and syn.write_clipboard)
     if type(setter) ~= "function" then
@@ -583,11 +529,9 @@ function Util.Clipboard(text)
     end
     return (pcall(setter, text))
 end
-
 function Util.FileApi()
     return type(writefile) == "function" and type(readfile) == "function" and type(isfile) == "function"
 end
-
 function Util.EnsureFolder(path)
     if type(makefolder) ~= "function" or type(isfolder) ~= "function" then
         return
@@ -600,17 +544,14 @@ function Util.EnsureFolder(path)
         end
     end
 end
-
 function Util.Sanitize(name)
     local clean = tostring(name):gsub('[%c/\\:%*%?"<>|]', ""):gsub("^%s+", ""):gsub("%s+$", "")
     return clean ~= "" and clean or "config"
 end
-
 function Util.Round(value, decimals)
     local factor = 10 ^ (decimals or 0)
     return math.floor(value * factor + 0.5) / factor
 end
-
 function Util.ToSet(value)
     local set = {}
     if type(value) ~= "table" then
@@ -625,7 +566,6 @@ function Util.ToSet(value)
     end
     return set
 end
-
 function Util.PlayerNames()
     local names = {}
     for _, player in ipairs(Players:GetPlayers()) do
@@ -636,15 +576,12 @@ function Util.PlayerNames()
     table.sort(names)
     return names
 end
-
 function Util.Lighten(color, amount)
     return color:Lerp(Color3.new(1, 1, 1), amount)
 end
-
 function Util.Hex(color)
     return string.format("#%02X%02X%02X", math.floor(color.R * 255 + 0.5), math.floor(color.G * 255 + 0.5), math.floor(color.B * 255 + 0.5))
 end
-
 function Util.FromHex(text)
     local hex = tostring(text):gsub("#", "")
     if not hex:match("^%x%x%x%x%x%x$") then
@@ -652,7 +589,6 @@ function Util.FromHex(text)
     end
     return Color3.fromRGB(tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16))
 end
-
 Lang.Strings = {
     Search = { EN = "Search..." },
     Confirm = { EN = "Click again to confirm" },
@@ -707,7 +643,6 @@ Lang.Strings = {
     ParticlesDesc = { EN = "Floating sparkles behind the menu" },
     Device = { EN = "Device: %s" },
 }
-
 function Lang.Resolve(spec)
     if type(spec) == "table" then
         return spec.EN or spec[1] or ""
@@ -717,7 +652,6 @@ function Lang.Resolve(spec)
     end
     return spec
 end
-
 function Lang.Get(key, ...)
     local text = Lang.Resolve(Lang.Strings[key] or key)
     if select("#", ...) > 0 then
@@ -725,25 +659,21 @@ function Lang.Get(key, ...)
     end
     return text
 end
-
 function Lang.SearchText(spec)
     if type(spec) == "table" then
         return tostring(spec.EN or spec[1] or ""):lower()
     end
     return tostring(spec or ""):lower()
 end
-
 function Lang.Bind(inst, spec, property, transform)
     local binding = { Spec = spec, Property = property or "Text", Transform = transform }
     Lang.Bound[inst] = binding
     Lang.Apply(inst, binding)
 end
-
 function Lang.Apply(inst, binding)
     local text = Lang.Resolve(binding.Spec)
     inst[binding.Property] = binding.Transform and binding.Transform(text) or text
 end
-
 Fonts.Latin = {
     Display = Enum.Font.LuckiestGuy,
     Body = Enum.Font.FredokaOne,
@@ -753,7 +683,6 @@ Fonts.Latin = {
     Glyph = Enum.Font.BuilderSansBold,
 }
 Fonts.Faces = {}
-
 function Fonts.Face(kind)
     local key = tostring(kind)
     local cached = Fonts.Faces[key]
@@ -764,17 +693,14 @@ function Fonts.Face(kind)
     Fonts.Faces[key] = face
     return face
 end
-
 function Fonts.Size(_, base)
     return base
 end
-
 function Fonts.Style(label, kind, base)
     Fonts.Texts[label] = { Kind = kind, Base = base }
     label.FontFace = Fonts.Face(kind)
     label.TextSize = base
 end
-
 function Fonts.ApplyAll()
     table.clear(Layout.Measured)
     Layout.MeasuredCount = 0
@@ -783,7 +709,6 @@ function Fonts.ApplyAll()
         label.TextSize = style.Base
     end
 end
-
 function Assets.Configure(map)
     if type(map) ~= "table" then
         return
@@ -795,7 +720,6 @@ function Assets.Configure(map)
         Assets.Jobs[key] = nil
     end
 end
-
 function Assets.Download(name, url)
     if type(getcustomasset) ~= "function" or not Util.FileApi() then
         return nil
@@ -811,7 +735,6 @@ function Assets.Download(name, url)
     end
     return Util.CustomAsset(path)
 end
-
 function Assets.Load(key, source)
     if source:match("^https?://") then
         return Assets.Download(key, source)
@@ -821,7 +744,6 @@ function Assets.Load(key, source)
     end
     return nil
 end
-
 function Assets.Fetch(key, source)
     local job = Assets.Jobs[key]
     if not job then
@@ -849,7 +771,6 @@ function Assets.Fetch(key, source)
     end
     return job
 end
-
 function Assets.Resolve(name)
     local key = tostring(name):lower()
     local cached = Assets.Cache[key]
@@ -871,7 +792,6 @@ function Assets.Resolve(name)
     end
     return Assets.Cache[key] or nil
 end
-
 function Assets.Later(job, holder)
     if not job then
         return
@@ -891,7 +811,6 @@ function Assets.Later(job, holder)
         Draw.New("ImageLabel", { BackgroundTransparency = 1, Image = image, Size = UDim2.fromScale(1, 1), ScaleType = Enum.ScaleType.Fit, Parent = holder })
     end)
 end
-
 Sprite.Palette = {
     k = Color3.fromRGB(24, 20, 30), w = Color3.fromRGB(255, 255, 255), r = Color3.fromRGB(229, 37, 33),
     s = Color3.fromRGB(252, 216, 168), y = Color3.fromRGB(252, 208, 0), Y = Color3.fromRGB(196, 132, 0),
@@ -900,7 +819,6 @@ Sprite.Palette = {
     n = Color3.fromRGB(154, 160, 166), N = Color3.fromRGB(46, 46, 58), B = Color3.fromRGB(200, 86, 28),
     m = Color3.fromRGB(90, 42, 14), b = Color3.fromRGB(4, 156, 216),
 }
-
 Sprite.Art = {
     mushroom = {
         "....kkkk....", "..kkrrwwkk..", ".krrrrwwwrk.", ".kwwrrwwrrk.",
@@ -983,7 +901,6 @@ Sprite.Art = {
         "BBBBkkkkBBBB", "mmmmkkkkmmmm", "BBBBkkkkBBBB", "BBBBkkkkBBBB",
     },
 }
-
 Sprite.Alias = {
     house = "castle", home = "castle", user = "oneup", player = "oneup", globe = "pipe", map = "pipe",
     teleport = "pipe", eye = "boo", visuals = "boo", swords = "flower", combat = "flower", target = "bomb",
@@ -993,13 +910,10 @@ Sprite.Alias = {
     ["refresh-cw"] = "pipe", link = "pipe", copy = "brick", check = "star", save = "qblock",
     download = "qblock", upload = "qblock", search = "boo", misc = "qblock", troll = "shell",
 }
-
 Sprite.Swaps = {
     oneup = { base = "mushroom", swap = { r = "g" } },
 }
-
 Sprite.Templates = {}
-
 function Sprite.Resolve(name)
     name = tostring(name or "qblock"):lower():gsub("^lucide%-", "")
     name = Sprite.Alias[name] or name
@@ -1008,7 +922,6 @@ function Sprite.Resolve(name)
     end
     return "qblock"
 end
-
 function Sprite.Template(name)
     if Sprite.Templates[name] then
         return Sprite.Templates[name]
@@ -1040,7 +953,6 @@ function Sprite.Template(name)
     Sprite.Templates[name] = holder
     return holder
 end
-
 function Sprite.New(parent, name, size)
     local key = Sprite.Resolve(name)
     local image, pending = Assets.Resolve(tostring(name):lower())
@@ -1058,7 +970,6 @@ function Sprite.New(parent, name, size)
     sprite.Parent = parent
     return sprite
 end
-
 Sprite.Palette.A = Color3.fromRGB(190, 60, 110)
 Sprite.Palette.C = Color3.fromRGB(0, 92, 164)
 Sprite.Palette.O = Color3.fromRGB(196, 84, 0)
@@ -1076,7 +987,6 @@ Sprite.Palette.j = Color3.fromRGB(255, 240, 150)
 Sprite.Palette.t = Color3.fromRGB(40, 196, 168)
 Sprite.Palette.v = Color3.fromRGB(150, 84, 222)
 Sprite.Palette.z = Color3.fromRGB(88, 101, 242)
-
 Sprite.Art.aimbot = {
     "....kkkk....", "..kkhhhrkk..", ".khhwwwwhrk.", ".krwwrrwwRk.",
     "khwwrwwrwwrk", "krwrwrrwrwRk", "krwrwrrwrwRk", "krwwrwwrwwRk",
@@ -1982,7 +1892,6 @@ Sprite.Art.zoom = {
     "kwbbbbbbek..", "kwbbbbbbek..", "kwwbbbbwek..", ".kwwbbwek...",
     "..kweeennk..", "...kkkknnnk.", ".......knNnk", "........kkk.",
 }
-
 Sprite.Alias["home"] = nil
 Sprite.Alias["player"] = nil
 Sprite.Alias["map"] = nil
@@ -3260,15 +3169,12 @@ Sprite.Alias["zone"] = "map"
 Sprite.Alias["zones"] = "map"
 Sprite.Alias["zoom-in"] = "zoom"
 Sprite.Alias["zoom-out"] = "zoom"
-
 Sprite.Scoped = {}
-
 function Sprite.Has(name)
     name = tostring(name or ""):lower():gsub("^lucide%-", "")
     name = Sprite.Alias[name] or name
     return Sprite.Art[name] ~= nil or Sprite.Swaps[name] ~= nil
 end
-
 function Sprite.Register(name, rows, palette)
     if type(name) ~= "string" or name == "" or type(rows) ~= "table" or #rows == 0 then
         warn("[UI] AddIcon: need a name and a list of rows")
@@ -3307,7 +3213,6 @@ function Sprite.Register(name, rows, palette)
     end
     return true
 end
-
 function Sprite.Template(name)
     if Sprite.Templates[name] then
         return Sprite.Templates[name]
@@ -3341,22 +3246,18 @@ function Sprite.Template(name)
     Sprite.Templates[name] = holder
     return holder
 end
-
 function Library:AddIcon(name, rows, palette)
     return Sprite.Register(name, rows, palette)
 end
-
 function Library:HasIcon(name)
     return Sprite.Has(name)
 end
-
 Theme.Tokens = {
     "Backdrop", "BackdropAlt", "Topbar", "TopbarText", "Sidebar", "SidebarAlt", "SidebarText", "SidebarMuted",
     "TabActive", "TabActiveText", "Panel", "PanelHeader", "Element", "Hover", "Pressed", "Outline", "Shadow",
     "Text", "SubText", "Muted", "Track", "Accent", "AccentDark", "AccentText", "Good", "Warn", "Bad", "Info",
     "Coin", "Cloud", "Grass", "GrassDark", "Brick", "BrickDark", "Glow",
 }
-
 function Theme.Missing(name)
     local palette = Themes[name]
     local missing = {}
@@ -3370,7 +3271,6 @@ function Theme.Missing(name)
     end
     return missing
 end
-
 function Theme.Apply(name)
     if name == "Order" or name == "Shared" or type(Themes[name]) ~= "table" then
         name = "Overworld"
@@ -3394,11 +3294,9 @@ function Theme.Apply(name)
         Util.Try(render)
     end
 end
-
 function Theme.Color(token)
     return Theme.Colors[token] or Themes.Shared.Black
 end
-
 function Theme.ParkedRoots()
     local roots = {}
     local window = State.Window
@@ -3418,7 +3316,6 @@ function Theme.ParkedRoots()
     end
     return roots
 end
-
 function Theme.Reachable(inst, root, parked, memo)
     local chain, depth, node = Theme.Chain, 0, inst
     local alive = memo[node]
@@ -3442,19 +3339,16 @@ function Theme.Reachable(inst, root, parked, memo)
     end
     return alive
 end
-
 function Theme.PruneRegistry(registry, root, parked, memo)
     if type(registry) ~= "table" then
         return
     end
-
     for inst in pairs(registry) do
         if not Theme.Reachable(inst, root, parked, memo) then
             registry[inst] = nil
         end
     end
 end
-
 function Theme.Prune()
     local root = State.Gui
     if not root then
@@ -3467,7 +3361,6 @@ function Theme.Prune()
     Theme.PruneRegistry(Lang.InstanceListeners, root, parked, memo)
     Theme.PruneRegistry(Fonts.Texts, root, parked, memo)
 end
-
 function Theme.Paint(inst, map)
     local colors = Theme.Colors
     for property, token in pairs(map) do
@@ -3477,7 +3370,6 @@ function Theme.Paint(inst, map)
         end
     end
 end
-
 function Theme.Bind(inst, map)
     local existing = Theme.Bound[inst]
     if existing then
@@ -3490,18 +3382,15 @@ function Theme.Bind(inst, map)
     Theme.Paint(inst, map)
     return inst
 end
-
 function Theme.Unbind(inst)
     Theme.Bound[inst] = nil
     Theme.InstanceRenderers[inst] = nil
 end
-
 function Theme.OnRender(owner, render)
     local registry = typeof(owner) == "Instance" and Theme.InstanceRenderers or Theme.Renderers
     registry[owner] = render
     Util.Try(render)
 end
-
 function Draw.New(className, props)
     local inst = Instance.new(className)
     local parent = props and props.Parent
@@ -3518,11 +3407,9 @@ function Draw.New(className, props)
     inst.Parent = parent
     return inst
 end
-
 function Draw.Corner(parent, radius)
     return Draw.New("UICorner", { CornerRadius = typeof(radius) == "UDim" and radius or UDim.new(0, radius or 8), Parent = parent })
 end
-
 function Draw.Stroke(parent, token, thickness, border)
     local stroke = Draw.New("UIStroke", {
         Thickness = thickness or 2,
@@ -3533,7 +3420,6 @@ function Draw.Stroke(parent, token, thickness, border)
     Theme.Bind(stroke, { Color = token or "Outline" })
     return stroke
 end
-
 function Draw.Padding(parent, top, right, bottom, left)
     return Draw.New("UIPadding", {
         PaddingTop = UDim.new(0, top or 0),
@@ -3543,7 +3429,6 @@ function Draw.Padding(parent, top, right, bottom, left)
         Parent = parent,
     })
 end
-
 function Draw.List(parent, gap, horizontal, alignX, alignY)
     return Draw.New("UIListLayout", {
         Padding = UDim.new(0, gap or 0),
@@ -3554,7 +3439,6 @@ function Draw.List(parent, gap, horizontal, alignX, alignY)
         Parent = parent,
     })
 end
-
 function Draw.Text(props, font, size, token, spec)
     props.BackgroundTransparency = 1
     props.Text = props.Text or ""
@@ -3570,7 +3454,6 @@ function Draw.Text(props, font, size, token, spec)
     end
     return label
 end
-
 function Draw.Box(className, props, fill, stroke, radius, thickness)
     local box = Draw.New(className, props)
     if fill then
@@ -3592,7 +3475,6 @@ function Draw.Box(className, props, fill, stroke, radius, thickness)
     end
     return box
 end
-
 function Draw.Block(parent, faceToken, shadeToken, radius, depth)
     depth = depth or Platform.Metric("Depth")
     local holder = Draw.New("Frame", { BackgroundTransparency = 1, Parent = parent })
@@ -3604,7 +3486,6 @@ function Draw.Block(parent, faceToken, shadeToken, radius, depth)
     local face = Draw.Box("Frame", { Size = UDim2.new(1, 0, 1, -depth), Parent = holder }, faceToken, "Outline", radius, 2)
     return holder, face, shade, depth
 end
-
 function Draw.Cloud(parent, width, token)
     local cloud = Draw.New("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(width, width * 0.5), Parent = parent })
     local puffs = { { 0, 0.35, 0.42 }, { 0.24, 0, 0.55 }, { 0.55, 0.18, 0.45 } }
@@ -3628,7 +3509,6 @@ function Draw.Cloud(parent, width, token)
     end)
     return cloud
 end
-
 function Draw.Emblem(parent, size)
     local image, pending = Assets.Resolve("logo")
     if image then
@@ -3654,7 +3534,6 @@ function Draw.Emblem(parent, size)
     Assets.Later(pending, emblem)
     return emblem
 end
-
 function Draw.Bricks(parent, columns, token)
     local mortar = {}
     for row = 0, 1 do
@@ -3673,7 +3552,6 @@ function Draw.Bricks(parent, columns, token)
         Theme.Bind(line, { BackgroundColor3 = token or "BrickDark" })
     end
 end
-
 function Draw.PoolHolder()
     local holder = Draw.Holder
     if holder and holder.Parent then
@@ -3683,14 +3561,12 @@ function Draw.PoolHolder()
     Draw.Holder = holder
     return holder
 end
-
 function Draw.Pool(key, factory)
     local existing = Draw.Pools[key]
     if existing then
         return existing
     end
     local pool = { Free = {}, Factory = factory }
-
     function pool.Acquire()
         local free = pool.Free
         local count = #free
@@ -3701,7 +3577,6 @@ function Draw.Pool(key, factory)
         free[count] = nil
         return inst
     end
-
     function pool.Release(inst)
         if not inst or Library.Unloaded then
             return
@@ -3713,11 +3588,9 @@ function Draw.Pool(key, factory)
         inst.Parent = Draw.PoolHolder()
         table.insert(pool.Free, inst)
     end
-
     Draw.Pools[key] = pool
     return pool
 end
-
 Motion.Springs = {}
 Motion.ByInst = {}
 Motion.Free = {}
@@ -3725,7 +3598,6 @@ Motion.Homes = {}
 Motion.Shown = {}
 Motion.Finished = {}
 Motion.Sizes = { number = 1, Vector2 = 2, Color3 = 3, UDim2 = 4 }
-
 function Motion.Pack(kind, value, out)
     if kind == "number" then
         out[1] = value
@@ -3737,7 +3609,6 @@ function Motion.Pack(kind, value, out)
         out[1], out[2], out[3] = value.R, value.G, value.B
     end
 end
-
 function Motion.Unpack(kind, values)
     if kind == "number" then
         return values[1]
@@ -3748,7 +3619,6 @@ function Motion.Unpack(kind, values)
     end
     return Color3.new(math.clamp(values[1], 0, 1), math.clamp(values[2], 0, 1), math.clamp(values[3], 0, 1))
 end
-
 function Motion.SpeedOf(speedKey)
     if type(speedKey) == "number" then
         return speedKey
@@ -3756,12 +3626,10 @@ function Motion.SpeedOf(speedKey)
     local speeds = Config.Motion.Speed
     return speeds[speedKey or "Normal"] or speeds.Normal
 end
-
 function Motion.Get(inst, prop)
     local props = Motion.ByInst[inst]
     return props and props[prop]
 end
-
 function Motion.Create(inst, prop, kind)
     local spring = table.remove(Motion.Free) or { Pos = {}, Vel = {}, Goal = {} }
     spring.Inst, spring.Prop, spring.Kind, spring.Count = inst, prop, kind, Motion.Sizes[kind]
@@ -3779,7 +3647,6 @@ function Motion.Create(inst, prop, kind)
     spring.Index = #Motion.Springs
     return spring
 end
-
 function Motion.Remove(spring, keepCallback)
     local springs = Motion.Springs
     local last = springs[#springs]
@@ -3800,7 +3667,6 @@ function Motion.Remove(spring, keepCallback)
         Util.Try(onDone, inst)
     end
 end
-
 function Motion.Spring(inst, prop, target, speedKey, options)
     local kind = typeof(target)
     if Motion.Reduced or not Motion.Sizes[kind] then
@@ -3817,7 +3683,6 @@ function Motion.Spring(inst, prop, target, speedKey, options)
     spring.OnDone = options and options.OnDone
     Motion.Start()
 end
-
 function Motion.Impulse(inst, prop, velocity, speedKey, damping)
     if Motion.Reduced then
         return
@@ -3839,7 +3704,6 @@ function Motion.Impulse(inst, prop, velocity, speedKey, damping)
     spring.Damping = damping or Config.Motion.Damping
     Motion.Start()
 end
-
 function Motion.Set(inst, prop, value)
     local spring = Motion.Get(inst, prop)
     if spring then
@@ -3847,7 +3711,6 @@ function Motion.Set(inst, prop, value)
     end
     inst[prop] = value
 end
-
 function Motion.Target(inst, prop)
     local spring = Motion.Get(inst, prop)
     if spring then
@@ -3855,7 +3718,6 @@ function Motion.Target(inst, prop)
     end
     return inst[prop]
 end
-
 function Motion.Cancel(inst)
     local props = Motion.ByInst[inst]
     if not props then
@@ -3865,15 +3727,12 @@ function Motion.Cancel(inst)
         Motion.Remove(spring, false)
     end
 end
-
 function Motion.Start()
     Motion.Running = #Motion.Springs > 0
 end
-
 function Motion.Stop()
     Motion.Running = false
 end
-
 function Motion.Advance(spring, step, substeps)
     local pos, vel, goal = spring.Pos, spring.Vel, spring.Goal
     local omega, zeta = spring.Speed, spring.Damping
@@ -3893,7 +3752,6 @@ function Motion.Advance(spring, step, substeps)
     end
     return settled
 end
-
 function Motion.Step(deltaTime)
     local motion = Config.Motion
     deltaTime = math.min(deltaTime, motion.MaxDelta)
@@ -3922,7 +3780,6 @@ function Motion.Step(deltaTime)
         Motion.Stop()
     end
 end
-
 function Motion.Flush()
     local finished = Motion.Finished
     if #finished == 0 then
@@ -3933,7 +3790,6 @@ function Motion.Flush()
         Util.Try(entry[1], entry[2])
     end
 end
-
 function Motion.FinishAll()
     local springs = Motion.Springs
     for index = #springs, 1, -1 do
@@ -3945,7 +3801,6 @@ function Motion.FinishAll()
     end
     Motion.Stop()
 end
-
 function Motion.Refresh()
     local reduced = Motion.UserReduced
     if reduced == Motion.Reduced then
@@ -3956,19 +3811,16 @@ function Motion.Refresh()
         Motion.FinishAll()
     end
 end
-
 function Motion.SetReduced(enabled)
     Motion.UserReduced = enabled == true
     Motion.Refresh()
 end
-
 function Motion.ReportFps(deltaTime)
     if deltaTime <= 0 then
         return
     end
     State.Fps = State.Fps * 0.92 + (1 / deltaTime) * 0.08
 end
-
 function Motion.ScaleOf(frame)
     local scale = frame:FindFirstChild("MotionScale")
     if not scale then
@@ -3976,14 +3828,12 @@ function Motion.ScaleOf(frame)
     end
     return scale
 end
-
 function Motion.SetHome(frame, position)
     Motion.Homes[frame] = position
     if Motion.Shown[frame] ~= false then
         Motion.Set(frame, "Position", position)
     end
 end
-
 function Motion.PresenceOffset(from, distance)
     if from == "Top" then
         return UDim2.fromOffset(0, -distance)
@@ -3996,15 +3846,12 @@ function Motion.PresenceOffset(from, distance)
     end
     return UDim2.fromOffset(0, distance)
 end
-
 function Motion.HideDone(frame)
     if Motion.Shown[frame] == false then
         frame.Visible = false
     end
 end
-
 Motion.HideOptions = { OnDone = Motion.HideDone }
-
 function Motion.Presence(frame, shown, options)
     options = options or {}
     local from = options.From or "Bottom"
@@ -4043,13 +3890,11 @@ function Motion.Presence(frame, shown, options)
     end
     Motion.Spring(frame, "Position", shown and home or hidden, speed, moveDone)
 end
-
 function Motion.Forget(frame)
     Motion.Homes[frame] = nil
     Motion.Shown[frame] = nil
     Motion.Cancel(frame)
 end
-
 function Motion.MakeRipple()
     local circle = Draw.New("Frame", {
         Name = "Ripple",
@@ -4060,13 +3905,10 @@ function Motion.MakeRipple()
     Draw.Corner(circle, UDim.new(1, 0))
     return circle
 end
-
 function Motion.RippleDone(circle)
     Draw.Pool("Ripple", Motion.MakeRipple).Release(circle)
 end
-
 Motion.RippleOptions = { OnDone = Motion.RippleDone }
-
 function Motion.Ripple(button, position)
     if Motion.Reduced or not button.Parent then
         return
@@ -4083,7 +3925,6 @@ function Motion.Ripple(button, position)
     Motion.Spring(circle, "Size", UDim2.fromOffset(diameter, diameter), "Soft")
     Motion.Spring(circle, "BackgroundTransparency", 1, "Soft", Motion.RippleOptions)
 end
-
 function Motion.Pop(frame)
     if Motion.Reduced then
         return
@@ -4093,12 +3934,10 @@ function Motion.Pop(frame)
     Motion.Set(scale, "Scale", pop.From)
     Motion.Spring(scale, "Scale", 1, pop.Speed, pop)
 end
-
 function Motion.Shake(frame)
     local shake = Config.Motion.Shake
     Motion.Impulse(frame, "Position", { 0, shake.Impulse, 0, 0 }, shake.Speed, shake.Damping)
 end
-
 function Motion.MakeCoin()
     local size = Config.Motion.Coin.Size
     local coin = Sprite.New(nil, "coin", size)
@@ -4106,19 +3945,14 @@ function Motion.MakeCoin()
     coin.ZIndex = Config.Z.Pop
     return coin
 end
-
 function Motion.CoinDone(coin)
     Draw.Pool("Coin", Motion.MakeCoin).Release(coin)
 end
-
 Motion.CoinShrinkOptions = { OnDone = Motion.CoinDone }
-
 function Motion.CoinRisen(coin)
     Motion.Spring(coin, "Size", UDim2.fromOffset(0, Config.Motion.Coin.Size), "Fast", Motion.CoinShrinkOptions)
 end
-
 Motion.CoinRiseOptions = { OnDone = Motion.CoinRisen }
-
 function Motion.CoinPop(parent, origin)
     if Motion.Reduced or not Particles.Enabled then
         return
@@ -4130,19 +3964,14 @@ function Motion.CoinPop(parent, origin)
     coin.Parent = parent
     Motion.Spring(coin, "Position", origin - UDim2.fromOffset(0, settings.Rise), "Normal", Motion.CoinRiseOptions)
 end
-
 table.insert(State.UnloadHooks, Motion.Stop)
-
 function Fx.MakeSpark()
     return Draw.Text({ Name = "Spark", AnchorPoint = Vector2.new(0.5, 0.5), TextXAlignment = Enum.TextXAlignment.Center }, "Glyph", 12, "Coin")
 end
-
 function Fx.SparkDone(spark)
     Draw.Pool("FxSpark", Fx.MakeSpark).Release(spark)
 end
-
 Fx.SparkOptions = { OnDone = Fx.SparkDone }
-
 function Fx.Burst(parent, origin, count)
     if Motion.Reduced or not Particles.Enabled or not parent.Parent then
         return
@@ -4166,12 +3995,10 @@ function Fx.Burst(parent, origin, count)
         Motion.Spring(spark, "TextTransparency", 1, burst.Fade, Fx.SparkOptions)
     end
 end
-
 function Fx.Bump(frame)
     local bump = Config.Decor.Bump
     Motion.Impulse(frame, "Position", { 0, 0, 0, -bump.Velocity }, "Fast", bump.Damping)
 end
-
 function Fx.Lift(frame, lifted)
     local home = Fx.Homes[frame]
     if not home then
@@ -4183,7 +4010,6 @@ function Fx.Lift(frame, lifted)
     end
     Motion.Spring(frame, "Position", lifted and home - UDim2.fromOffset(0, Config.Decor.Lift) or home, "Fast")
 end
-
 function Fx.Stagger(values, gap, fn)
     for index, value in ipairs(values) do
         if index == 1 or Motion.Reduced then
@@ -4193,7 +4019,6 @@ function Fx.Stagger(values, gap, fn)
         end
     end
 end
-
 function Fx.Axis(frame)
     local axis = { Frame = frame, X = Draw.New("NumberValue", { Value = 1 }), Y = Draw.New("NumberValue", { Value = 1 }) }
     local function Apply()
@@ -4203,12 +4028,10 @@ function Fx.Axis(frame)
     Util.Connect(axis.Y.Changed, Apply)
     return axis
 end
-
 function Fx.SetAxis(axis, x, y)
     Motion.Set(axis.X, "Value", x)
     Motion.Set(axis.Y, "Value", y)
 end
-
 function Fx.Warp(axis, x, y, options)
     local onDone = options.OnDone
     Motion.Spring(axis.X, "Value", x, options.SpeedX, { Damping = options.Damping })
@@ -4219,7 +4042,6 @@ function Fx.Warp(axis, x, y, options)
         end,
     })
 end
-
 function Fx.ScaleOf(frame)
     local scale = frame:FindFirstChild("FxScale")
     if not scale then
@@ -4227,15 +4049,12 @@ function Fx.ScaleOf(frame)
     end
     return scale
 end
-
 function Fx.Prime(frame)
     local cards = Config.Chrome.Cards
     Motion.Set(frame, "Position", UDim2.fromOffset(0, cards.Rise))
     Motion.Set(Fx.ScaleOf(frame), "Scale", cards.Scale)
 end
-
 Fx.RiseOptions = {}
-
 function Fx.Rise(frame)
     if not frame.Parent then
         return
@@ -4245,7 +4064,6 @@ function Fx.Rise(frame)
     Motion.Spring(frame, "Position", UDim2.new(), "Normal", Fx.RiseOptions)
     Motion.Spring(Fx.ScaleOf(frame), "Scale", 1, "Normal", Fx.RiseOptions)
 end
-
 function Container.New(host, options)
     options = options or {}
     local self = setmetatable({
@@ -4272,14 +4090,12 @@ function Container.New(host, options)
     Layout.All[self] = true
     return self
 end
-
 function Container:SetParent(parent)
     self.Parent = parent
     self.Depth = parent and parent.Depth + 1 or 0
     self.Window = self.Window or (parent and parent.Window)
     self.Tab = self.Tab or (parent and parent.Tab)
 end
-
 function Container:MarkDirty()
     local view = self.Tab
     if view and view.Dormant then
@@ -4289,7 +4105,6 @@ function Container:MarkDirty()
     end
     Layout.Dirty[self] = true
 end
-
 function Container:SetWidth(width)
     width = math.max(0, math.floor(width))
     if width == self.Width then
@@ -4298,7 +4113,6 @@ function Container:SetWidth(width)
     self.Width = width
     self:MarkDirty()
 end
-
 function Container:Add(frame, spec)
     spec = spec or {}
     local item = {
@@ -4330,7 +4144,6 @@ function Container:Add(frame, spec)
     self:MarkDirty()
     return item
 end
-
 function Container:Insert(item, after)
     for index, existing in ipairs(self.Items) do
         if existing == after then
@@ -4340,7 +4153,6 @@ function Container:Insert(item, after)
     end
     table.insert(self.Items, item)
 end
-
 function Container:Remove(item)
     local index = table.find(self.Items, item)
     if index then
@@ -4354,13 +4166,11 @@ function Container:Remove(item)
     item.Frame:Destroy()
     self:MarkDirty()
 end
-
 function Container:Clear()
     for index = #self.Items, 1, -1 do
         self:Remove(self.Items[index])
     end
 end
-
 function Container:Destroy()
     if self.Destroyed then
         return
@@ -4379,40 +4189,33 @@ function Container:Destroy()
         self.Tab.Parked[self] = nil
     end
 end
-
 function Container:Forget(frame)
     local detached = self.Tab and self.Tab.Detached
     if detached then
         detached[frame] = nil
     end
 end
-
 function Container:SameLine(gap)
     self.PendingSameLine = { Gap = gap }
     return self
 end
-
 function Container:NewLine()
     self.PendingSameLine = nil
     return self:Spacing(0)
 end
-
 function Container:Spacing(height)
     local spacer = Draw.New("Frame", { Name = "Spacing", BackgroundTransparency = 1 })
     self:Add(spacer, { Height = height or Config.Gap.Y })
     return self
 end
-
 function Container:Indent(width)
     self.IndentX += width or 16
     return self
 end
-
 function Container:Unindent(width)
     self.IndentX = math.max(0, self.IndentX - (width or 16))
     return self
 end
-
 function Layout.ResolveWidth(spec, available, used, gap)
     local remaining = math.max(0, available - used)
     if spec == nil or spec == 0 then
@@ -4426,14 +4229,12 @@ function Layout.ResolveWidth(spec, available, used, gap)
     end
     return math.min(spec, remaining)
 end
-
 function Layout.ItemWidth(item, joined, available, used, gap)
     if item.Width == nil and item.AutoWidth and not item.Fill and (joined or item.SameLine) then
         return math.min(item.AutoWidth(), math.max(0, available - used))
     end
     return Layout.ResolveWidth(item.Width, available, used, gap)
 end
-
 function Container:Place(item, cursor, available, joined)
     if item.SameLine and cursor.EndX then
         cursor.X = cursor.EndX + (item.Gap or self.GapX)
@@ -4462,7 +4263,6 @@ function Container:Place(item, cursor, available, joined)
     cursor.EndX = cursor.X + width
     cursor.LineHeight = math.max(cursor.LineHeight, height)
 end
-
 function Container:Layout()
     Layout.Dirty[self] = nil
     if self.Destroyed then
@@ -4502,7 +4302,6 @@ function Container:Layout()
     local height = cursor.EndX and (cursor.Y + cursor.LineHeight + self.PadY) or 0
     self:Commit(height)
 end
-
 function Container:Commit(height)
     if self.Scroll then
         self.Host.CanvasSize = UDim2.fromOffset(0, height)
@@ -4518,11 +4317,9 @@ function Container:Commit(height)
         self.Parent:MarkDirty()
     end
 end
-
 function Layout.ByDepth(left, right)
     return left.Depth < right.Depth
 end
-
 function Layout.Flush()
     local batch = Layout.Batch
     for _ = 1, Config.LayoutPasses do
@@ -4542,7 +4339,6 @@ function Layout.Flush()
     end
     table.clear(batch)
 end
-
 function Layout.Wake(view)
     local parked = view.Parked
     if not parked then
@@ -4553,7 +4349,6 @@ function Layout.Wake(view)
     end
     table.clear(parked)
 end
-
 function Layout.Warm(view, deadline)
     local parked = view.Parked
     if not parked or next(parked) == nil then
@@ -4584,13 +4379,11 @@ function Layout.Warm(view, deadline)
     table.clear(batch)
     return next(parked) == nil
 end
-
 function Layout.MarkAll()
     for container in pairs(Layout.All) do
         container:MarkDirty()
     end
 end
-
 function Layout.Measure(text, size, fontKind, width)
     width = math.max(1, math.floor(width))
     local key = table.concat({ text, size, fontKind, width,  }, "\0")
@@ -4626,10 +4419,8 @@ function Layout.Measure(text, size, fontKind, width)
     Layout.MeasuredCount += 1
     return bounds
 end
-
 Layout.TextService = game:GetService("TextService")
 Layout.EnumFonts = {}
-
 function Layout.EnumFont(face)
     local cache = Layout.EnumFonts
     local key = face.Family .. "|" .. face.Weight.Name .. "|" .. face.Style.Name
@@ -4646,7 +4437,6 @@ function Layout.EnumFont(face)
     end
     return cached or nil
 end
-
 function Layout.Probe()
     local host = Layout.ProbeHost()
     local probe = Layout.ProbeLabel
@@ -4668,7 +4458,6 @@ function Layout.Probe()
     Layout.ProbeLabel = probe
     return probe
 end
-
 function Layout.ProbeHost()
     if State.Gui and State.Gui.Parent then
         return State.Gui
@@ -4686,7 +4475,6 @@ function Layout.ProbeHost()
     Layout.ProbeGui = gui
     return gui
 end
-
 function Layout.DropProbeGui()
     local gui = Layout.ProbeGui
     Layout.ProbeGui = nil
@@ -4694,7 +4482,6 @@ function Layout.DropProbeGui()
         gui:Destroy()
     end
 end
-
 function Layout.ScrollFrame(props)
     props.BackgroundTransparency = 1
     props.ScrollBarThickness = Config.Page.ScrollBar
@@ -4706,7 +4493,6 @@ function Layout.ScrollFrame(props)
     Theme.Bind(frame, { ScrollBarImageColor3 = "Muted" })
     return frame
 end
-
 function Container:ColumnCount(width)
     local columns = self.ColumnSpec
     if columns.Count <= 1 or width < columns.Count * columns.MinWidth then
@@ -4719,7 +4505,6 @@ function Container:ColumnCount(width)
     end
     return columns.Count
 end
-
 function Container:ColumnsHeight(width)
     local spec = self.ColumnSpec
     local count = self:ColumnCount(width)
@@ -4730,7 +4515,6 @@ function Container:ColumnsHeight(width)
     end
     return count == 1 and total or tallest
 end
-
 function Container:ColumnsLayout(width)
     local spec = self.ColumnSpec
     local count = self:ColumnCount(width)
@@ -4746,7 +4530,6 @@ function Container:ColumnsLayout(width)
         y += child.ContentHeight + self.GapY
     end
 end
-
 function Container:Columns(count, minWidth)
     local holder = Draw.New("Frame", { Name = "Columns", BackgroundTransparency = 1 })
     local proxy = setmetatable({ Host = holder, GapY = self.GapY }, Container)
@@ -4767,18 +4550,14 @@ function Container:Columns(count, minWidth)
     spec.Children.Holder = item
     return spec.Children
 end
-
 table.insert(State.UnloadHooks, Layout.DropProbeGui)
 Platform.OnViewport(Layout.MarkAll)
-
 Gui.TextKinds = { Body = "Label", Desc = "Desc", Strong = "Label", Display = "Header" }
 Gui.Press = { Active = false, Token = 0 }
-
 function Gui.Lookup(container, id)
     local ids = container.Ids
     return id ~= nil and ids and ids[id] or nil
 end
-
 function Gui.Remember(container, id, handle)
     if id == nil then
         return
@@ -4786,11 +4565,9 @@ function Gui.Remember(container, id, handle)
     container.Ids = container.Ids or {}
     container.Ids[id] = handle
 end
-
 function Gui.Current()
     return Gui.Stack[#Gui.Stack]
 end
-
 function Gui.BeginChild(parent, id, options)
     local existing = Gui.Lookup(parent, id)
     if existing then
@@ -4822,12 +4599,10 @@ function Gui.BeginChild(parent, id, options)
     table.insert(Gui.Stack, child)
     return child
 end
-
 function Gui.EndChild()
     Gui.Stack[#Gui.Stack] = nil
     return Gui.Current()
 end
-
 function Gui.EnsureInput()
     if Gui.InputBound then
         return
@@ -4836,14 +4611,12 @@ function Gui.EnsureInput()
     Util.Connect(UserInputService.InputChanged, Gui.OnMove)
     Util.Connect(UserInputService.InputEnded, Gui.OnEnd)
 end
-
 function Gui.SetPressed(binder, pressed)
     local onPress = binder.Handlers.OnPress
     if onPress then
         Util.Try(onPress, pressed)
     end
 end
-
 function Gui.OnBegin(binder, input)
     if binder.Disabled or not Util.IsPointer(input) then
         return
@@ -4864,7 +4637,6 @@ function Gui.OnBegin(binder, input)
         task.delay(Config.Click.LongPress, Gui.OnLongCheck, press.Token)
     end
 end
-
 function Gui.OnLongCheck(token)
     local press = Gui.Press
     if not press.Active or press.Token ~= token or Library.Unloaded then
@@ -4879,7 +4651,6 @@ function Gui.OnLongCheck(token)
     Gui.SetPressed(binder, false)
     Util.Try(binder.Handlers.OnLongPress)
 end
-
 function Gui.OnMove(input)
     local press = Gui.Press
     if not press.Active or press.Long then
@@ -4895,7 +4666,6 @@ function Gui.OnMove(input)
     press.Active = false
     Gui.SetPressed(press.Binder, false)
 end
-
 function Gui.OnEnd(input)
     local press = Gui.Press
     if not press.Active then
@@ -4917,7 +4687,6 @@ function Gui.OnEnd(input)
     end
     Util.Try(binder.Handlers.OnClick, input)
 end
-
 function Gui.OnHoverChange(binder, hovered)
     if binder.Hovered == hovered or Platform.Touch then
         return
@@ -4928,10 +4697,8 @@ function Gui.OnHoverChange(binder, hovered)
         Util.Try(onHover, hovered and not binder.Disabled)
     end
 end
-
 Gui.Binder = {}
 Gui.Binder.__index = Gui.Binder
-
 function Gui.Binder:SetDisabled(disabled)
     self.Disabled = disabled == true
     if self.Disabled and self.Hovered then
@@ -4939,7 +4706,6 @@ function Gui.Binder:SetDisabled(disabled)
         Gui.OnHoverChange(self, false)
     end
 end
-
 function Gui.Binder:Disconnect()
     for _, conn in ipairs(self.Connections) do
         conn:Disconnect()
@@ -4950,7 +4716,6 @@ function Gui.Binder:Disconnect()
         press.Active, press.Binder, press.Input = false, nil, nil
     end
 end
-
 function Gui.Clickable(frame, handlers)
     Gui.EnsureInput()
     local binder = setmetatable({ Frame = frame, Handlers = handlers, Disabled = false, Hovered = false }, Gui.Binder)
@@ -4968,15 +4733,12 @@ function Gui.Clickable(frame, handlers)
     }
     return binder
 end
-
 function Gui.TextWidth(spec, size, fontKind)
     return Layout.Measure(Lang.Resolve(spec), Fonts.Size(fontKind, size), fontKind, 100000).X
 end
-
 function Gui.Hitbox(name)
     return Draw.New("TextButton", { Name = name, Text = "", AutoButtonColor = false, BackgroundTransparency = 1 })
 end
-
 function Gui.BuildBlock(holder, style, depth, radius)
     local tokens = Config.Button.Styles[style] or Config.Button.Styles.Default
     if not tokens.Face then
@@ -4992,7 +4754,6 @@ function Gui.BuildBlock(holder, style, depth, radius)
     local face = Draw.Box("Frame", { Name = "Face", Size = UDim2.new(1, 0, 1, -depth), ClipsDescendants = true, Parent = holder }, tokens.Face, "Outline", radius, 2)
     return face, shade
 end
-
 function Gui.BuildContent(face, spec, icon, token)
     local content = Draw.New("Frame", { Name = "Content", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = face })
     Draw.List(content, Config.Button.IconGap, true, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center)
@@ -5010,16 +4771,13 @@ function Gui.BuildContent(face, spec, icon, token)
     label.Parent = content
     return label
 end
-
 Gui.ButtonHandle = {}
 Gui.ButtonHandle.__index = Gui.ButtonHandle
-
 function Gui.ButtonHandle:Set(spec)
     self.Spec = spec
     Lang.Bind(self.Label, spec)
     self.Container:MarkDirty()
 end
-
 function Gui.ButtonHandle:SetDisabled(disabled)
     self.Binder:SetDisabled(disabled)
     local alpha = disabled and 0.45 or 0
@@ -5029,7 +4787,6 @@ function Gui.ButtonHandle:SetDisabled(disabled)
         self.Shade.BackgroundTransparency = alpha
     end
 end
-
 function Gui.ButtonHandle:SetStyle(style)
     local tokens = Config.Button.Styles[style] or Config.Button.Styles.Default
     self.Style = style
@@ -5039,12 +4796,10 @@ function Gui.ButtonHandle:SetStyle(style)
     end
     Theme.Bind(self.Label, { TextColor3 = tokens.Text })
 end
-
 function Gui.ButtonHandle:Destroy()
     self.Binder:Disconnect()
     self.Container:Remove(self.Item)
 end
-
 function Gui.ButtonHandle:OnHover(hovered)
     local tokens = Config.Button.Styles[self.Style] or Config.Button.Styles.Default
     if not tokens.Face then
@@ -5055,14 +4810,12 @@ function Gui.ButtonHandle:OnHover(hovered)
     local base = Theme.Color(tokens.Face)
     Motion.Spring(self.Face, "BackgroundColor3", hovered and Util.Lighten(base, Config.Button.Hover) or base, "Fast")
 end
-
 function Gui.ButtonHandle:OnPress(pressed)
     if not self.Shade then
         return
     end
     Motion.Spring(self.Face, "Position", UDim2.fromOffset(0, pressed and self.Depth - 1 or 0), "Fast")
 end
-
 function Gui.Button(container, options)
     local existing = Gui.Lookup(container, options.Id)
     if existing then
@@ -5098,10 +4851,8 @@ function Gui.Button(container, options)
     Gui.Remember(container, options.Id, handle)
     return handle
 end
-
 Gui.SelectableHandle = {}
 Gui.SelectableHandle.__index = Gui.SelectableHandle
-
 function Gui.SelectableHandle:SetSelected(selected)
     self.Selected = selected == true
     local frame = self.Frame
@@ -5110,25 +4861,21 @@ function Gui.SelectableHandle:SetSelected(selected)
     Motion.Spring(frame, "BackgroundTransparency", selected and 0 or 1, "Fast")
     Motion.Spring(self.Bar, "Size", UDim2.new(0, Config.Selectable.Bar, selected and 0.6 or 0, 0), "Normal")
 end
-
 function Gui.SelectableHandle:Set(spec)
     self.Spec = spec
     Lang.Bind(self.Label, spec)
     self.Container:MarkDirty()
 end
-
 function Gui.SelectableHandle:Destroy()
     self.Binder:Disconnect()
     self.Container:Remove(self.Item)
 end
-
 function Gui.SelectableHandle:OnHover(hovered)
     if self.Selected then
         return
     end
     Motion.Spring(self.Frame, "BackgroundTransparency", hovered and Config.Selectable.HoverAlpha or 1, "Fast")
 end
-
 function Gui.Selectable(container, options)
     local existing = Gui.Lookup(container, options.Id)
     if existing then
@@ -5169,19 +4916,15 @@ function Gui.Selectable(container, options)
     Gui.Remember(container, options.Id, handle)
     return handle
 end
-
 Gui.TextHandle = {}
 Gui.TextHandle.__index = Gui.TextHandle
-
 function Gui.TextHandle:Set(spec)
     Lang.Bind(self.Label, spec)
     self.Container:MarkDirty()
 end
-
 function Gui.TextHandle:Destroy()
     self.Container:Remove(self.Item)
 end
-
 function Gui.Text(container, spec, options)
     options = options or {}
     local existing = Gui.Lookup(container, options.Id)
@@ -5210,7 +4953,6 @@ function Gui.Text(container, spec, options)
     Gui.Remember(container, options.Id, handle)
     return handle
 end
-
 function Gui.Separator(container, spec)
     local holder = Draw.New("Frame", { Name = "Separator", BackgroundTransparency = 1 })
     local left = Draw.New("Frame", { AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.fromScale(0, 0.5), Size = UDim2.new(1, 0, 0, 1), Parent = holder })
@@ -5236,14 +4978,12 @@ function Gui.Separator(container, spec)
     })
     return handle
 end
-
 function Gui.Icon(container, name, size)
     size = size or Platform.Metric("Icon")
     local holder = Draw.New("Frame", { Name = "Icon", BackgroundTransparency = 1 })
     local sprite = Sprite.New(holder, name, size)
     return { Frame = holder, Sprite = sprite, Item = container:Add(holder, { Width = size, Height = size }) }
 end
-
 Config.Widget = {
     HoverPad = 6,
     HoverAlpha = 0.5,
@@ -5275,7 +5015,6 @@ Config.Widget = {
         MouseButton1 = "MB1", MouseButton2 = "MB2", MouseButton3 = "MB3",
     },
 }
-
 Lang.Strings.All = { EN = "All" }
 Lang.Strings.Invert = { EN = "Invert" }
 Lang.Strings.Reset = { EN = "Reset to default" }
@@ -5297,12 +5036,10 @@ Lang.Strings.MaxPicked = { EN = "Up to %d selections" }
 Lang.Strings.PickColor = { EN = "Pick a color" }
 Lang.Strings.Selected = { EN = "%d selected" }
 Lang.Strings.TapConfirm = { EN = "Tap again to confirm" }
-
 Widget.Waiting = {}
 Widget.Drag = {}
 Widget.NoBinders = {}
 Widget.PopOnShow = true
-
 function Widget.Normalize(idx, info)
     if type(idx) == "table" and info == nil then
         info = idx
@@ -5310,7 +5047,6 @@ function Widget.Normalize(idx, info)
     end
     return idx, Widget.Aliases(info or {})
 end
-
 function Widget.Aliases(info)
     info.Callback = info.Callback or info.Func
     info.NoSave = info.NoSave == true or info.Save == false
@@ -5318,7 +5054,6 @@ function Widget.Aliases(info)
     info.Description = info.Description or info.Content
     return info
 end
-
 function Widget.Register(option, idx, info)
     Widget.Aliases(info)
     option.Idx = idx
@@ -5353,7 +5088,6 @@ function Widget.Register(option, idx, info)
     end
     Widget.Resolve(idx)
 end
-
 function Widget.Matches(value, dep)
     local expected = dep[2]
     if expected == nil then
@@ -5372,7 +5106,6 @@ function Widget.Matches(value, dep)
     end
     return false
 end
-
 function Widget.Depend(target, dep)
     local masterIdx = dep[1] or dep.Idx
     local master = Library.Options[masterIdx]
@@ -5388,7 +5121,6 @@ function Widget.Depend(target, dep)
     Sync()
     target.InstantShow = nil
 end
-
 function Widget.Resolve(idx)
     if idx == nil then
         return
@@ -5402,14 +5134,12 @@ function Widget.Resolve(idx)
         end
     end
 end
-
 function Widget.Key(value)
     if type(value) == "table" then
         return value.EN or value[1]
     end
     return value
 end
-
 function Widget.IndexOf(values, value)
     if value == nil then
         return nil
@@ -5422,12 +5152,10 @@ function Widget.IndexOf(values, value)
     end
     return nil
 end
-
 function Widget.Canonical(values, value)
     local index = Widget.IndexOf(values, value)
     return index and values[index] or nil
 end
-
 function Widget.SelectSet(values, picks, max)
     local set = {}
     if type(picks) ~= "table" then
@@ -5456,7 +5184,6 @@ function Widget.SelectSet(values, picks, max)
     end
     return set
 end
-
 function Widget.KeysOf(set)
     local keys = {}
     for entry, on in pairs(set) do
@@ -5466,7 +5193,6 @@ function Widget.KeysOf(set)
     end
     return keys
 end
-
 function Widget.SameSet(left, right)
     local keys, count = {}, 0
     for entry in pairs(left) do
@@ -5481,7 +5207,6 @@ function Widget.SameSet(left, right)
     end
     return count == 0
 end
-
 function Widget.SameOrder(left, right)
     if #left ~= #right then
         return false
@@ -5493,12 +5218,10 @@ function Widget.SameOrder(left, right)
     end
     return true
 end
-
 function Widget:OnChanged(callback)
     table.insert(self.Changed, callback)
     return self
 end
-
 function Widget:Fire()
     local value = self.Value
     if self.CloneOnFire and type(value) == "table" then
@@ -5509,15 +5232,12 @@ function Widget:Fire()
         Util.Try(callback, value)
     end
 end
-
 function Widget:Serialize()
     return self.Value
 end
-
 function Widget:Deserialize(saved)
     self:SetValue(saved)
 end
-
 function Widget:SetVisible(visible)
     visible = visible ~= false
     self.Visible = visible
@@ -5531,7 +5251,6 @@ function Widget:SetVisible(visible)
         Motion.Pop(item.Frame)
     end
 end
-
 function Widget:AddBinder(binder)
     self.Binders = self.Binders or {}
     table.insert(self.Binders, binder)
@@ -5540,20 +5259,17 @@ function Widget:AddBinder(binder)
     end
     return binder
 end
-
 function Widget:SetDisabled(disabled, reason)
     self.Disabled = disabled == true
     self.Reason = self.Disabled and reason or nil
     self:ApplyBlocked()
     return self
 end
-
 function Widget:Lock(locked)
     self.Locked = locked ~= false
     self:ApplyBlocked()
     return self
 end
-
 function Widget:ApplyBlocked()
     local blocked = self.Disabled == true or self.Locked == true
     for _, binder in ipairs(self.Binders or Widget.NoBinders) do
@@ -5564,11 +5280,9 @@ function Widget:ApplyBlocked()
         self.Row:SetBlocked(blocked, blocked and reason or nil)
     end
 end
-
 function Widget:IsBlocked()
     return self.Disabled == true or self.Locked == true
 end
-
 function Widget:Flash()
     if self.Row then
         self.Row:Flash()
@@ -5577,47 +5291,39 @@ function Widget:Flash()
     end
     return self
 end
-
 function Widget:SetBadge(spec)
     if self.Row then
         self.Row:SetBadge(spec)
     end
     return self
 end
-
 function Widget:SetText(spec)
     if self.Row then
         self.Row:SetTitle(spec)
     end
     return self
 end
-
 function Widget:SetDescription(spec)
     if self.Row then
         self.Row:SetDescription(spec)
     end
     return self
 end
-
 function Widget:AddKeyPicker(idx, info)
     KeyPicker.New(self.Row, idx, info or {}, self.Type == "Toggle" and self or nil)
     return self
 end
-
 function Widget:AddColorPicker(idx, info)
     ColorPicker.New(self.Row, idx, info or {})
     return self
 end
-
 function Widget.DefaultIcon(info, kind)
     if info.Icon == nil then
         info.Icon = Config.Widget.DefaultIcons[kind]
     end
     return info
 end
-
 Widget.Paints = {}
-
 function Widget.Paint(_, inst, prop, token, animate)
     local map = Widget.Paints[inst]
     if not map then
@@ -5639,7 +5345,6 @@ function Widget.Paint(_, inst, prop, token, animate)
         Motion.Set(inst, prop, Theme.Color(token))
     end
 end
-
 function Widget.ClosePopup()
     if Popup.CloseTop then
         Popup.CloseTop()
@@ -5647,7 +5352,6 @@ function Widget.ClosePopup()
         Popup.Close()
     end
 end
-
 function Widget.MoveAfter(container, item, after)
     local index = table.find(container.Items, item)
     if index then
@@ -5656,7 +5360,6 @@ function Widget.MoveAfter(container, item, after)
     container:Insert(item, after)
     container:MarkDirty()
 end
-
 function Widget.EnsureDrag()
     if Widget.DragBound then
         return
@@ -5665,7 +5368,6 @@ function Widget.EnsureDrag()
     Util.Connect(UserInputService.InputChanged, Widget.OnDragMove)
     Util.Connect(UserInputService.InputEnded, Widget.OnDragEnd)
 end
-
 function Widget.BeginDrag(input, owner, frame)
     Widget.EnsureDrag()
     local drag = Widget.Drag
@@ -5682,7 +5384,6 @@ function Widget.BeginDrag(input, owner, frame)
         scroller.ScrollingEnabled = false
     end
 end
-
 function Widget.OnDragMove(input)
     local drag = Widget.Drag
     if not drag.Owner then
@@ -5694,7 +5395,6 @@ function Widget.OnDragMove(input)
     end
     Util.Try(drag.Owner.OnDrag, drag.Owner, input.Position)
 end
-
 function Widget.OnDragEnd(input)
     local drag = Widget.Drag
     if not drag.Owner or (input ~= drag.Input and input.UserInputType ~= drag.Type) then
@@ -5702,7 +5402,6 @@ function Widget.OnDragEnd(input)
     end
     Widget.EndDrag()
 end
-
 function Widget.EndDrag()
     local drag = Widget.Drag
     local owner = drag.Owner
@@ -5715,7 +5414,6 @@ function Widget.EndDrag()
         Util.Try(owner.OnDragEnd, owner)
     end
 end
-
 function Widget.Field(parent)
     local field = Draw.Box("Frame", { Name = "Field", Size = UDim2.fromScale(1, 1), Parent = parent }, "Element", nil, Platform.Metric("Radius"))
     local stroke = Draw.Stroke(field, "Outline", 2, true)
@@ -5740,15 +5438,12 @@ function Widget.Field(parent)
     end)
     return box, field
 end
-
 function Row.LineHeight(kind)
     return Fonts.Size("Body", Util.TextSize(kind or "Label")) + Config.Widget.LineExtra
 end
-
 function Row.SearchText(info)
     return Lang.SearchText(info.Text) .. " " .. Lang.SearchText(info.Description)
 end
-
 function Row.New(container, info, options)
     options = options or {}
     local settings = Config.Widget
@@ -5792,14 +5487,12 @@ function Row.New(container, info, options)
     })
     return row
 end
-
 function Row:SetTitle(spec)
     Lang.Bind(self.Title, spec)
     self.Item.Search = Lang.SearchText(spec) .. " " .. Lang.SearchText(self.Info.Description)
     self.Item.Label = spec
     self.Container:MarkDirty()
 end
-
 function Row:SetDescription(spec)
     if not self.Desc then
         self.Desc = Draw.Text({ Name = "Desc", TextWrapped = true, TextYAlignment = Enum.TextYAlignment.Top, ZIndex = Config.Z.Text, Parent = self.Holder }, "Desc", Util.TextSize("Desc"), "SubText")
@@ -5807,7 +5500,6 @@ function Row:SetDescription(spec)
     Lang.Bind(self.Desc, spec or "")
     self.Container:MarkDirty()
 end
-
 function Row:SetNote(spec, token)
     if spec == nil then
         if self.Note then
@@ -5824,7 +5516,6 @@ function Row:SetNote(spec, token)
     self.Note.Visible = true
     self.Container:MarkDirty()
 end
-
 function Row:SetIcon(name)
     if self.IconSprite then
         self.IconSprite:Destroy()
@@ -5833,7 +5524,6 @@ function Row:SetIcon(name)
     self.IconSprite.ZIndex = Config.Z.Text
     self.Container:MarkDirty()
 end
-
 function Row:SetBadge(spec)
     if spec == nil then
         if self.Badge then
@@ -5855,7 +5545,6 @@ function Row:SetBadge(spec)
     Lang.Bind(self.BadgeLabel, spec, "Text", string.upper)
     self.Container:MarkDirty()
 end
-
 function Row:AddRight(frame, width)
     table.insert(self.Rights, { Frame = frame, Width = width })
     frame.AnchorPoint = Vector2.new(0, 0.5)
@@ -5863,7 +5552,6 @@ function Row:AddRight(frame, width)
     frame.Parent = self.Holder
     self:RecalcRight()
 end
-
 function Row:SetRightWidth(frame, width)
     for _, right in ipairs(self.Rights) do
         if right.Frame == frame and right.Width ~= width then
@@ -5872,7 +5560,6 @@ function Row:SetRightWidth(frame, width)
         end
     end
 end
-
 function Row:RecalcRight()
     local total = 0
     for index, right in ipairs(self.Rights) do
@@ -5881,7 +5568,6 @@ function Row:RecalcRight()
     self.RightWidth = total
     self.Container:MarkDirty()
 end
-
 function Row:SetAsideWidth(width)
     if self.AsideWidth == width then
         return
@@ -5889,7 +5575,6 @@ function Row:SetAsideWidth(width)
     self.AsideWidth = width
     self.Container:MarkDirty()
 end
-
 function Row:TextColumn(width)
     local settings = Config.Widget
     local left = self.IconSprite and Platform.Metric("Icon") + settings.Badge.Gap or 0
@@ -5899,14 +5584,12 @@ function Row:TextColumn(width)
     end
     return left, math.max(20, width - left - right)
 end
-
 function Row:LabelHeight(label, width)
     if not label or not label.Visible or label.Text == "" then
         return 0
     end
     return Layout.Measure(label.Text, label.TextSize, "Desc", width).Y
 end
-
 function Row:Measure(width)
     local settings = Config.Widget
     if self.MeasureControl then
@@ -5940,7 +5623,6 @@ function Row:Measure(width)
     end
     return math.max(self.MinHeight or Platform.Metric("Row"), content + settings.RowPadY)
 end
-
 function Row:Arrange(width, height)
     local settings = Config.Widget
     local top = self.ControlHeight and 0 or math.floor((height - self.TextHeight) / 2)
@@ -5975,7 +5657,6 @@ function Row:Arrange(width, height)
         self.OnArranged(width, height)
     end
 end
-
 function Row:ArrangeDecor(top)
     local lineHeight = Row.LineHeight()
     if self.IconSprite then
@@ -5992,7 +5673,6 @@ function Row:ArrangeDecor(top)
     self.Badge.Position = UDim2.fromOffset(x, top + math.floor((lineHeight - settings.Height) / 2) - 2)
     self.Badge.Size = UDim2.fromOffset(self.BadgeWidth, settings.Height)
 end
-
 function Row:ArrangeRights(width)
     local x = width
     for _, right in ipairs(self.Rights) do
@@ -6000,11 +5680,9 @@ function Row:ArrangeRights(width)
         x -= right.Width + Config.Widget.RightGap
     end
 end
-
 function Row:SetHover(hovered)
     Motion.Spring(self.Hover, "BackgroundTransparency", hovered and Config.Widget.HoverAlpha or 1, "Fast")
 end
-
 function Row:Bind(onClick)
     local hit = Gui.Hitbox("Hit")
     hit.ZIndex = Config.Z.Body
@@ -6024,7 +5702,6 @@ function Row:Bind(onClick)
         OnClick = onClick,
     })
 end
-
 Row.VeilDone = {
     OnDone = function(veil)
         if veil.BackgroundTransparency > 0.95 then
@@ -6032,7 +5709,6 @@ Row.VeilDone = {
         end
     end,
 }
-
 function Row:SetBlocked(blocked, reason)
     if not self.Veil then
         self.Veil = Draw.Box("TextButton", {
@@ -6051,13 +5727,11 @@ function Row:SetBlocked(blocked, reason)
     Motion.Spring(self.Veil, "BackgroundTransparency", blocked and Config.Widget.Veil or 1, "Fast", Row.VeilDone)
     self:SetNote(reason)
 end
-
 Row.FlashDone = {
     OnDone = function(hover)
         Theme.Bind(hover, { BackgroundColor3 = "Hover" })
     end,
 }
-
 function Row:Flash()
     local hover = self.Hover
     Theme.Bind(hover, { BackgroundColor3 = "Glow" })
@@ -6067,9 +5741,7 @@ function Row:Flash()
         Motion.Pop(self.Badge)
     end
 end
-
 Toggle.KnobSpring = { Damping = Config.Widget.Knob.Damping }
-
 function WidgetHost:AddToggle(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local toggle = setmetatable({ Type = "Toggle", Value = info.Default == true, Style = info.Style or "Switch", Container = self }, Toggle)
@@ -6100,13 +5772,11 @@ function WidgetHost:AddToggle(idx, info)
     toggle:Render(true)
     return toggle
 end
-
 function WidgetHost:AddCheckbox(idx, info)
     idx, info = Widget.Normalize(idx, info)
     info.Style = "Checkbox"
     return self:AddToggle(idx, info)
 end
-
 function Toggle:BuildSwitch()
     local size, knobSize = Platform.Metric("Switch"), Platform.Metric("SwitchKnob")
     local settings = Config.Widget.Knob
@@ -6122,7 +5792,6 @@ function Toggle:BuildSwitch()
     self.Row:AddRight(track, size.X)
     self:BuildHit(track, size.X, size.Y)
 end
-
 function Toggle:BuildCheckbox()
     local size = Platform.Metric("Check")
     local depth = Config.Widget.Knob.Shade
@@ -6136,7 +5805,6 @@ function Toggle:BuildCheckbox()
     self.Row:AddRight(holder, size)
     self:BuildHit(holder, size, size + depth)
 end
-
 function Toggle.BuildCheckMark(face, size, token)
     local check = Config.Widget.Check
     local mark = Draw.New("CanvasGroup", { Name = "Mark", BackgroundTransparency = 1, GroupTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = face.ZIndex + 1, Parent = face })
@@ -6158,7 +5826,6 @@ function Toggle.BuildCheckMark(face, size, token)
     end
     return mark
 end
-
 function Toggle:BuildHit(target, width, height)
     local minimum = Platform.Metric("Hit")
     if width >= minimum and height >= minimum then
@@ -6177,7 +5844,6 @@ function Toggle:BuildHit(target, width, height)
         Parent = target,
     })
 end
-
 function Toggle:Render(instant)
     local on = self.Value
     local animate = not instant
@@ -6200,7 +5866,6 @@ function Toggle:Render(instant)
         Motion.Pop(self.Mark)
     end
 end
-
 function Toggle:Squash()
     local settings = Config.Widget.Knob
     local direction = self.Value and 1 or -1
@@ -6208,7 +5873,6 @@ function Toggle:Squash()
     Motion.Impulse(self.Knob, "Size", { 0, settings.Squash, 0, -settings.Squash * 0.5 }, "Fast", settings.SquashDamping)
     Motion.Impulse(self.Knob, "Position", { 0, direction * settings.Squash * 0.25, 0, 0 }, "Fast", Config.Widget.Knob.Damping)
 end
-
 function Toggle:Celebrate()
     local holder = self.Row.Holder
     local track = self.Track
@@ -6216,21 +5880,18 @@ function Toggle:Celebrate()
     local x = offset.X + (self.Knob and self.Travel + self.KnobSize / 2 or track.AbsoluteSize.X / 2)
     Motion.CoinPop(holder, UDim2.fromOffset(x, offset.Y + 2))
 end
-
 function Toggle:ApplyBlocked()
     Widget.ApplyBlocked(self)
     if self.Now then
         self.Now:Lock(self:IsBlocked())
     end
 end
-
 function Toggle:SetVisible(visible)
     Widget.SetVisible(self, visible)
     if self.Now then
         self.Now:SetVisible(visible)
     end
 end
-
 function Toggle:SetValue(value)
     value = value == true
     if value == self.Value then
@@ -6240,9 +5901,7 @@ function Toggle:SetValue(value)
     self:Render(false)
     self:Fire()
 end
-
 Slider.GrabSpring = { Damping = 0.55 }
-
 function WidgetHost:AddSlider(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local knob = Platform.Metric("Knob")
@@ -6268,7 +5927,6 @@ function WidgetHost:AddSlider(idx, info)
     slider:Render(false)
     return slider
 end
-
 function Slider.Decimals(step)
     if not step then
         return 0
@@ -6276,7 +5934,6 @@ function Slider.Decimals(step)
     local fraction = tostring(step):match("%.(%d+)$")
     return fraction and #fraction or 0
 end
-
 function Slider.Bounds(min, max)
     min, max = tonumber(min) or 0, tonumber(max) or 100
     if min ~= min then
@@ -6287,7 +5944,6 @@ function Slider.Bounds(min, max)
     end
     return math.min(min, max), math.max(min, max)
 end
-
 function Slider:Quantize(value)
     if value ~= value then
         value = self.Min
@@ -6298,7 +5954,6 @@ function Slider:Quantize(value)
     end
     return Util.Round(math.clamp(value, self.Min, self.Max), self.Rounding)
 end
-
 function Slider:Build(knob)
     local control = self.Row.Control
     local depth = Config.Widget.Knob.Shade
@@ -6332,7 +5987,6 @@ function Slider:Build(knob)
         end
     end)
 end
-
 function Slider:BuildMarks(track)
     if type(self.Marks) ~= "table" then
         return
@@ -6352,7 +6006,6 @@ function Slider:BuildMarks(track)
         }, "Muted", nil, 1)
     end
 end
-
 function Slider:BuildAside()
     local aside = self.Row.Aside
     local settings = Config.Widget.Slider
@@ -6390,7 +6043,6 @@ function Slider:BuildAside()
         Tooltip.Attach(reset, Lang.Strings.Reset)
     end
 end
-
 function Slider:MeasureAside()
     local widest = 0
     local size = self.ValueBox.TextSize
@@ -6399,13 +6051,11 @@ function Slider:MeasureAside()
     end
     self.Row:SetAsideWidth(math.max(widest + 6, Platform.TouchMin()) + Config.Widget.Slider.Reset + 4)
 end
-
 function Slider:Format(value)
     value = value or self.Value
     local text = self.Rounding > 0 and string.format("%." .. self.Rounding .. "f", value) or tostring(math.floor(value + 0.5))
     return Lang.Resolve(self.Prefix) .. text .. Lang.Resolve(self.Suffix)
 end
-
 function Slider:BeginDrag(input)
     if self:IsBlocked() then
         return
@@ -6415,13 +6065,11 @@ function Slider:BeginDrag(input)
     Widget.BeginDrag(input, self, self.Row.Holder)
     self:OnDrag(input.Position)
 end
-
 function Slider:OnDrag(position)
     local left, width = self.Track.AbsolutePosition.X, self.Track.AbsoluteSize.X
     local fraction = width > 0 and math.clamp((position.X - left) / width, 0, 1) or 0
     self:SetValue(self.Min + (self.Max - self.Min) * fraction)
 end
-
 function Slider:OnDragEnd()
     Motion.Spring(self.KnobScale, "Scale", 1, "Fast", Slider.GrabSpring)
     self.Dragging = false
@@ -6430,7 +6078,6 @@ function Slider:OnDragEnd()
         self:Fire()
     end
 end
-
 function Slider:Render(animated)
     local span = self.Max - self.Min
     local fraction = span > 0 and (self.Value - self.Min) / span or 0
@@ -6449,7 +6096,6 @@ function Slider:Render(animated)
     Motion.Spring(self.Reset, "TextTransparency", dirty and 0 or 1, "Fast")
     self.Reset.Active = dirty
 end
-
 function Slider:SetValue(value)
     value = tonumber(value)
     if not value then
@@ -6467,7 +6113,6 @@ function Slider:SetValue(value)
     end
     self:Fire()
 end
-
 function Slider:SetRange(min, max)
     self.Min, self.Max = Slider.Bounds(min, max)
     local clamped = self:Quantize(self.Value)
@@ -6480,18 +6125,14 @@ function Slider:SetRange(min, max)
         self:Fire()
     end
 end
-
 function Slider:SetMax(max)
     self:SetRange(self.Min, max)
 end
-
 function Slider:SetMin(min)
     self:SetRange(min, self.Max)
 end
-
 Gui.ListHandle = {}
 Gui.ListHandle.__index = Gui.ListHandle
-
 function Gui.VirtualList(container, options)
     local settings = Config.Widget.List
     local box = Draw.Box("Frame", { Name = "List", ClipsDescendants = true, BackgroundTransparency = 0 }, options.Fill or "Element", options.Bare and nil or "Outline", Platform.Metric("Radius"), 2)
@@ -6519,18 +6160,15 @@ function Gui.VirtualList(container, options)
     list:Refresh(true)
     return list
 end
-
 function Gui.ListHandle:Height()
     local settings = Config.Widget.List
     local options = self.Options
     local rows = options.Rows or math.clamp(options.Count(), 1, options.MaxRows or settings.Rows)
     return rows * self.Step - settings.Gap + settings.Pad * 2
 end
-
 function Gui.ListHandle:Slots()
     return math.ceil(self.Scroll.AbsoluteSize.Y / self.Step) + 2
 end
-
 function Gui.ListHandle:Refresh(force)
     local settings = Config.Widget.List
     local count = self.Options.Count()
@@ -6549,7 +6187,6 @@ function Gui.ListHandle:Refresh(force)
         self:Place(parts, first + slot, count)
     end
 end
-
 function Gui.ListHandle:Grow(needed)
     local options = self.Options
     while #self.Pool < needed do
@@ -6568,7 +6205,6 @@ function Gui.ListHandle:Grow(needed)
         table.insert(self.Pool, parts)
     end
 end
-
 function Gui.ListHandle:Place(parts, index, count)
     local frame = parts.Frame
     if index > count then
@@ -6583,11 +6219,9 @@ function Gui.ListHandle:Place(parts, index, count)
     frame.Visible = true
     self.Options.Render(parts, index)
 end
-
 function Gui.ListHandle:ScrollTo(index)
     self.Scroll.CanvasPosition = Vector2.new(0, math.max(0, (index - 1) * self.Step))
 end
-
 function Gui.MakeListRow()
     local frame = Draw.Box("TextButton", { Name = "Entry", BackgroundTransparency = 1 }, "Hover", nil, Platform.Metric("Radius") - 2)
     local label = Draw.Text({ Name = "Label", Position = UDim2.fromOffset(Config.Selectable.PadX, 0), Size = UDim2.new(1, -Config.Selectable.PadX * 2 - Config.Widget.List.Mark, 1, 0), TextTruncate = Enum.TextTruncate.AtEnd, Parent = frame }, "Body", Util.TextSize("Label"), "Text")
@@ -6596,14 +6230,12 @@ function Gui.MakeListRow()
     local mark = Toggle.BuildCheckMark(slot, size, "TabActiveText")
     return { Frame = frame, Label = label, Mark = mark }
 end
-
 function Gui.HoverListRow(parts, hovered)
     if parts.Header or parts.Selected then
         return
     end
     Motion.Spring(parts.Frame, "BackgroundTransparency", hovered and Config.Selectable.HoverAlpha or 1, "Fast")
 end
-
 function Gui.PaintListRow(parts, state)
     local frame, label = parts.Frame, parts.Label
     parts.Header, parts.Selected = state.Header, state.Selected
@@ -6621,7 +6253,6 @@ function Gui.PaintListRow(parts, state)
     parts.Mark.GroupTransparency = state.Selected and 0 or 1
     Gui.SetListIcon(parts, state.Icon, state.Reserve)
 end
-
 function Gui.SetListIcon(parts, icon, reserve)
     local key = icon or (reserve and "" or nil)
     if parts.IconName == key then
@@ -6646,7 +6277,6 @@ function Gui.SetListIcon(parts, icon, reserve)
     parts.Label.Position = UDim2.fromOffset(textX, 0)
     parts.Label.Size = UDim2.new(1, -textX - padX - Config.Widget.List.Mark, 1, 0)
 end
-
 function Widget.SearchField(container, onChanged)
     local holder = Draw.New("Frame", { Name = "Search", BackgroundTransparency = 1 })
     local box = Widget.Field(holder, Lang.Strings.Search)
@@ -6656,7 +6286,6 @@ function Widget.SearchField(container, onChanged)
     container:Add(holder, { Height = Platform.Metric("Box") })
     return box
 end
-
 function WidgetHost:AddDropdown(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local dropdown = setmetatable({
@@ -6686,7 +6315,6 @@ function WidgetHost:AddDropdown(idx, info)
     dropdown:WatchPlayers()
     return dropdown
 end
-
 function Dropdown:SetGroups(groups)
     self.Groups = groups
     if type(groups) ~= "table" then
@@ -6701,7 +6329,6 @@ function Dropdown:SetGroups(groups)
     end
     self.Values = flat
 end
-
 function Dropdown:Build(depth)
     local holder = Gui.Hitbox("Field")
     holder.Size = UDim2.fromScale(1, 1)
@@ -6728,7 +6355,6 @@ function Dropdown:Build(depth)
         end,
     }))
 end
-
 function Dropdown:ApplyDefault(default)
     if not self.Multi and type(default) == "number" and self.Values[default] ~= nil and not Widget.IndexOf(self.Values, default) then
         default = self.Values[default]
@@ -6736,7 +6362,6 @@ function Dropdown:ApplyDefault(default)
     self.Value = self:Normalize(default)
     self:Render()
 end
-
 function Dropdown:Normalize(value)
     if self.Multi then
         return Widget.SelectSet(self.Values, value, self.Max)
@@ -6750,7 +6375,6 @@ function Dropdown:Normalize(value)
     end
     return Widget.Canonical(self.Values, self.Value) or self.Values[1]
 end
-
 function Dropdown:Commit(value)
     local same
     if self.Multi then
@@ -6764,7 +6388,6 @@ function Dropdown:Commit(value)
         self:Fire()
     end
 end
-
 function Dropdown:WatchPlayers()
     if self.SpecialType ~= "Player" then
         return
@@ -6779,14 +6402,12 @@ function Dropdown:WatchPlayers()
         task.defer(Refresh)
     end)
 end
-
 function Dropdown:IsSelected(value)
     if self.Multi then
         return self.Value[value] == true
     end
     return self.Value == value
 end
-
 function Dropdown:GetActiveValues()
     local active = {}
     if not self.Multi then
@@ -6802,7 +6423,6 @@ function Dropdown:GetActiveValues()
     end
     return active
 end
-
 function Dropdown:Summary(active)
     local count = #active
     if count == 0 then
@@ -6814,7 +6434,6 @@ function Dropdown:Summary(active)
     end
     return table.concat(shown, ", ")
 end
-
 function Dropdown:Render()
     local active = self:GetActiveValues()
     self.Display.Text = self:Summary(active)
@@ -6831,11 +6450,9 @@ function Dropdown:Render()
         self.List:Refresh(true)
     end
 end
-
 function Dropdown:SetValue(value)
     self:Commit(self:Normalize(value))
 end
-
 function Dropdown:SetValues(values, groups)
     local previous = self.Multi and Widget.KeysOf(self.Value) or self.Value
     if groups then
@@ -6855,7 +6472,6 @@ function Dropdown:SetValues(values, groups)
     end
     self:Commit(entry)
 end
-
 function Dropdown:Serialize()
     if self.Multi then
         local keys = {}
@@ -6866,18 +6482,15 @@ function Dropdown:Serialize()
     end
     return Widget.Key(self.Value)
 end
-
 function Dropdown:IsSearchable()
     if self.Searchable ~= nil then
         return self.Searchable == true
     end
     return #self.Values > Config.Dropdown.SearchThreshold
 end
-
 function Dropdown.Match(value, query)
     return query == "" or Lang.SearchText(value):find(query, 1, true) ~= nil
 end
-
 function Dropdown:BuildEntries()
     local entries, query = self.Entries, self.Query
     table.clear(entries)
@@ -6905,9 +6518,7 @@ function Dropdown:BuildEntries()
         end
     end
 end
-
 Dropdown.State = {}
-
 function Dropdown:EntryLabel(entry)
     if entry == nil then
         return (self.Query or "") ~= "" and Lang.Strings.NoResults or Lang.Strings.Empty, true
@@ -6917,7 +6528,6 @@ function Dropdown:EntryLabel(entry)
     end
     return entry, false
 end
-
 function Dropdown:RenderEntry(parts, index)
     local entry = self.Entries[index]
     local state = Dropdown.State
@@ -6929,7 +6539,6 @@ function Dropdown:RenderEntry(parts, index)
     state.Reserve = not header and self.Icons ~= nil and next(self.Icons) ~= nil
     Gui.PaintListRow(parts, state)
 end
-
 function Dropdown:PickEntry(index, parts)
     local value = self.Entries[index]
     if value == nil or (type(value) == "table" and value.Header) or self:IsBlocked() then
@@ -6948,7 +6557,6 @@ function Dropdown:PickEntry(index, parts)
         Widget.ClosePopup()
     end
 end
-
 function Dropdown:Pick(value)
     if not self.Multi then
         self:Commit(if self.Value == value and self.AllowNull then nil else value)
@@ -6958,7 +6566,6 @@ function Dropdown:Pick(value)
     picked[value] = not picked[value] or nil
     self:Commit(picked)
 end
-
 function Dropdown:Bulk(mode)
     local picked = {}
     for _, value in ipairs(self.Values) do
@@ -6969,7 +6576,6 @@ function Dropdown:Bulk(mode)
     end
     self:SetValue(picked)
 end
-
 function Dropdown:BuildToolbar(container)
     for index, mode in ipairs({ "All", "None", "Invert" }) do
         if index > 1 then
@@ -6985,7 +6591,6 @@ function Dropdown:BuildToolbar(container)
         })
     end
 end
-
 function Dropdown:BuildPopup(container)
     self.Query = ""
     if self:IsSearchable() then
@@ -7022,7 +6627,6 @@ function Dropdown:BuildPopup(container)
         self.List:ScrollTo(math.max(1, selected - 2))
     end
 end
-
 function Dropdown:Open()
     if self:IsBlocked() then
         return
@@ -7040,7 +6644,6 @@ function Dropdown:Open()
         end,
     })
 end
-
 function WidgetHost:AddListBox(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local rows = info.Height or 5
@@ -7079,7 +6682,6 @@ function WidgetHost:AddListBox(idx, info)
     Widget.Register(listbox, idx, info)
     return listbox
 end
-
 ListBox.IsSelected = Dropdown.IsSelected
 ListBox.EntryLabel = Dropdown.EntryLabel
 ListBox.GetActiveValues = Dropdown.GetActiveValues
@@ -7090,13 +6692,10 @@ ListBox.ApplyDefault = Dropdown.ApplyDefault
 ListBox.Normalize = Dropdown.Normalize
 ListBox.Commit = Dropdown.Commit
 ListBox.SetValue = Dropdown.SetValue
-
 function ListBox:Render()
     self.List:Refresh(true)
 end
-
 ListBox.SetValues = Dropdown.SetValues
-
 function WidgetHost:AddInput(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local input = setmetatable({
@@ -7118,7 +6717,6 @@ function WidgetHost:AddInput(idx, info)
     Widget.Register(input, idx, info)
     return input
 end
-
 function Input:Bind()
     local box = self.Box
     box:GetPropertyChangedSignal("Text"):Connect(function()
@@ -7138,12 +6736,10 @@ function Input:Bind()
         end
     end)
 end
-
 function Input:ApplyBlocked()
     Widget.ApplyBlocked(self)
     self.Box.TextEditable = not self:IsBlocked()
 end
-
 function Input:Sanitize(text)
     if self.Numeric then
         text = text:gsub("[^%d%.%-]", "")
@@ -7153,7 +6749,6 @@ function Input:Sanitize(text)
     end
     return text
 end
-
 function Input:Commit(text)
     if text == self.Value then
         return
@@ -7161,17 +6756,14 @@ function Input:Commit(text)
     self.Value = text
     self:Fire()
 end
-
 function Input:SetValue(text)
     text = self:Sanitize(tostring(text or ""))
     self.Box.Text = text
     self:Commit(text)
 end
-
 function WidgetHost:AddButton(info, callback)
     return Button.Create(self, info, callback)
 end
-
 function Button.Normalize(info, callback)
     if type(info) ~= "table" or info.EN then
         info = { Text = info }
@@ -7179,7 +6771,6 @@ function Button.Normalize(info, callback)
     info.Callback = info.Callback or info.Func or callback
     return info
 end
-
 function Button.Create(container, info, callback, after, class)
     info = Button.Normalize(info, callback)
     local button = setmetatable({ Type = "Button", Container = container, Info = info, Callback = info.Callback, Armed = false }, class or Button)
@@ -7210,7 +6801,6 @@ function Button.Create(container, info, callback, after, class)
     end
     return button
 end
-
 function Button:Click()
     if self.Disabled or self.Locked then
         return
@@ -7222,7 +6812,6 @@ function Button:Click()
     self:Disarm()
     Util.Try(self.Callback)
 end
-
 function Button:Arm()
     self.Armed = true
     local token = os.clock()
@@ -7232,13 +6821,11 @@ function Button:Arm()
     Motion.Shake(self.Handle.Face)
     task.delay(Config.ConfirmWindow, Button.Expire, self, token)
 end
-
 function Button.Expire(button, token)
     if button.ArmToken == token then
         button:Disarm()
     end
 end
-
 function Button:Disarm()
     if not self.Armed then
         return
@@ -7247,7 +6834,6 @@ function Button:Disarm()
     self.Handle:SetStyle(self.Info.Style or "Default")
     Lang.Bind(self.Handle.Label, self.Info.Text or "")
 end
-
 function Button:AddButton(info, callback)
     local last = self.Group[#self.Group]
     local sibling = Button.Create(self.Container, info, callback, last.Item)
@@ -7261,36 +6847,29 @@ function Button:AddButton(info, callback)
     self.Container:MarkDirty()
     return sibling
 end
-
 function Button:SetText(spec)
     self.Info.Text = spec
     self.Handle:Set(spec)
     self.Item.Search, self.Item.Label = Lang.SearchText(spec), spec
 end
-
 function Button:SetDisabled(disabled)
     self.Disabled = disabled == true
     self.Handle:SetDisabled(self.Disabled or self.Locked == true)
     return self
 end
-
 function Button:Lock(locked)
     self.Locked = locked ~= false
     self.Handle:SetDisabled(self.Locked or self.Disabled == true)
     return self
 end
-
 function Button:Flash()
     Motion.Pop(self.Handle.Face)
     return self
 end
-
 Button.SetVisible = Widget.SetVisible
-
 function KeyPicker.Short(name)
     return Config.Widget.KeyShort[name] or tostring(name)
 end
-
 function KeyPicker.New(row, idx, info, linked)
     Widget.Aliases(info)
     local picker = setmetatable({
@@ -7320,7 +6899,6 @@ function KeyPicker.New(row, idx, info, linked)
     end
     return picker
 end
-
 function KeyPicker:Build()
     local depth = Config.Widget.Knob.Shade
     local height, width = Platform.Metric("Control"), Platform.Metric("Key")
@@ -7351,7 +6929,6 @@ function KeyPicker:Build()
         end
     end)
 end
-
 function KeyPicker:Render()
     local listening = State.Binding == self
     if not listening then
@@ -7369,7 +6946,6 @@ function KeyPicker:Render()
     Widget.Paint(self, self.Shade, "BackgroundColor3", listening and "CoinDark" or "Pressed", true)
     Widget.Paint(self, self.Dot, "BackgroundColor3", Config.Widget.ModeTokens[self.Mode] or "Muted", true)
 end
-
 function KeyPicker:Listen()
     local previous = State.Binding
     State.Binding = self
@@ -7380,7 +6956,6 @@ function KeyPicker:Listen()
     self:Render()
     Motion.Pop(self.Holder)
 end
-
 function KeyPicker:SetKey(name)
     name = name or "None"
     local captured = self.Capturing
@@ -7399,7 +6974,6 @@ function KeyPicker:SetKey(name)
         Util.Try(callback, name)
     end
 end
-
 function KeyPicker:IsMounted()
     local container = self.Container
     if not container or container.Destroyed then
@@ -7407,7 +6981,6 @@ function KeyPicker:IsMounted()
     end
     return table.find(container.Items, self.Item) ~= nil
 end
-
 function KeyPicker:WarnDuplicate()
     if self.Value == "None" then
         return
@@ -7423,7 +6996,6 @@ function KeyPicker:WarnDuplicate()
         end
     end
 end
-
 function KeyPicker:Press(down)
     if self.Mode == "Always" or self:IsBlocked() or (self.Linked and self.Linked:IsBlocked()) then
         return
@@ -7445,7 +7017,6 @@ function KeyPicker:Press(down)
     end
     Util.Try(self.Callback, self:GetState())
 end
-
 function KeyPicker:GetState()
     if self.Mode == "Always" then
         return true
@@ -7455,7 +7026,6 @@ function KeyPicker:GetState()
     end
     return self.Linked and self.Linked.Value or self.Toggled
 end
-
 function KeyPicker:SetValue(value)
     if type(value) == "table" then
         self:SetMode(value.Mode or value[2] or self.Mode, true)
@@ -7463,11 +7033,9 @@ function KeyPicker:SetValue(value)
     end
     self:SetKey(Util.KeyName(value) or "None")
 end
-
 function KeyPicker:Serialize()
     return { Key = self.Value, Mode = self.Mode }
 end
-
 function KeyPicker:SetMode(mode, silent)
     if not table.find(Config.Widget.Modes, mode) then
         return
@@ -7486,7 +7054,6 @@ function KeyPicker:SetMode(mode, silent)
     self:Render()
     Motion.Pop(self.Dot)
 end
-
 function KeyPicker:OpenMenu()
     Popup.Open(self.Holder, function(container)
         Gui.Button(container, {
@@ -7522,7 +7089,6 @@ function KeyPicker:OpenMenu()
         end
     end, { Width = Config.Widget.Key.Menu, Title = Lang.Strings.Keybind })
 end
-
 function KeyPicker:Flash()
     Motion.Shake(self.Face)
     if self.Row then
@@ -7530,7 +7096,6 @@ function KeyPicker:Flash()
     end
     return self
 end
-
 function ColorPicker.New(row, idx, info)
     local picker = setmetatable({
         Type = "ColorPicker",
@@ -7561,14 +7126,12 @@ function ColorPicker.New(row, idx, info)
     picker:Render()
     return picker
 end
-
 function ColorPicker:Fire()
     Util.Try(self.Callback, self.Value, self.Transparency)
     for _, callback in ipairs(self.Changed) do
         Util.Try(callback, self.Value, self.Transparency)
     end
 end
-
 function ColorPicker:Render()
     Motion.Spring(self.Swatch, "BackgroundColor3", self.Value, "Fast")
     self.Swatch.BackgroundTransparency = (self.Transparency or 0) * 0.8
@@ -7589,13 +7152,11 @@ function ColorPicker:Render()
         view.Hex.Text = Util.Hex(self.Value)
     end
 end
-
 function ColorPicker:Commit()
     self.Value = Color3.fromHSV(self.Hue, self.Sat, self.Vib)
     self:Render()
     self:Fire()
 end
-
 function ColorPicker:SetValueRGB(color, transparency)
     self.Value = color
     if transparency ~= nil then
@@ -7605,7 +7166,6 @@ function ColorPicker:SetValueRGB(color, transparency)
     self:Render()
     self:Fire()
 end
-
 function ColorPicker:SetValue(value, transparency)
     if type(value) == "table" then
         value, transparency = value.Hex or value[1], value.Transparency or value[2]
@@ -7615,14 +7175,12 @@ function ColorPicker:SetValue(value, transparency)
         self:SetValueRGB(color, transparency)
     end
 end
-
 function ColorPicker:Serialize()
     if self.Transparency == nil then
         return Util.Hex(self.Value)
     end
     return { Hex = Util.Hex(self.Value), Transparency = self.Transparency }
 end
-
 function ColorPicker:BeginDrag(input, kind)
     if not Util.IsPointer(input) then
         return
@@ -7631,7 +7189,6 @@ function ColorPicker:BeginDrag(input, kind)
     Widget.BeginDrag(input, self, self.View and self.View.Root)
     self:OnDrag(input.Position)
 end
-
 function ColorPicker:OnDrag(position)
     local view = self.View
     if not view then
@@ -7650,7 +7207,6 @@ function ColorPicker:OnDrag(position)
     end
     self:Commit()
 end
-
 function ColorPicker:BuildField(root)
     local field = Draw.Box("Frame", { Name = "Field", BackgroundTransparency = 0, Parent = root }, nil, "Outline", 6, 2)
     local white = Draw.Box("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 0, Parent = field }, "White", nil, 6)
@@ -7663,7 +7219,6 @@ function ColorPicker:BuildField(root)
     end)
     return field, cursor
 end
-
 function ColorPicker:BuildBar(root, name, kind)
     local bar = Draw.Box("Frame", { Name = name, BackgroundTransparency = 0, Parent = root }, "White", "Outline", 4, 2)
     local cursor = Draw.Box("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.new(1, 6, 0, 4), ZIndex = Config.Z.Body, Parent = bar }, "Knob", "Outline", 2, 1)
@@ -7672,7 +7227,6 @@ function ColorPicker:BuildBar(root, name, kind)
     end)
     return bar, cursor
 end
-
 function ColorPicker:BuildHue(root)
     local bar, cursor = self:BuildBar(root, "Hue", "Hue")
     local keys = {}
@@ -7682,14 +7236,12 @@ function ColorPicker:BuildHue(root)
     Draw.New("UIGradient", { Rotation = 90, Color = ColorSequence.new(keys), Parent = bar })
     return bar, cursor
 end
-
 function ColorPicker:BuildAlpha(root)
     local bar, cursor = self:BuildBar(root, "Alpha", "Alpha")
     Theme.Unbind(bar)
     Draw.New("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(0, 0.9), Parent = bar })
     return bar, cursor
 end
-
 function ColorPicker:BuildPresets(root)
     local strip = Draw.New("Frame", { Name = "Presets", BackgroundTransparency = 1, Parent = root })
     Draw.List(strip, 6, true, Enum.HorizontalAlignment.Left, Enum.VerticalAlignment.Center)
@@ -7706,7 +7258,6 @@ function ColorPicker:BuildPresets(root)
     end
     return strip
 end
-
 function ColorPicker:BuildHexRow(root)
     local hexHolder = Draw.New("Frame", { Name = "Hex", BackgroundTransparency = 1, Parent = root })
     local hex = Widget.Field(hexHolder, "#FFFFFF")
@@ -7723,7 +7274,6 @@ function ColorPicker:BuildHexRow(root)
     local preview = Draw.Box("Frame", { Name = "Preview", BackgroundTransparency = 0, Parent = root }, nil, "Outline", 8, 2)
     return hexHolder, hex, preview
 end
-
 function ColorPicker:LayoutView(width)
     local view = self.View
     local settings, gap = Config.ColorPicker, Config.Gap.X
@@ -7742,7 +7292,6 @@ function ColorPicker:LayoutView(width)
     view.Presets.Position = UDim2.fromOffset(0, rowY + box + gap)
     view.Presets.Size = UDim2.fromOffset(width, Platform.Metric("Preset"))
 end
-
 function ColorPicker:BuildView(container)
     local settings, gap = Config.ColorPicker, Config.Gap.X
     local root = Draw.New("Frame", { Name = "Picker", BackgroundTransparency = 1 })
@@ -7763,7 +7312,6 @@ function ColorPicker:BuildView(container)
     })
     self:Render()
 end
-
 function ColorPicker:Open()
     if self:IsBlocked() then
         return
@@ -7779,7 +7327,6 @@ function ColorPicker:Open()
         end,
     })
 end
-
 function WidgetHost:AddLabel(text, wrap)
     local info = type(text) == "table" and text.Text and text or { Text = text }
     local label = setmetatable({ Type = "Label", Container = self, Wrap = wrap }, Label)
@@ -7790,16 +7337,13 @@ function WidgetHost:AddLabel(text, wrap)
     end
     return label
 end
-
 function Label:SetText(spec)
     self.Row:SetTitle(spec)
 end
-
 Label.SetVisible = Widget.SetVisible
 Label.AddColorPicker = Widget.AddColorPicker
 Label.AddKeyPicker = Widget.AddKeyPicker
 Label.Flash = Widget.Flash
-
 function WidgetHost:AddParagraph(info)
     info = Widget.Aliases(info or {})
     local paragraph = setmetatable({ Type = "Label", Container = self }, Label)
@@ -7810,27 +7354,21 @@ function WidgetHost:AddParagraph(info)
     end
     return paragraph
 end
-
 function Label:SetContent(spec)
     self.Row:SetDescription(spec)
 end
-
 function Label:SetTitle(spec)
     self.Row:SetTitle(spec)
 end
-
 function WidgetHost:AddDivider()
     Gui.Separator(self)
     return self
 end
-
 WidgetHost.Separator = WidgetHost.AddDivider
-
 function WidgetHost:AddSeparatorText(spec)
     Gui.Separator(self, spec)
     return self
 end
-
 function WidgetHost:AddProgressBar(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local progress = setmetatable({ Type = "Progress", Value = 0, Max = info.Max or 1, Suffix = info.Suffix, Container = self, NoSave = true }, Progress)
@@ -7844,7 +7382,6 @@ function WidgetHost:AddProgressBar(idx, info)
     progress:SetValue(info.Default or info.Value or 0)
     return progress
 end
-
 function Progress:SetValue(value)
     self.Value = math.clamp(tonumber(value) or 0, 0, self.Max)
     local fraction = self.Max > 0 and self.Value / self.Max or 0
@@ -7853,16 +7390,13 @@ function Progress:SetValue(value)
     self.AsideLabel.Text = text
     self.Row:SetAsideWidth(Layout.Measure(text, self.AsideLabel.TextSize, "Strong", 1000).X + 6)
 end
-
 function Progress:SetMax(max)
     self.Max = math.max(0, tonumber(max) or 1)
     self:SetValue(self.Value)
 end
-
 function Progress:SetText(spec)
     self.Row:SetTitle(spec)
 end
-
 Progress.SetVisible = Widget.SetVisible
 Progress.OnChanged = Widget.OnChanged
 Progress.Fire = Widget.Fire
@@ -7873,7 +7407,6 @@ Progress.Lock = Widget.Lock
 Progress.ApplyBlocked = Widget.ApplyBlocked
 Progress.IsBlocked = Widget.IsBlocked
 Progress.Flash = Widget.Flash
-
 function WidgetHost:AddSelectable(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local selectable = setmetatable({ Type = "Selectable", Value = info.Default == true or info.Selected == true, Container = self }, Selectable)
@@ -7894,7 +7427,6 @@ function WidgetHost:AddSelectable(idx, info)
     Widget.Register(selectable, idx, info)
     return selectable
 end
-
 function Selectable:SetValue(value)
     value = value == true
     if value == self.Value then
@@ -7904,7 +7436,6 @@ function Selectable:SetValue(value)
     self.Handle:SetSelected(value)
     self:Fire()
 end
-
 function WidgetHost:AddChild(info)
     info = info or {}
     local settings = Config.Widget.Child
@@ -7924,21 +7455,17 @@ function WidgetHost:AddChild(info)
     end
     return child
 end
-
 function WidgetHost:AddKeybind(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local row = Row.New(self, Widget.DefaultIcon(info, "Keybind"))
     return KeyPicker.New(row, idx, info, nil)
 end
-
 WidgetHost.AddKeyPicker = WidgetHost.AddKeybind
-
 function WidgetHost:AddColorPicker(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local row = Row.New(self, Widget.DefaultIcon(info, "ColorPicker"))
     return ColorPicker.New(row, idx, info)
 end
-
 Config.Widget.Segment = { Damping = 0.72, Inset = 3 }
 Config.Widget.Stepper = { Value = 54, Big = 10 }
 Config.Widget.Chip = { Height = 28, TouchHeight = 44, PadX = 10, Gap = 6, Dot = 8, Depth = 2 }
@@ -7951,18 +7478,15 @@ Config.Widget.Status = { Dot = 10, Halo = 18, Gap = 8, MaxText = 0.5, Tokens = {
 Config.Widget.Stat = { Size = 26, MinWindow = 10, Speed = 9 }
 Config.Widget.Teleport = { Rows = 6, Chip = 30, TouchChip = 52, Pill = 40, ChipInset = 4 }
 Config.Widget.Confirm = { Hold = 0.9, Style = "Danger" }
-
 Lang.Strings.RunNow = { EN = "Run now" }
 Lang.Strings.Mode = { EN = "Mode" }
 Lang.Strings.HoldConfirm = { EN = "Hold to confirm" }
 Lang.Strings.Teleport = { EN = "TP" }
 Lang.Strings.PerHour = { EN = "%s/h" }
-
 function Widget.InkFor(color)
     local luminance = color.R * 0.299 + color.G * 0.587 + color.B * 0.114
     return luminance > 0.6 and "Ink" or "White"
 end
-
 function Widget.SmallBlock(style, size, radius)
     local depth = Config.Widget.Chip.Depth
     local holder = Gui.Hitbox("Block")
@@ -7970,15 +7494,12 @@ function Widget.SmallBlock(style, size, radius)
     local face, shade = Gui.BuildBlock(holder, style or "Default", depth, radius or 6)
     return holder, face, shade, depth
 end
-
 function Widget.SinkOnPress(face, depth)
     return function(pressed)
         Motion.Spring(face, "Position", UDim2.fromOffset(0, pressed and depth - 1 or 0), "Fast")
     end
 end
-
 Segmented.Spring = { Damping = Config.Widget.Segment.Damping }
-
 function WidgetHost:AddSegmented(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local values = info.Values or {}
@@ -7996,7 +7517,6 @@ function WidgetHost:AddSegmented(idx, info)
     segmented:Paint(false)
     return segmented
 end
-
 function Segmented:Build()
     local control = self.Row.Control
     local radius = Platform.Metric("Radius")
@@ -8007,7 +7527,6 @@ function Segmented:Build()
     self.Indicator = indicator
     self:BuildSegments()
 end
-
 function Segmented:BuildSegments()
     for _, segment in ipairs(self.Segments) do
         segment.Binder:Disconnect()
@@ -8029,7 +7548,6 @@ function Segmented:BuildSegments()
         self.Segments[index] = segment
     end
 end
-
 function Segmented:Arrange(width)
     local count = math.max(1, #self.Segments)
     local segmentWidth = width / count
@@ -8041,7 +7559,6 @@ function Segmented:Arrange(width)
     self.SegmentWidth = segmentWidth
     self:Place(false)
 end
-
 function Segmented:Place(animate)
     local index = Widget.IndexOf(self.Values, self.Value)
     local width = self.SegmentWidth
@@ -8064,13 +7581,11 @@ function Segmented:Place(animate)
         Motion.Set(self.Indicator, "Size", size)
     end
 end
-
 function Segmented:Paint(animate)
     for _, segment in ipairs(self.Segments) do
         Widget.Paint(segment, segment.Label, "TextColor3", segment.Value == self.Value and "AccentText" or "SubText", animate)
     end
 end
-
 function Segmented:SetValue(value)
     local entry = Widget.Canonical(self.Values, value)
     if entry == nil or Widget.Key(entry) == Widget.Key(self.Value) then
@@ -8081,7 +7596,6 @@ function Segmented:SetValue(value)
     self:Paint(true)
     self:Fire()
 end
-
 function Segmented:SetValues(values)
     self.Values = values or {}
     local previous = self.Value
@@ -8093,11 +7607,9 @@ function Segmented:SetValues(values)
         self:Fire()
     end
 end
-
 function Segmented:Serialize()
     return Widget.Key(self.Value)
 end
-
 function WidgetHost:AddStepper(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local stepper = setmetatable({
@@ -8117,10 +7629,8 @@ function WidgetHost:AddStepper(idx, info)
     stepper:Render(false)
     return stepper
 end
-
 Stepper.Quantize = Slider.Quantize
 Stepper.Format = Slider.Format
-
 function Stepper:Build()
     local settings = Config.Widget.Stepper
     local height = Platform.Metric("Control")
@@ -8147,7 +7657,6 @@ function Stepper:Build()
     end)
     self.Row:AddRight(holder, size * 2 + settings.Value)
 end
-
 function Stepper:BuildButton(parent, glyph, direction, position, size, height)
     local holder, face, _, depth = Widget.SmallBlock("Default", UDim2.fromOffset(size, height + Config.Widget.Chip.Depth))
     holder.Position = position
@@ -8167,7 +7676,6 @@ function Stepper:BuildButton(parent, glyph, direction, position, size, height)
     }))
     return face
 end
-
 function Stepper:Nudge(steps)
     local before = self.Value
     self:SetValue(self.Value + self.Step * steps)
@@ -8175,7 +7683,6 @@ function Stepper:Nudge(steps)
         Motion.Shake(steps > 0 and self.Plus or self.Minus)
     end
 end
-
 function Stepper:Render(animate)
     if not self.Box:IsFocused() then
         self.Box.Text = self:Format()
@@ -8186,7 +7693,6 @@ function Stepper:Render(animate)
     Widget.Paint(self, self.Minus, "BackgroundColor3", self.Value <= self.Min and "Pressed" or "Element", animate)
     Widget.Paint(self, self.Plus, "BackgroundColor3", self.Value >= self.Max and "Pressed" or "Element", animate)
 end
-
 function Stepper:SetValue(value)
     value = tonumber(value)
     if not value then
@@ -8200,7 +7706,6 @@ function Stepper:SetValue(value)
     self:Render(true)
     self:Fire()
 end
-
 function WidgetHost:AddRangeSlider(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local knob = Platform.Metric("Knob")
@@ -8226,10 +7731,8 @@ function WidgetHost:AddRangeSlider(idx, info)
     range:Render(false)
     return range
 end
-
 RangeSlider.Quantize = Slider.Quantize
 RangeSlider.Format = Slider.Format
-
 function RangeSlider:Build(knob)
     local control = self.Row.Control
     local depth = Config.Widget.Knob.Shade
@@ -8261,18 +7764,15 @@ function RangeSlider:Build(knob)
         end
     end)
 end
-
 function RangeSlider:Fraction(value)
     local span = self.Max - self.Min
     return span > 0 and (value - self.Min) / span or 0
 end
-
 function RangeSlider:ValueAt(screenX)
     local left, width = self.Track.AbsolutePosition.X, self.Track.AbsoluteSize.X
     local fraction = width > 0 and math.clamp((screenX - left) / width, 0, 1) or 0
     return self.Min + (self.Max - self.Min) * fraction
 end
-
 function RangeSlider:BeginDrag(input)
     if self:IsBlocked() then
         return
@@ -8286,7 +7786,6 @@ function RangeSlider:BeginDrag(input)
     Widget.BeginDrag(input, self, self.Row.Holder)
     self:OnDrag(input.Position)
 end
-
 function RangeSlider:OnDrag(position)
     local value = self:Quantize(self:ValueAt(position.X))
     local low, high = self.Value[1], self.Value[2]
@@ -8297,7 +7796,6 @@ function RangeSlider:OnDrag(position)
     end
     self:SetValue({ low, high })
 end
-
 function RangeSlider:OnDragEnd()
     if self.Active then
         Motion.Spring(self.Knobs[self.Active].Scale, "Scale", 1, "Fast", Slider.GrabSpring)
@@ -8308,17 +7806,14 @@ function RangeSlider:OnDragEnd()
         self:Fire()
     end
 end
-
 function RangeSlider:Text()
     return self:Format(self.Value[1]) .. " – " .. self:Format(self.Value[2])
 end
-
 function RangeSlider:MeasureAside()
     local size = self.ValueLabel.TextSize
     local widest = Layout.Measure(self:Format(self.Max) .. " – " .. self:Format(self.Max), size, "Strong", 1000).X
     self.Row:SetAsideWidth(widest + 6)
 end
-
 function RangeSlider:Render(animate)
     local low, high = self:Fraction(self.Value[1]), self:Fraction(self.Value[2])
     local speed = self.Dragging and "Fast" or "Normal"
@@ -8337,7 +7832,6 @@ function RangeSlider:Render(animate)
     end
     self.ValueLabel.Text = self:Text()
 end
-
 function RangeSlider:SetValue(value)
     if type(value) ~= "table" then
         return
@@ -8356,11 +7850,9 @@ function RangeSlider:SetValue(value)
     end
     self:Fire()
 end
-
 function RangeSlider:Serialize()
     return { self.Value[1], self.Value[2] }
 end
-
 function WidgetHost:AddMultiChips(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local chips = setmetatable({
@@ -8387,11 +7879,9 @@ function WidgetHost:AddMultiChips(idx, info)
     chips:Paint(false)
     return chips
 end
-
 MultiChips.IsSelected = Dropdown.IsSelected
 MultiChips.GetActiveValues = Dropdown.GetActiveValues
 MultiChips.Serialize = Dropdown.Serialize
-
 function MultiChips:BuildBulk()
     local aside = self.Row.Aside
     self.BulkLinks = {}
@@ -8407,7 +7897,6 @@ function MultiChips:BuildBulk()
     end
     self:SizeBulk()
 end
-
 function MultiChips:SizeBulk()
     local size = Util.TextSize("Small")
     local width = 0
@@ -8420,7 +7909,6 @@ function MultiChips:SizeBulk()
     end
     self.Row:SetAsideWidth(width)
 end
-
 function MultiChips:Capped(values)
     if not self.Max then
         return values
@@ -8431,7 +7919,6 @@ function MultiChips:Capped(values)
     end
     return capped
 end
-
 function MultiChips:BuildChips()
     for _, chip in pairs(self.Chips) do
         chip.Binder:Disconnect()
@@ -8459,12 +7946,10 @@ function MultiChips:BuildChips()
     end
     self.Container:MarkDirty()
 end
-
 function MultiChips.ChipHeight()
     local settings = Config.Widget.Chip
     return Platform.Touch and settings.TouchHeight or settings.Height
 end
-
 function MultiChips:Flow(width, apply)
     local settings = Config.Widget.Chip
     local height = MultiChips.ChipHeight()
@@ -8487,7 +7972,6 @@ function MultiChips:Flow(width, apply)
     end
     return y + height
 end
-
 function MultiChips:ColorOf(value)
     local color = self.Colors[value]
     if typeof(color) == "Color3" then
@@ -8495,7 +7979,6 @@ function MultiChips:ColorOf(value)
     end
     return Theme.Color(type(color) == "string" and color or "Accent")
 end
-
 function MultiChips:PaintChip(chip, animate)
     local on = self.Value[chip.Value] == true
     local color = self:ColorOf(chip.Value)
@@ -8510,7 +7993,6 @@ function MultiChips:PaintChip(chip, animate)
     end
     Widget.Paint(chip, chip.Label, "TextColor3", on and Widget.InkFor(color) or "Text", animate)
 end
-
 function MultiChips:Paint(animate)
     for _, chip in pairs(self.Chips) do
         self:PaintChip(chip, animate)
@@ -8522,7 +8004,6 @@ function MultiChips:Paint(animate)
         end)
     end
 end
-
 function MultiChips:Pick(value, chip)
     if not self.Value[value] and self.Max and #self:GetActiveValues() >= self.Max then
         Motion.Shake(chip.Face)
@@ -8535,7 +8016,6 @@ function MultiChips:Pick(value, chip)
     end
     self:Fire()
 end
-
 function MultiChips:SetValue(value)
     local picked = Widget.SelectSet(self.Values, value, self.Max)
     if Widget.SameSet(picked, self.Value) then
@@ -8545,7 +8025,6 @@ function MultiChips:SetValue(value)
     self:Paint(true)
     self:Fire()
 end
-
 function MultiChips:SetValues(values, colors)
     local previous = self.Value
     self.Values = values or {}
@@ -8557,9 +8036,7 @@ function MultiChips:SetValues(values, colors)
         self:Fire()
     end
 end
-
 PriorityList.Spring = { Damping = 0.8 }
-
 function WidgetHost:AddPriorityList(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local list = setmetatable({ Type = "PriorityList", Container = self, Entries = {}, Values = info.Values or {}, CloneOnFire = true }, PriorityList)
@@ -8576,7 +8053,6 @@ function WidgetHost:AddPriorityList(idx, info)
     Widget.Register(list, idx, info)
     return list
 end
-
 function PriorityList:Normalize(order)
     local result, seen = {}, {}
     for _, value in ipairs(type(order) == "table" and order or {}) do
@@ -8595,15 +8071,12 @@ function PriorityList:Normalize(order)
     end
     return result
 end
-
 function PriorityList:Step()
     return PriorityList.EntryHeight() + Config.Widget.Priority.Gap
 end
-
 function PriorityList.EntryHeight()
     return math.max(Platform.Metric("Item"), Platform.TouchMin() + Config.Widget.Chip.Depth + 2)
 end
-
 function PriorityList:BuildEntries()
     for _, entry in pairs(self.Entries) do
         entry.Holder:Destroy()
@@ -8614,7 +8087,6 @@ function PriorityList:BuildEntries()
     end
     self.Container:MarkDirty()
 end
-
 function PriorityList:BuildEntry(value)
     local settings = Config.Widget.Priority
     local height = PriorityList.EntryHeight()
@@ -8634,7 +8106,6 @@ function PriorityList:BuildEntry(value)
     end
     return entry
 end
-
 function PriorityList:BuildHandle(entry, face)
     local settings = Config.Widget.Priority
     local handle = Draw.Text({ ClassName = "TextButton", Name = "Handle", Text = "≡", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0), Position = UDim2.fromScale(1, 0), Size = UDim2.new(0, settings.Handle, 1, -2), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = face.ZIndex + 2, Parent = face }, "Glyph", Util.TextSize("Header"), "Muted")
@@ -8650,7 +8121,6 @@ function PriorityList:BuildHandle(entry, face)
         Widget.Paint(entry, handle, "TextColor3", "Muted", true)
     end)
 end
-
 function PriorityList:BuildArrows(entry, face)
     local settings = Config.Widget.Priority
     for index, glyph in ipairs({ "▲", "▼" }) do
@@ -8662,7 +8132,6 @@ function PriorityList:BuildArrows(entry, face)
         }))
     end
 end
-
 function PriorityList:PlaceAll(animate, skip)
     local step = self:Step()
     for index, value in ipairs(self.Value) do
@@ -8678,7 +8147,6 @@ function PriorityList:PlaceAll(animate, skip)
         end
     end
 end
-
 function PriorityList:Move(value, offset)
     local from = Widget.IndexOf(self.Value, value)
     if not from then
@@ -8695,7 +8163,6 @@ function PriorityList:Move(value, offset)
     Motion.Pop(self.Entries[value].Holder)
     self:Fire()
 end
-
 function PriorityList:BeginDrag(input, entry)
     self.DragEntry = entry
     self.DragStart = Widget.IndexOf(self.Value, entry.Value)
@@ -8704,7 +8171,6 @@ function PriorityList:BeginDrag(input, entry)
     Motion.Pop(entry.Holder)
     Widget.BeginDrag(input, self, self.Row.Holder)
 end
-
 function PriorityList:OnDrag(position)
     local entry = self.DragEntry
     if not entry then
@@ -8722,7 +8188,6 @@ function PriorityList:OnDrag(position)
         self:PlaceAll(true, entry)
     end
 end
-
 function PriorityList:OnDragEnd()
     local entry = self.DragEntry
     if not entry then
@@ -8735,7 +8200,6 @@ function PriorityList:OnDragEnd()
         self:Fire()
     end
 end
-
 function PriorityList:SetValue(order)
     local normalized = self:Normalize(order)
     if Widget.SameOrder(normalized, self.Value) then
@@ -8745,7 +8209,6 @@ function PriorityList:SetValue(order)
     self:PlaceAll(true)
     self:Fire()
 end
-
 function PriorityList:SetValues(values)
     local previous = self.Value
     self.Values = values or {}
@@ -8756,7 +8219,6 @@ function PriorityList:SetValues(values)
         self:Fire()
     end
 end
-
 function PriorityList:Serialize()
     local keys = {}
     for index, entry in ipairs(self.Value) do
@@ -8764,7 +8226,6 @@ function PriorityList:Serialize()
     end
     return keys
 end
-
 function WidgetHost:AddTable(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local settings = Config.Widget.Table
@@ -8797,7 +8258,6 @@ function WidgetHost:AddTable(idx, info)
     grid:Sort()
     return grid
 end
-
 function Table.NormalizeColumns(columns)
     local normalized = {}
     for index, column in ipairs(columns or {}) do
@@ -8806,7 +8266,6 @@ function Table.NormalizeColumns(columns)
     end
     return normalized
 end
-
 function Table:BuildHeader()
     local header = Draw.New("Frame", { Name = "Header", BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, Platform.Metric("TableHeader")), ZIndex = Config.Z.Body, Parent = self.Row.Control })
     self.HeaderCells = {}
@@ -8822,7 +8281,6 @@ function Table:BuildHeader()
     self.Header = header
     self:PaintHeader()
 end
-
 function Table:PaintHeader()
     for index, column in ipairs(self.Columns) do
         local cell = self.HeaderCells[index]
@@ -8832,7 +8290,6 @@ function Table:PaintHeader()
         Widget.Paint(cell, cell, "TextColor3", sorted and "Accent" or "Muted", true)
     end
 end
-
 function Table:BuildBody(rows)
     local body = Draw.New("Frame", { Name = "Body", BackgroundTransparency = 1, Position = UDim2.fromOffset(0, Platform.Metric("TableHeader") + 4), Size = UDim2.new(1, 0, 1, -Platform.Metric("TableHeader") - 4), ZIndex = Config.Z.Body, Parent = self.Row.Control })
     self.List = Gui.VirtualList(nil, {
@@ -8855,7 +8312,6 @@ function Table:BuildBody(rows)
         end,
     })
 end
-
 function Table:MakeRow()
     local frame = Draw.Box("TextButton", { Name = "Row", BackgroundTransparency = 1 }, "Hover", nil, Platform.Metric("Radius") - 2)
     local parts = { Frame = frame, Cells = {}, Label = nil }
@@ -8864,7 +8320,6 @@ function Table:MakeRow()
     end
     return parts
 end
-
 function Table:Arrange(width)
     local settings = Config.Widget.Table
     local fixed, flexible, shares = 0, 0, 0
@@ -8891,7 +8346,6 @@ function Table:Arrange(width)
     end
     self.List:Refresh(true)
 end
-
 function Table:RenderRow(parts, index)
     local entry = self.View[index]
     local pad = Config.Widget.Table.CellPad
@@ -8904,7 +8358,6 @@ function Table:RenderRow(parts, index)
         cell.Size = UDim2.new(0, math.max(0, (self.Widths[column] or 0) - pad * 2), 1, 0)
     end
 end
-
 function Table:Sort()
     local view = self.View
     table.clear(view)
@@ -8929,25 +8382,20 @@ function Table:Sort()
     end
     self.List:Refresh(true)
 end
-
 function Table:SetSort(key, desc)
     self.SortKey, self.SortDesc = key, desc == true
     self:PaintHeader()
     self:Sort()
 end
-
 function Table:SetRows(rows)
     self.Rows = rows or {}
     self.Value = self.Rows
     self:Sort()
 end
-
 Table.SetValue = Table.SetRows
-
 function Table:Serialize()
     return nil
 end
-
 function WidgetHost:AddStatus(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local status = setmetatable({ Type = "Status", Container = self, NoSave = true, Value = "" }, Status)
@@ -8968,7 +8416,6 @@ function WidgetHost:AddStatus(idx, info)
     status:SetValue(type(default) == "table" and (default.Text or default[1]) or default or "Idle", type(default) == "table" and (default.State or default[2]) or nil)
     return status
 end
-
 function Status:SetValue(text, kind)
     text = text == nil and "" or text
     local settings = Config.Widget.Status
@@ -8988,7 +8435,6 @@ function Status:SetValue(text, kind)
         Motion.Pop(self.Halo)
     end
 end
-
 function Status:FitLabel()
     local settings = Config.Widget.Status
     local full = Layout.Measure(self.Label.Text, self.Label.TextSize, "Strong", 1000).X
@@ -8999,13 +8445,10 @@ function Status:FitLabel()
     self.Holder.Size = UDim2.fromOffset(slot, self.Holder.Size.Y.Offset)
     self.Row:SetRightWidth(self.Holder, slot)
 end
-
 function Status:Fire() end
-
 function Status:Serialize()
     return nil
 end
-
 function WidgetHost:AddStat(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local settings = Config.Widget.Stat
@@ -9027,9 +8470,7 @@ function WidgetHost:AddStat(idx, info)
     stat:SetValue(tonumber(info.Default) or 0)
     return stat
 end
-
 Stat.Suffixes = { "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc" }
-
 function Stat.Abbreviate(value)
     local absolute = math.abs(value)
     if absolute < 1e3 then
@@ -9039,7 +8480,6 @@ function Stat.Abbreviate(value)
     local text = string.format("%.2f", value / 10 ^ (tier * 3)):gsub("%.?0+$", "")
     return text .. Stat.Suffixes[tier]
 end
-
 function Stat:Text(value)
     local text = Stat.Abbreviate(value)
     if type(self.Format) == "string" then
@@ -9049,7 +8489,6 @@ function Stat:Text(value)
     end
     return text .. Lang.Resolve(self.Suffix)
 end
-
 function Stat:SetValue(value)
     value = tonumber(value)
     if not value then
@@ -9066,7 +8505,6 @@ function Stat:SetValue(value)
     end
     self:RenderRate(now)
 end
-
 function Stat:RenderRate(now)
     local elapsed = now - self.BaseTime
     if elapsed < Config.Widget.Stat.MinWindow then
@@ -9078,23 +8516,18 @@ function Stat:RenderRate(now)
     self.Delta.Text = Lang.Get("PerHour", sign .. Stat.Abbreviate(rate))
     Widget.Paint(self, self.Delta, "TextColor3", rate > 0 and "Good" or (rate < 0 and "Bad" or "SubText"), true)
 end
-
 function Stat:Reset()
     self.BaseTime, self.BaseValue = os.clock(), self.Value
     self.Delta.Text = ""
 end
-
 function Stat:Fire() end
-
 function Stat:Serialize()
     return nil
 end
-
 function TeleportList.ChipBar()
     local settings = Config.Widget.Teleport
     return Platform.Touch and settings.TouchChip or settings.Chip
 end
-
 function WidgetHost:AddTeleportList(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local settings = Config.Widget.Teleport
@@ -9113,7 +8546,6 @@ function WidgetHost:AddTeleportList(idx, info)
     tp:Reload()
     return tp
 end
-
 function TeleportList:BuildTop()
     local control = self.Row.Control
     local box = Platform.Metric("Box")
@@ -9147,7 +8579,6 @@ function TeleportList:BuildTop()
     Draw.Padding(chips, 0, inset, 0, inset)
     self.ChipStrip = chips
 end
-
 function TeleportList:BuildList(height)
     local body = Draw.New("Frame", { Name = "Body", BackgroundTransparency = 1, Position = UDim2.fromOffset(0, self.ListTop), Size = UDim2.new(1, 0, 0, height), ZIndex = Config.Z.Body, Parent = self.Row.Control })
     self.List = Gui.VirtualList(nil, {
@@ -9166,7 +8597,6 @@ function TeleportList:BuildList(height)
         end,
     })
 end
-
 function TeleportList.MakeRow()
     local parts = Gui.MakeListRow()
     local pillWidth = Config.Widget.Teleport.Pill
@@ -9178,7 +8608,6 @@ function TeleportList.MakeRow()
     parts.Pill = pill
     return parts
 end
-
 function TeleportList.Shape(entry)
     if type(entry) ~= "table" then
         return { Name = tostring(entry), Raw = entry }
@@ -9187,14 +8616,12 @@ function TeleportList.Shape(entry)
     entry.CategoryKey = TeleportList.CategoryKey(entry.Category)
     return entry
 end
-
 function TeleportList.CategoryKey(spec)
     if type(spec) == "table" then
         return tostring(spec.EN)
     end
     return spec ~= nil and tostring(spec) or nil
 end
-
 function TeleportList:Reload()
     local source = self.Source
     local ok, list = true, source
@@ -9212,7 +8639,6 @@ function TeleportList:Reload()
     self:BuildChips()
     self:Filter()
 end
-
 function TeleportList:RunRefresh()
     if self.Refreshing then
         return
@@ -9228,7 +8654,6 @@ function TeleportList:RunRefresh()
         end
     end)
 end
-
 function TeleportList:Categories()
     local seen, order = {}, {}
     for _, entry in ipairs(self.Entries) do
@@ -9240,7 +8665,6 @@ function TeleportList:Categories()
     end
     return order, seen
 end
-
 function TeleportList:BuildChips()
     for _, chip in ipairs(self.Chips) do
         chip.Frame:Destroy()
@@ -9257,7 +8681,6 @@ function TeleportList:BuildChips()
     end
     self:PaintChips()
 end
-
 function TeleportList:AddChip(category, order)
     local spec = category or Lang.Strings.All
     local size = Util.TextSize("Small")
@@ -9275,7 +8698,6 @@ function TeleportList:AddChip(category, order)
     })
     table.insert(self.Chips, entry)
 end
-
 function TeleportList:PaintChips()
     for _, chip in ipairs(self.Chips) do
         local on = chip.Category == self.Category
@@ -9283,7 +8705,6 @@ function TeleportList:PaintChips()
         Widget.Paint(chip, chip.Label, "TextColor3", on and "AccentText" or "Text", true)
     end
 end
-
 function TeleportList:Filter()
     local shown, query, category = self.Shown, self.Query, self.Category
     table.clear(shown)
@@ -9296,9 +8717,7 @@ function TeleportList:Filter()
     self.List:ScrollTo(1)
     self.List:Refresh(true)
 end
-
 TeleportList.RowState = {}
-
 function TeleportList:RenderRow(parts, index)
     local entry = self.Shown[index]
     local state = TeleportList.RowState
@@ -9309,7 +8728,6 @@ function TeleportList:RenderRow(parts, index)
     parts.Sub.Text = entry and entry.Category and Lang.Resolve(entry.Category) or ""
     parts.Pill.Visible = entry ~= nil
 end
-
 function TeleportList:Teleport(index, input, parts)
     local entry = self.Shown[index]
     if not entry or self:IsBlocked() then
@@ -9323,22 +8741,17 @@ function TeleportList:Teleport(index, input, parts)
         Util.Try(callback, entry.Raw ~= nil and entry.Raw or entry)
     end
 end
-
 function TeleportList:SetSource(source)
     self.Source = source
     self:Reload()
 end
-
 TeleportList.SetValues = TeleportList.SetSource
-
 function TeleportList:SetValue(name)
     self.Value = name
 end
-
 function TeleportList:Serialize()
     return nil
 end
-
 function WidgetHost:AddConfirmButton(info, callback)
     info = Widget.DefaultIcon(Button.Normalize(info, callback), "ConfirmButton")
     local settings = Config.Widget.Confirm
@@ -9360,7 +8773,6 @@ function WidgetHost:AddConfirmButton(info, callback)
     end
     return button
 end
-
 function ConfirmButton:OnPress(pressed)
     if Platform.Touch or self.Disabled or self.Locked then
         return
@@ -9374,7 +8786,6 @@ function ConfirmButton:OnPress(pressed)
     Motion.Spring(self.Fill, "Size", UDim2.fromScale(1, 1), 4.6 / self.Hold)
     task.delay(self.Hold, ConfirmButton.Complete, self, self.Token)
 end
-
 function ConfirmButton.Complete(button, token)
     if button.Token ~= token or Library.Unloaded or button.Disabled or button.Locked then
         return
@@ -9384,12 +8795,10 @@ function ConfirmButton.Complete(button, token)
     Motion.Spring(button.Fill, "Size", UDim2.fromScale(0, 1), "Soft")
     button:Run()
 end
-
 function ConfirmButton:Run()
     Motion.Pop(self.Frame)
     Util.Try(self.Callback)
 end
-
 function ConfirmButton:Click()
     if not Platform.Touch or self.Disabled or self.Locked then
         return
@@ -9407,13 +8816,11 @@ function ConfirmButton:Click()
     Motion.Shake(self.Face)
     task.delay(Config.ConfirmWindow, ConfirmButton.Expire, self, token)
 end
-
 function ConfirmButton.Expire(button, token)
     if button.ArmToken == token and button.Armed then
         button:Cancel()
     end
 end
-
 function ConfirmButton:Cancel()
     if not self.Fill then
         return
@@ -9423,7 +8830,6 @@ function ConfirmButton:Cancel()
     Lang.Bind(self.Label, self.Info.Text or "")
     Motion.Spring(self.Fill, "Size", UDim2.fromScale(0, 1), "Fast")
 end
-
 function ConfirmButton:SetDisabled(disabled)
     Button.SetDisabled(self, disabled)
     if self.Disabled then
@@ -9431,7 +8837,6 @@ function ConfirmButton:SetDisabled(disabled)
     end
     return self
 end
-
 function ConfirmButton:Lock(locked)
     Button.Lock(self, locked)
     if self.Locked then
@@ -9439,7 +8844,6 @@ function ConfirmButton:Lock(locked)
     end
     return self
 end
-
 function WidgetHost:AddFeature(idx, info)
     idx, info = Widget.Normalize(idx, info)
     local toggle = self:AddToggle(idx, {
@@ -9464,7 +8868,6 @@ function WidgetHost:AddFeature(idx, info)
     end
     return toggle
 end
-
 function Feature.AttachKey(toggle, idx, keybind)
     if keybind == nil or idx == nil then
         return
@@ -9478,7 +8881,6 @@ function Feature.AttachKey(toggle, idx, keybind)
     })
     toggle.Key = Library.Options[idx .. "Key"]
 end
-
 function Feature.AttachNow(container, toggle, now)
     if now == nil then
         return
@@ -9503,7 +8905,6 @@ function Feature.AttachNow(container, toggle, now)
         toggle.Now:SetVisible(false)
     end
 end
-
 function Feature.BuildOptions(container, idx, build)
     local child = Gui.BeginChild(container, idx and (idx .. "Options") or nil, { PadX = Config.Widget.Child.Pad * 2, PadY = 2 })
     Gui.EndChild()
@@ -9525,7 +8926,6 @@ function Feature.BuildOptions(container, idx, build)
     Util.Try(build, child)
     return child
 end
-
 Config.Overlay = {
     Margin = 12, Shadow = 4, Stroke = 3, Radius = 12, Dim = 0.45,
     PopupGap = 6, PopupPad = 6, PopupMaxHeight = 320, PopupMin = 96,
@@ -9541,14 +8941,12 @@ Config.Overlay = {
     KeybindList = { Width = 220, Header = 30, Row = 24, Every = 0.25, Max = 12 },
     Store = "overlay.json", SaveDelay = 1,
 }
-
 Lang.Strings.OK = { EN = "OK" }
 Lang.Strings.Cancel = Lang.Strings.Cancel or { EN = "Cancel" }
 Lang.Strings.PromptNumber = { EN = "Enter a number" }
 Lang.Strings.PromptPick = { EN = "Pick one first" }
 Lang.Strings.Keybinds = { EN = "KEYBINDS" }
 Lang.Strings.NoKeybinds = { EN = "No keys bound" }
-
 Popup.Layers = {}
 Popup.Presence = { From = "Top", Distance = 8, Speed = "Fast" }
 Popup.Drag = { Active = nil, Bound = false }
@@ -9557,7 +8955,6 @@ Popup.DimDone = { OnDone = function(dim)
         dim.Visible = false
     end
 end }
-
 function Popup.Layer(key)
     local layer = Popup.Layers[key]
     if layer and layer.Parent then
@@ -9567,23 +8964,19 @@ function Popup.Layer(key)
     Popup.Layers[key] = layer
     return layer
 end
-
 function Popup.Insets(layer)
     local top = math.max(0, -layer.AbsolutePosition.Y)
     local ok, _, bottomRight = pcall(GuiService.GetGuiInset, GuiService)
     return top, ok and bottomRight.Y or 0
 end
-
 function Popup.ScreenToLocal(layer, point)
     local ok, topLeft = pcall(GuiService.GetGuiInset, GuiService)
     local inset = ok and topLeft or Vector2.zero
     return point - inset - layer.AbsolutePosition
 end
-
 function Popup.Edge()
     return Config.Overlay.Stroke * 2
 end
-
 function Popup.Card(parent, className, fill, radius)
     local settings = Config.Overlay
     local shadow = settings.Shadow
@@ -9594,7 +8987,6 @@ function Popup.Card(parent, className, fill, radius)
     local face = Draw.Box("Frame", { Name = "Face", Position = UDim2.fromOffset(inset, inset), Size = UDim2.new(1, -(shadow + inset * 2), 1, -(shadow + inset * 2)), ClipsDescendants = true, Parent = holder }, fill or "Panel", "Outline", radius, settings.Stroke)
     return holder, face
 end
-
 function Popup.Dim(layer, onClick)
     local dim = Gui.Hitbox("Dim")
     dim.Size = UDim2.fromScale(1, 1)
@@ -9604,7 +8996,6 @@ function Popup.Dim(layer, onClick)
     Gui.Clickable(dim, { OnClick = onClick })
     return dim
 end
-
 function Popup.ShowDim(dim, shown)
     dim:SetAttribute("Open", shown)
     if shown then
@@ -9614,7 +9005,6 @@ function Popup.ShowDim(dim, shown)
     end
     Motion.Spring(dim, "BackgroundTransparency", 1, "Fast", Popup.DimDone)
 end
-
 function Popup.CloseButton(parent, onClick)
     local hit = Gui.Hitbox("Close")
     hit.AnchorPoint = Vector2.new(1, 0.5)
@@ -9635,7 +9025,6 @@ function Popup.CloseButton(parent, onClick)
     })
     return hit
 end
-
 function Popup.Renew(owner, host, padX, padY, onHeight)
     local old = owner.Content
     if old then
@@ -9646,7 +9035,6 @@ function Popup.Renew(owner, host, padX, padY, onHeight)
     owner.Content = content
     return content
 end
-
 function Popup.EnsureDrag()
     if Popup.Drag.Bound then
         return
@@ -9655,7 +9043,6 @@ function Popup.EnsureDrag()
     Util.Connect(UserInputService.InputChanged, Popup.DragMove)
     Util.Connect(UserInputService.InputEnded, Popup.DragEnd)
 end
-
 function Popup.Track(frame, handlers)
     Popup.EnsureDrag()
     frame.Active = true
@@ -9670,11 +9057,9 @@ function Popup.Track(frame, handlers)
         end
     end)
 end
-
 function Popup.DragMatches(drag, input)
     return input == drag.Input or (drag.Type == Enum.UserInputType.MouseButton1 and input.UserInputType == Enum.UserInputType.MouseMovement)
 end
-
 function Popup.DragMove(input)
     local drag = Popup.Drag.Active
     if not drag or not Popup.DragMatches(drag, input) then
@@ -9692,7 +9077,6 @@ function Popup.DragMove(input)
     drag.Last, drag.Time = point, now
     Util.Try(drag.Handlers.OnMove, delta)
 end
-
 function Popup.DragEnd(input)
     local drag = Popup.Drag.Active
     if not drag or (input ~= drag.Input and input.UserInputType ~= drag.Type) then
@@ -9706,7 +9090,6 @@ function Popup.DragEnd(input)
         Util.Try(drag.Handlers.OnEnd, drag.Moved, drag.Velocity)
     end
 end
-
 function Popup.Build()
     if Popup.Frame and Popup.Frame.Parent then
         return
@@ -9726,7 +9109,6 @@ function Popup.Build()
     local scroll = Layout.ScrollFrame({ Name = "Scroll", Position = UDim2.fromOffset(pad, pad), Size = UDim2.new(1, -pad * 2, 1, -pad * 2), Parent = face })
     Popup.Catcher, Popup.Frame, Popup.Face, Popup.Scroll = catcher, card, face, scroll
 end
-
 function Popup.Place(anchor, width, height)
     local settings = Config.Overlay
     local layer = Popup.Layer("Overlay")
@@ -9742,7 +9124,6 @@ function Popup.Place(anchor, width, height)
     local y = flipped and origin.Y - gap - height or origin.Y + size.Y + gap
     return UDim2.fromOffset(x, y), height, flipped
 end
-
 function Popup.Fit()
     local anchor, content = Popup.Anchor, Popup.Content
     if not State.Popup or not content then
@@ -9760,7 +9141,6 @@ function Popup.Fit()
     Popup.Presence.From = flipped and "Bottom" or "Top"
     Motion.SetHome(Popup.Frame, position)
 end
-
 function Popup.Open(anchor, build, options)
     options = options or {}
     if Platform.Mode == "Phone" then
@@ -9783,7 +9163,6 @@ function Popup.Open(anchor, build, options)
     Motion.Presence(Popup.Frame, true, Popup.Presence)
     return { Container = content, Close = Popup.Close, Fit = Popup.Fit }
 end
-
 function Popup.Close()
     local popup = State.Popup
     if not popup then
@@ -9795,7 +9174,6 @@ function Popup.Close()
     Motion.Presence(Popup.Frame, false, Popup.Presence)
     Util.Try(popup.OnClose)
 end
-
 function Popup.CloseTop()
     if State.Dialog then
         Dialog.Dismiss()
@@ -9808,7 +9186,6 @@ function Popup.CloseTop()
     end
     return true
 end
-
 function Sheet.Build()
     if Sheet.Panel and Sheet.Panel.Parent then
         return
@@ -9833,7 +9210,6 @@ function Sheet.Build()
     Sheet.Panel, Sheet.Header = panel, header
     Popup.Track(header, Sheet.DragHandlers)
 end
-
 function Sheet.Measure(spec, contentHeight)
     local settings = Config.Overlay
     local layer = Popup.Layer("Sheet")
@@ -9854,7 +9230,6 @@ function Sheet.Measure(spec, contentHeight)
     Sheet.Home = UDim2.new(0.5, 0, 1, -height)
     Sheet.Hidden = UDim2.new(0.5, 0, 1, settings.Shadow + 8)
 end
-
 function Sheet.Refit()
     if not State.Sheet or Sheet.Spec ~= "Auto" or Popup.Drag.Active then
         return
@@ -9862,7 +9237,6 @@ function Sheet.Refit()
     Sheet.Measure("Auto", Sheet.Content.ContentHeight)
     Motion.Spring(Sheet.Panel, "Position", Sheet.Home, "Normal")
 end
-
 function Sheet.Open(titleSpec, build, options)
     options = options or {}
     Popup.Close()
@@ -9887,20 +9261,16 @@ function Sheet.Open(titleSpec, build, options)
     Motion.Spring(Sheet.Panel, "Position", Sheet.Home, "Normal", Sheet.OpenSpring)
     return { Container = content, Close = Sheet.Close, SetTitle = Sheet.SetTitle }
 end
-
 function Sheet.SetTitle(spec)
     Lang.Bind(Sheet.Title, spec or "")
 end
-
 function Sheet.HideDone(panel)
     if not State.Sheet then
         panel.Visible = false
     end
 end
-
 Sheet.OpenSpring = { Damping = 0.82 }
 Sheet.CloseSpring = { OnDone = Sheet.HideDone }
-
 function Sheet.Close(velocity)
     local sheet = State.Sheet
     if not sheet then
@@ -9914,12 +9284,10 @@ function Sheet.Close(velocity)
     end
     Util.Try(sheet.OnClose)
 end
-
 function Sheet.OnDragStart()
     Motion.Cancel(Sheet.Panel)
     Motion.Cancel(Sheet.Dim)
 end
-
 function Sheet.OnDragMove(delta)
     if not State.Sheet then
         return
@@ -9930,7 +9298,6 @@ function Sheet.OnDragMove(delta)
     local progress = math.clamp(offset / Sheet.Height, 0, 1)
     Sheet.Dim.BackgroundTransparency = settings.Dim + (1 - settings.Dim) * progress
 end
-
 function Sheet.OnDragEnd(moved, velocity)
     if not moved or not State.Sheet then
         return
@@ -9944,9 +9311,7 @@ function Sheet.OnDragEnd(moved, velocity)
     Motion.Spring(Sheet.Panel, "Position", Sheet.Home, "Normal", Sheet.OpenSpring)
     Motion.Spring(Sheet.Dim, "BackgroundTransparency", settings.Dim, "Fast")
 end
-
 Sheet.DragHandlers = { OnStart = Sheet.OnDragStart, OnMove = Sheet.OnDragMove, OnEnd = Sheet.OnDragEnd }
-
 function Dialog.Build()
     if Dialog.Card and Dialog.Card.Parent then
         return
@@ -9973,7 +9338,6 @@ function Dialog.Build()
     Dialog.Host = Draw.New("Frame", { Name = "Body", BackgroundTransparency = 1, Position = UDim2.fromOffset(0, settings.DialogHeader), Size = UDim2.new(1, 0, 1, -settings.DialogHeader), Parent = face })
     Dialog.Card = card
 end
-
 function Dialog.SetIcon(name)
     if Dialog.IconName == name then
         return
@@ -9982,7 +9346,6 @@ function Dialog.SetIcon(name)
     Dialog.IconSlot:ClearAllChildren()
     Sprite.New(Dialog.IconSlot, name, Dialog.IconSlot.Size.X.Offset)
 end
-
 function Dialog.Fill(container, options, close)
     if options.Content then
         Gui.Text(container, options.Content, { Kind = "Desc", Size = Util.TextSize("Label"), Token = "Text" })
@@ -10013,7 +9376,6 @@ function Dialog.Fill(container, options, close)
         })
     end
 end
-
 function Dialog.Fit()
     local content = Dialog.Content
     if not content then
@@ -10022,7 +9384,6 @@ function Dialog.Fit()
     local settings = Config.Overlay
     Dialog.Card.Size = UDim2.fromOffset(Dialog.Width + settings.Shadow + Popup.Edge(), settings.DialogHeader + content.ContentHeight + settings.Shadow + settings.Stroke + Popup.Edge())
 end
-
 function Dialog.Open(options)
     options = options or {}
     if Platform.Mode == "Phone" then
@@ -10048,9 +9409,7 @@ function Dialog.Open(options)
     Motion.Presence(Dialog.Card, true, Dialog.Presence)
     return { Close = Dialog.Close }
 end
-
 Dialog.Presence = { From = "Scale", Speed = "Fast" }
-
 function Dialog.PromptField(container, ask)
     local field = Draw.Box("Frame", { Name = "Field" }, "Element", "Outline", Platform.Metric("Radius"), 2)
     local box = Draw.Text({ ClassName = "TextBox", ClearTextOnFocus = false, Text = ask.Default ~= nil and tostring(ask.Default) or "", Position = UDim2.fromOffset(10, 0), Size = UDim2.new(1, -20, 1, 0), Parent = field }, "Body", Util.TextSize("Label"), "Text")
@@ -10065,7 +9424,6 @@ function Dialog.PromptField(container, ask)
     container:Add(field, { Height = Platform.Metric("Box") })
     return box
 end
-
 function Dialog.PromptChoices(container, ask, answer)
     local handles = {}
     for index, choice in ipairs(ask.Choices) do
@@ -10081,7 +9439,6 @@ function Dialog.PromptChoices(container, ask, answer)
         })
     end
 end
-
 function Dialog.PromptValue(ask, answer)
     if ask.Choices then
         local choice = answer.Index and ask.Choices[answer.Index]
@@ -10097,7 +9454,6 @@ function Dialog.PromptValue(ask, answer)
     end
     return number
 end
-
 function Dialog.Prompt(ask)
     ask = ask or {}
     local answer = {}
@@ -10133,7 +9489,6 @@ function Dialog.Prompt(ask)
         },
     })
 end
-
 function Dialog.Dismiss()
     local dialog = State.Dialog
     if not dialog or not dialog.Dismissable then
@@ -10144,7 +9499,6 @@ function Dialog.Dismiss()
     end
     Dialog.Close()
 end
-
 function Dialog.Close()
     local dialog = State.Dialog
     if not dialog then
@@ -10155,10 +9509,8 @@ function Dialog.Close()
     Motion.Presence(Dialog.Card, false, Dialog.Presence)
     Util.Try(dialog.OnClose)
 end
-
 Tooltip.Bound = {}
 Tooltip.Token = 0
-
 function Tooltip.Build()
     if Tooltip.Frame and Tooltip.Frame.Parent then
         return
@@ -10168,7 +9520,6 @@ function Tooltip.Build()
     Tooltip.Label = Draw.Text({ TextWrapped = true, TextYAlignment = Enum.TextYAlignment.Top, Position = UDim2.fromOffset(10, 6), Size = UDim2.new(1, -20, 1, -12), Parent = face }, "Desc", Util.TextSize("Desc") + 1, "Text")
     Tooltip.Frame = card
 end
-
 function Tooltip.Attach(frame, spec)
     local existing = Tooltip.Bound[frame]
     if existing then
@@ -10195,7 +9546,6 @@ function Tooltip.Attach(frame, spec)
     Tooltip.Bound[frame] = binding
     return binding
 end
-
 function Tooltip.Detach(binding)
     for _, conn in ipairs(binding.Connections) do
         conn:Disconnect()
@@ -10206,7 +9556,6 @@ function Tooltip.Detach(binding)
         Tooltip.Hide()
     end
 end
-
 function Tooltip.Hover(binding)
     if Platform.Touch or Library.Unloaded then
         return
@@ -10214,7 +9563,6 @@ function Tooltip.Hover(binding)
     Tooltip.Token += 1
     task.delay(Config.TooltipDelay, Tooltip.HoverDue, binding, Tooltip.Token)
 end
-
 function Tooltip.HoverDue(binding, token)
     if Tooltip.Token ~= token or Library.Unloaded or not binding.Frame.Parent then
         return
@@ -10222,7 +9570,6 @@ function Tooltip.HoverDue(binding, token)
     local layer = Popup.Layer("Tooltip")
     Tooltip.Show(binding, Popup.ScreenToLocal(layer, UserInputService:GetMouseLocation()), false)
 end
-
 function Tooltip.TouchBegan(binding, input)
     if input.UserInputType ~= Enum.UserInputType.Touch then
         return
@@ -10231,7 +9578,6 @@ function Tooltip.TouchBegan(binding, input)
     local start = Vector2.new(input.Position.X, input.Position.Y)
     task.delay(Config.Click.LongPress, Tooltip.LongPressDue, binding, input, start, Tooltip.Token)
 end
-
 function Tooltip.LongPressDue(binding, input, start, token)
     if Tooltip.Token ~= token or Library.Unloaded or input.UserInputState == Enum.UserInputState.End then
         return
@@ -10249,7 +9595,6 @@ function Tooltip.LongPressDue(binding, input, start, token)
     Tooltip.Show(binding, point - layer.AbsolutePosition, true)
     task.delay(Config.Overlay.TooltipHold, Tooltip.HideIf, Tooltip.Token)
 end
-
 function Tooltip.Show(binding, point, above)
     Tooltip.Build()
     local text = Lang.Resolve(binding.Spec)
@@ -10266,7 +9611,6 @@ function Tooltip.Show(binding, point, above)
     Tooltip.Frame.Visible = true
     Motion.Pop(Tooltip.Frame)
 end
-
 function Tooltip.Place(point)
     local frame = Tooltip.Frame
     local layer = Popup.Layer("Tooltip")
@@ -10279,20 +9623,17 @@ function Tooltip.Place(point)
     y = math.clamp(y, margin, math.max(margin, view.Y - size.Y - margin))
     frame.Position = UDim2.fromOffset(x, y)
 end
-
 function Tooltip.Follow(binding)
     if Tooltip.Owner ~= binding or not Tooltip.Frame or not Tooltip.Frame.Visible or Tooltip.Above then
         return
     end
     Tooltip.Place(Popup.ScreenToLocal(Popup.Layer("Tooltip"), UserInputService:GetMouseLocation()))
 end
-
 function Tooltip.HideIf(token)
     if Tooltip.Token == token then
         Tooltip.Hide()
     end
 end
-
 function Tooltip.Hide()
     Tooltip.Token += 1
     Tooltip.Owner = nil
@@ -10300,7 +9641,6 @@ function Tooltip.Hide()
         Tooltip.Frame.Visible = false
     end
 end
-
 Notify.Kinds = {
     Info = { Icon = "qblock", Token = "Info" },
     Success = { Icon = "star", Token = "Good" },
@@ -10314,14 +9654,12 @@ Notify.Serial = 0
 Notify.SlotSpring = { Damping = 0.78 }
 Notify.Corner = "BottomRight"
 Notify.Corners = { BottomRight = Vector2.new(1, 1), TopRight = Vector2.new(1, 0), BottomLeft = Vector2.new(0, 1), TopLeft = Vector2.new(0, 0) }
-
 function Notify.Anchor()
     if Platform.Mode == "Phone" then
         return Vector2.new(0.5, 0)
     end
     return Notify.Corners[Notify.Corner]
 end
-
 function Notify.SetPosition(corner)
     if not Notify.Corners[corner] then
         return
@@ -10335,15 +9673,12 @@ function Notify.SetPosition(corner)
     end
     Notify.Reflow()
 end
-
 function Notify.Build()
     Notify.Host = Popup.Layer("Notify")
 end
-
 function Notify.IsOptions(value)
     return type(value) == "table" and (value.Title ~= nil or value.Content ~= nil or value.Kind ~= nil or value.Action ~= nil)
 end
-
 function Notify.Options(title, content, duration, kind, action)
     local source = Notify.IsOptions(title) and title or { Title = title, Content = content, Duration = duration, Kind = kind, Action = action }
     local kindName = Notify.Aliases[source.Kind] or source.Kind
@@ -10355,7 +9690,6 @@ function Notify.Options(title, content, duration, kind, action)
         Action = type(source.Action) == "table" and source.Action or nil,
     }
 end
-
 function Notify.MakeCard()
     local settings = Config.Overlay
     local card, face = Popup.Card(nil, "CanvasGroup")
@@ -10381,7 +9715,6 @@ function Notify.MakeCard()
     Notify.Entries[card] = entry
     return card
 end
-
 function Notify.Clicked(entry, input)
     local action = entry.ActionSpec
     if action and entry.Action.Visible and Util.Inside(entry.Action, input.Position) then
@@ -10389,7 +9722,6 @@ function Notify.Clicked(entry, input)
     end
     Notify.Dismiss(entry)
 end
-
 function Notify.SetIcon(entry, kindName)
     if entry.KindName == kindName then
         return
@@ -10399,13 +9731,11 @@ function Notify.SetIcon(entry, kindName)
     local size = Config.Overlay.NotifyIcon[Platform.Mode]
     Sprite.New(entry.Icon, Notify.Kinds[kindName].Icon, size)
 end
-
 function Notify.Width()
     local view = Notify.Host.AbsoluteSize
     local width = Platform.Mode == "Phone" and Config.Notify.TouchWidth or Config.Notify.Width
     return math.min(width, view.X - Config.Overlay.Margin * 2)
 end
-
 function Notify.Measure(entry)
     local settings = Config.Overlay
     local pad, shadow = settings.NotifyPad, settings.Shadow + Popup.Edge()
@@ -10432,7 +9762,6 @@ function Notify.Measure(entry)
     entry.Frame.Size = UDim2.fromOffset(width, height + shadow)
     entry.Height = height + shadow
 end
-
 function Notify.Fill(entry, options)
     local token = Notify.Kinds[options.Kind].Token
     Notify.Serial += 1
@@ -10451,11 +9780,9 @@ function Notify.Fill(entry, options)
     entry.Frame.GroupTransparency = 1
     Notify.Measure(entry)
 end
-
 function Notify.Key(options)
     return table.concat({ options.Kind, Lang.Resolve(options.Title), Lang.Resolve(options.Content) }, "\0")
 end
-
 function Notify.Find(key)
     for _, entry in ipairs(Notify.Active) do
         if entry.Key == key and not entry.Closing then
@@ -10464,7 +9791,6 @@ function Notify.Find(key)
     end
     return nil
 end
-
 function Notify.Bump(entry, options)
     entry.Count += 1
     entry.Duration = math.max(entry.Duration, options.Duration)
@@ -10475,7 +9801,6 @@ function Notify.Bump(entry, options)
     Motion.Pop(entry.Badge)
     Motion.Impulse(entry.Frame, "Position", { 0, 0, 0, Notify.Anchor().Y == 1 and -90 or 90 }, "Fast", 0.45)
 end
-
 function Notify.Offscreen(entry)
     local enter = Config.Overlay.NotifyEnter
     if Platform.Mode == "Phone" then
@@ -10484,7 +9809,6 @@ function Notify.Offscreen(entry)
     local side = Notify.Anchor().X == 1 and 1 or -1
     return entry.Slot + UDim2.fromOffset(side * (Notify.Width() + enter), 0)
 end
-
 function Notify.SlotAt(offset, top, bottom)
     local margin = Config.Overlay.Margin
     if Platform.Mode == "Phone" then
@@ -10495,7 +9819,6 @@ function Notify.SlotAt(offset, top, bottom)
     local y = anchor.Y == 1 and UDim2.new(0, 0, 1, -(bottom + margin + offset)) or UDim2.fromOffset(0, top + margin + offset)
     return x + y
 end
-
 function Notify.Clearance(top, bottom)
     local mark = Watermark.Frame
     if not (mark and mark.Parent and mark.Visible and mark.Parent.Visible) then
@@ -10517,7 +9840,6 @@ function Notify.Clearance(top, bottom)
     local edge = top + margin
     return origin.Y < view.Y / 2 and math.max(0, origin.Y + size.Y - edge + Config.Notify.Gap) or 0
 end
-
 function Notify.Reflow()
     local layer = Notify.Host
     local top, bottom = Popup.Insets(layer)
@@ -10533,7 +9855,6 @@ function Notify.Reflow()
         offset += entry.Height + Config.Notify.Gap
     end
 end
-
 function Notify.Push(title, content, duration, kind, action)
     if Library.Unloaded or not State.Gui then
         return nil
@@ -10559,7 +9880,6 @@ function Notify.Push(title, content, duration, kind, action)
     Notify.StartClock()
     return Notify.Handle(entry)
 end
-
 function Notify.Handle(entry)
     local serial = entry.Serial
     return {
@@ -10570,13 +9890,10 @@ function Notify.Handle(entry)
         end,
     }
 end
-
 function Notify.Released(card)
     Draw.Pool("Notify", Notify.MakeCard).Release(card)
 end
-
 Notify.ExitSpring = { OnDone = Notify.Released }
-
 function Notify.Dismiss(entry)
     if entry.Closing then
         return
@@ -10590,15 +9907,12 @@ function Notify.Dismiss(entry)
     Motion.Spring(entry.Frame, "Position", Notify.Offscreen(entry), "Normal")
     Motion.Spring(entry.Frame, "GroupTransparency", 1, "Fast", Notify.ExitSpring)
 end
-
 function Notify.StartClock()
     Notify.Ticking = true
 end
-
 function Notify.StopClock()
     Notify.Ticking = false
 end
-
 function Notify.Tick(deltaTime)
     local active = Notify.Active
     local timerHeight = Config.Overlay.NotifyTimer
@@ -10616,12 +9930,9 @@ function Notify.Tick(deltaTime)
         Notify.StopClock()
     end
 end
-
 table.insert(State.UnloadHooks, Notify.StopClock)
-
 Float.Store = { Data = nil, Pending = false }
 Float.Placed = {}
-
 function Float.ReadStore()
     local store = Float.Store
     if store.Data then
@@ -10639,11 +9950,9 @@ function Float.ReadStore()
     end
     return store.Data
 end
-
 function Float.Recall(key)
     return Float.ReadStore()[key]
 end
-
 function Float.Remember(key, value)
     Float.ReadStore()[key] = value
     if Float.Store.Pending then
@@ -10652,7 +9961,6 @@ function Float.Remember(key, value)
     Float.Store.Pending = true
     task.delay(Config.Overlay.SaveDelay, Float.FlushStore)
 end
-
 function Float.FlushStore()
     Float.Store.Pending = false
     if not Util.FileApi() then
@@ -10665,7 +9973,6 @@ function Float.FlushStore()
     Util.EnsureFolder(Config.Root)
     Util.SafeFile(writefile, Config.Overlay.Store, encoded)
 end
-
 function Float.MoveTo(frame, center)
     local layer = frame.Parent
     if not layer then
@@ -10677,7 +9984,6 @@ function Float.MoveTo(frame, center)
     local y = math.clamp(center.Y, top + half.Y, math.max(top + half.Y, view.Y - bottom - half.Y))
     frame.Position = UDim2.fromOffset(math.floor(x + 0.5), math.floor(y + 0.5))
 end
-
 function Float.Place(frame, key, fallback)
     Float.Placed[frame] = { Key = key, Fallback = fallback }
     Float.EnsureReclamp(frame.Parent)
@@ -10685,7 +9991,6 @@ function Float.Place(frame, key, fallback)
     local fraction = type(saved) == "table" and tonumber(saved[1]) and Vector2.new(saved[1], tonumber(saved[2]) or fallback.Y) or fallback
     Float.MoveTo(frame, fraction * frame.Parent.AbsoluteSize)
 end
-
 function Float.EnsureReclamp(layer)
     if not layer or layer:GetAttribute("Reclamp") then
         return
@@ -10693,7 +9998,6 @@ function Float.EnsureReclamp(layer)
     layer:SetAttribute("Reclamp", true)
     Util.Connect(layer:GetPropertyChangedSignal("AbsoluteSize"), Float.Reclamp)
 end
-
 function Float.Reclamp()
     for frame, placed in pairs(Float.Placed) do
         if not frame.Parent then
@@ -10703,7 +10007,6 @@ function Float.Reclamp()
         Float.Place(frame, placed.Key, placed.Fallback)
     end
 end
-
 function Float.Mover(frame, key)
     local mover = {}
     function mover.OnStart()
@@ -10724,7 +10027,6 @@ function Float.Mover(frame, key)
     end
     return mover
 end
-
 function Float.Build()
     if Float.Button and Float.Button.Parent then
         return Float.Button
@@ -10747,7 +10049,6 @@ function Float.Build()
     task.delay(settings.HopEvery, Float.Hop)
     return button
 end
-
 function Float.Sync()
     local window = State.Window or Library.Window
     local open = window ~= nil and window.Visible ~= false and not window.Minimized
@@ -10763,11 +10064,9 @@ function Float.Sync()
     Float.Slot:ClearAllChildren()
     Sprite.New(Float.Slot, art, Float.Size)
 end
-
 function Float.OnPress(pressed)
     Motion.Spring(Float.Slot, "Position", UDim2.fromOffset(0, pressed and Config.Overlay.Float.Sink or 0), "Fast")
 end
-
 function Float.OnClick()
     Motion.Impulse(Float.Slot, "Position", { 0, 0, 0, -Config.Overlay.Float.Hop }, "Fast", 0.4)
     Motion.CoinPop(Float.Button, UDim2.fromScale(0.5, 0))
@@ -10777,7 +10076,6 @@ function Float.OnClick()
     end
     Float.Sync()
 end
-
 function Float.Hop()
     local button = Float.Button
     if Library.Unloaded or not button or not button.Parent then
@@ -10791,7 +10089,6 @@ function Float.Hop()
     end
     Motion.Impulse(Float.Slot, "Position", { 0, 0, 0, -settings.Hop * 0.6 }, "Normal", 0.35)
 end
-
 function Float.SetSize(size)
     Float.SizeOverride = math.clamp(math.floor(tonumber(size) or Config.Overlay.Float[Platform.Mode]), 44, 96)
     local button = Float.Button
@@ -10804,7 +10101,6 @@ function Float.SetSize(size)
     Float.Sync()
     Float.Reclamp()
 end
-
 function Float.SetVisible(visible)
     Float.Wanted = visible == true
     if Float.Button then
@@ -10812,14 +10108,11 @@ function Float.SetVisible(visible)
         Float.Sync()
     end
 end
-
 QuickBar.Pins = {}
 QuickBar.Order = {}
-
 function QuickBar.OptionOf(idx)
     return Library.Toggles[idx] or Library.Options[idx]
 end
-
 function QuickBar.LabelOf(option, idx)
     local spec = option.Text or (type(option.Info) == "table" and option.Info.Text)
     if type(spec) == "string" or type(spec) == "table" then
@@ -10827,7 +10120,6 @@ function QuickBar.LabelOf(option, idx)
     end
     return tostring(idx)
 end
-
 function QuickBar.Build(idx, option)
     local settings = Config.Overlay.QuickBar
     local height = settings.Height[Platform.Mode]
@@ -10842,7 +10134,6 @@ function QuickBar.Build(idx, option)
     local label = Draw.Text({ Position = UDim2.fromOffset(textX, 0), Size = UDim2.new(1, -textX - 8, 1, 0), TextTruncate = Enum.TextTruncate.AtEnd, Parent = face }, "Body", Util.TextSize("Small") + 1, "Text", QuickBar.LabelOf(option, idx))
     return { Idx = idx, Frame = chip, Face = face, Shade = shade, Lamp = lamp, Label = label, Depth = depth }
 end
-
 function QuickBar.Add(idx)
     if QuickBar.Pins[idx] then
         return QuickBar.Pins[idx]
@@ -10869,7 +10160,6 @@ function QuickBar.Add(idx)
     QuickBar.EnsureSync()
     return entry
 end
-
 function QuickBar.DefaultSpot(slot)
     local settings = Config.Overlay.QuickBar
     local view = Popup.Layer("QuickBar").AbsoluteSize
@@ -10881,7 +10171,6 @@ function QuickBar.DefaultSpot(slot)
     local y = top + height / 2 + row * (height + settings.Gap)
     return Vector2.new(x / math.max(view.X, 1), y / math.max(view.Y, 1))
 end
-
 function QuickBar.Flip(entry, input)
     local option = QuickBar.OptionOf(entry.Idx)
     if not option or type(option.SetValue) ~= "function" then
@@ -10891,7 +10180,6 @@ function QuickBar.Flip(entry, input)
     option:SetValue(not option.Value)
     QuickBar.Render(entry)
 end
-
 function QuickBar.Render(entry, instant)
     local option = QuickBar.OptionOf(entry.Idx)
     local on = option ~= nil and option.Value == true
@@ -10907,7 +10195,6 @@ function QuickBar.Render(entry, instant)
         Motion.Pop(entry.Lamp)
     end
 end
-
 function QuickBar.EnsureSync()
     if QuickBar.Syncing then
         return
@@ -10915,7 +10202,6 @@ function QuickBar.EnsureSync()
     QuickBar.Syncing = true
     Util.Every(Config.Overlay.QuickBar.Sync, QuickBar.Sync)
 end
-
 function QuickBar.Sync()
     for idx, entry in pairs(QuickBar.Pins) do
         if not entry.Frame.Parent or not QuickBar.OptionOf(idx) then
@@ -10925,7 +10211,6 @@ function QuickBar.Sync()
         QuickBar.Render(entry)
     end
 end
-
 function QuickBar.Remove(idx)
     local entry = QuickBar.Pins[idx]
     if not entry then
@@ -10941,11 +10226,9 @@ function QuickBar.Remove(idx)
     Float.Remember(QuickBar.Key(idx), nil)
     QuickBar.SavePins()
 end
-
 function QuickBar.Has(idx)
     return QuickBar.Pins[idx] ~= nil
 end
-
 function QuickBar.Toggle(idx)
     if QuickBar.Pins[idx] then
         QuickBar.Remove(idx)
@@ -10953,12 +10236,10 @@ function QuickBar.Toggle(idx)
     end
     return QuickBar.Add(idx) ~= nil
 end
-
 function QuickBar.Key(idx)
     local scope = Configs.Folder or "default"
     return idx == nil and ("Pins:" .. scope) or ("Pin:" .. scope .. ":" .. tostring(idx))
 end
-
 function QuickBar.SavePins()
     local pins = table.clone(QuickBar.Order)
     for index, idx in ipairs(pins) do
@@ -10966,7 +10247,6 @@ function QuickBar.SavePins()
     end
     Float.Remember(QuickBar.Key(), pins)
 end
-
 function QuickBar.Restore()
     local pins = Float.Recall(QuickBar.Key())
     if type(pins) ~= "table" then
@@ -10976,14 +10256,11 @@ function QuickBar.Restore()
         QuickBar.Add(idx)
     end
 end
-
 QuickBar.Wanted = true
-
 function QuickBar.SetVisible(visible)
     QuickBar.Wanted = visible ~= false
     Float.Sync()
 end
-
 function QuickBar.Apply(menuOpen)
     if not State.Gui then
         return
@@ -10992,9 +10269,7 @@ function QuickBar.Apply(menuOpen)
     Popup.Layer("QuickBar").Visible = QuickBar.Wanted and not covered
     Popup.Layer("Watermark").Visible = not covered
 end
-
 Watermark.Buckets = { { 50, "Good" }, { 30, "Warn" }, { 0, "Bad" } }
-
 function Watermark.Build(title)
     if Watermark.Frame and Watermark.Frame.Parent then
         Watermark.SetTitle(title)
@@ -11022,7 +10297,6 @@ function Watermark.Build(title)
     Util.Every(settings.Every, Watermark.Update)
     return card
 end
-
 function Watermark.SetTitle(title)
     if not Watermark.Frame then
         return
@@ -11038,7 +10312,6 @@ function Watermark.SetTitle(title)
     local center = Vector2.new(margin + size.X.Offset / 2, top + margin + size.Y.Offset / 2)
     Float.Place(Watermark.Frame, "Watermark", center / Vector2.new(math.max(view.X, 1), math.max(view.Y, 1)))
 end
-
 function Watermark.FpsToken(fps)
     for _, bucket in ipairs(Watermark.Buckets) do
         if fps >= bucket[1] then
@@ -11047,7 +10320,6 @@ function Watermark.FpsToken(fps)
     end
     return "Bad"
 end
-
 function Watermark.Update()
     local frame = Watermark.Frame
     if not frame or not frame.Parent or not frame.Visible then
@@ -11069,7 +10341,6 @@ function Watermark.Update()
     end
     Watermark.Resize()
 end
-
 function Watermark.Resize()
     local settings = Config.Overlay.Watermark
     local width = settings.PadX * 2 + settings.Coin
@@ -11083,7 +10354,6 @@ function Watermark.Resize()
         Watermark.Frame.Size = size
     end
 end
-
 function Watermark.SetVisible(visible)
     if not Watermark.Frame then
         return
@@ -11091,9 +10361,7 @@ function Watermark.SetVisible(visible)
     Watermark.Frame.Visible = visible ~= false
     Watermark.Update()
 end
-
 KeybindList.Rows = {}
-
 function KeybindList.Build()
     if KeybindList.Frame and KeybindList.Frame.Parent then
         return KeybindList.Frame
@@ -11118,7 +10386,6 @@ function KeybindList.Build()
     Util.Every(settings.Every, KeybindList.Refresh)
     return card
 end
-
 function KeybindList.MakeRow()
     local settings = Config.Overlay.KeybindList
     local row = Draw.New("Frame", { Name = "Row", BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, settings.Row) })
@@ -11128,7 +10395,6 @@ function KeybindList.MakeRow()
     Draw.Text({ Name = "Label", Size = UDim2.fromScale(1, 1), TextXAlignment = Enum.TextXAlignment.Center, Parent = key }, "Strong", Util.TextSize("Small"), "SubText")
     return row
 end
-
 function KeybindList.LabelOf(picker)
     local linked = type(picker.Linked) == "table" and picker.Linked or nil
     for _, spec in ipairs({ picker.Text, linked and linked.Text, picker.Idx }) do
@@ -11138,14 +10404,12 @@ function KeybindList.LabelOf(picker)
     end
     return "Key"
 end
-
 function KeybindList.StateOf(picker)
     if type(picker.GetState) ~= "function" then
         return false
     end
     return picker:GetState() == true
 end
-
 function KeybindList.Collect()
     local bound = {}
     for _, picker in ipairs(State.KeyPickers) do
@@ -11159,7 +10423,6 @@ function KeybindList.Collect()
     end
     return bound
 end
-
 function KeybindList.Refresh()
     local frame = KeybindList.Frame
     if not frame or not frame.Parent or not frame.Visible then
@@ -11186,7 +10449,6 @@ function KeybindList.Refresh()
     local count = math.max(#pickers, 1)
     frame.Size = UDim2.fromOffset(settings.Width + Config.Overlay.Shadow, settings.Header + 10 + count * settings.Row + Config.Overlay.Shadow)
 end
-
 function KeybindList.Paint(row, picker)
     local short = Keybinds.Short(picker.Value)
     local on = KeybindList.StateOf(picker)
@@ -11199,13 +10461,11 @@ function KeybindList.Paint(row, picker)
         Theme.Bind(row.Caption, { TextColor3 = on and "Text" or "SubText" })
     end
 end
-
 function KeybindList.SetVisible(visible)
     KeybindList.Build()
     KeybindList.Frame.Visible = visible == true
     KeybindList.Refresh()
 end
-
 Config.Chrome = {
     Z = {
         Pop = 1, Pipe = 2,
@@ -11250,7 +10510,6 @@ Config.Chrome = {
     KnobDamping = 0.6,
     ChevronDamping = 0.6,
 }
-
 Lang.Strings.SearchResults = { EN = "Search results" }
 Lang.Strings.SearchDesc = { EN = "Tap a result to jump to it" }
 Lang.Strings.More = { EN = "More" }
@@ -11279,9 +10538,7 @@ Lang.Strings.NotifyCorners = {
     EN = { "Bottom right", "Top right", "Bottom left", "Top left" },
 }
 Lang.Strings.Version = { EN = "Version" }
-
 Window.Corners = { "BottomRight", "TopRight", "BottomLeft", "TopLeft" }
-
 function Gui.Draggable(handle, move, exclude)
     return Util.Connect(handle.InputBegan, function(input)
         if not Util.IsPointer(input) then
@@ -11305,7 +10562,6 @@ function Gui.Draggable(handle, move, exclude)
         }
     end)
 end
-
 function Window.New(options)
     local size = options.Size or Vector2.new(Config.Window.Width, Config.Window.Height)
     if typeof(size) == "UDim2" then
@@ -11355,23 +10611,19 @@ function Window.New(options)
     self:ApplyMode(Platform.Mode)
     return self
 end
-
 function Window:IsShown()
     return self.Visible and not self.Minimized
 end
-
 function Window:OnState(fn)
     self.StateListeners = self.StateListeners or {}
     table.insert(self.StateListeners, fn)
 end
-
 function Window:EmitState()
     self:HideTip()
     for _, listener in ipairs(self.StateListeners or {}) do
         Util.Try(listener, self)
     end
 end
-
 function Window:BuildFrame()
     local z, shadow, radius = Config.Chrome.Z, Config.Window.Shadow, Config.Window.Radius
     self.Root = Draw.New("Frame", { Name = "Window", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), ZIndex = Config.Layer.Window, Parent = State.Stage })
@@ -11395,11 +10647,9 @@ function Window:BuildFrame()
     self:BuildOutline()
     self:BuildPipe()
 end
-
 function Window:BuildOutline()
     Draw.Stroke(self.Body, "Outline", Config.Window.Stroke, true)
 end
-
 function Window:BuildPipe()
     local pipe, z = Config.Chrome.Pipe, Config.Chrome.Z
     local edge = pipe.Stroke
@@ -11423,7 +10673,6 @@ function Window:BuildPipe()
         end
     end }
 end
-
 function Window:ShowPipe(shown)
     local pipe, settings = self.Pipe, Config.Chrome.Pipe
     local down = UDim2.new(0.5, 0, 1, settings.Rise)
@@ -11443,7 +10692,6 @@ function Window:ShowPipe(shown)
     Motion.Spring(pipe, "Position", UDim2.new(0.5, 0, 1, -math.floor(settings.Lip / 2)), "Fast")
     Motion.Spring(pipe, "GroupTransparency", 0, "Fast")
 end
-
 function Window:WarpIn()
     local warp = Config.Chrome.Warp
     if not self.Pop.Visible then
@@ -11460,7 +10708,6 @@ function Window:WarpIn()
         end,
     })
 end
-
 function Window:WarpOut()
     local warp = Config.Chrome.Warp
     self:ShowPipe(true)
@@ -11475,14 +10722,12 @@ function Window:WarpOut()
         end,
     })
 end
-
 function Window:BuildAmbient()
     local ambient = Draw.New("Frame", { Name = "Ambient", BackgroundTransparency = 1, ClipsDescendants = true, ZIndex = Config.Chrome.Z.Ambient, Parent = self.Body })
     self.Ambient = ambient
     self.Backdrop = Decor.AttachBackdrop(ambient)
     Particles.Build(ambient)
 end
-
 function Window:BuildPages()
     self.PageHost = Draw.New("Frame", { Name = "Pages", BackgroundTransparency = 1, ClipsDescendants = true, ZIndex = Config.Chrome.Z.Pages, Parent = self.Body })
     self.SearchView = Tab.BuildPage(self, nil)
@@ -11492,7 +10737,6 @@ function Window:BuildPages()
         self:PageTick()
     end)
 end
-
 function Window:HeaderHeight()
     local header = Config.Chrome.Header
     if self.Landscape then
@@ -11500,23 +10744,18 @@ function Window:HeaderHeight()
     end
     return header[self.Mode] or header.Desktop
 end
-
 function Window:Docked()
     return self.Mode ~= "Phone" or self.Landscape == true
 end
-
 function Window:GroundHeight()
     return self.Mode == "Phone" and 0 or Config.Chrome.Ground
 end
-
 function Window:HeroSize()
     return Config.Chrome.Hero[self.Mode] or Config.Chrome.Hero.Desktop
 end
-
 function Window:DockMetrics()
     return Config.Chrome.Dock[self.Mode] or Config.Chrome.Dock.Desktop
 end
-
 function Window:BuildHeader()
     local z = Config.Chrome.Z
     local radius = Config.Window.Radius
@@ -11536,13 +10775,11 @@ function Window:BuildHeader()
         return self:DragWindow(begin, delta)
     end, self.TopButtons)
 end
-
 function Window.Cluster(parent, right)
     local cluster = Draw.New("Frame", { Name = right and "Right" or "Left", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = parent })
     Draw.List(cluster, Config.Chrome.Gap, true, right and Enum.HorizontalAlignment.Right or Enum.HorizontalAlignment.Left, Enum.VerticalAlignment.Center)
     return cluster
 end
-
 function Window:DragWindow(begin, delta)
     if self.Mode == "Phone" then
         return nil
@@ -11553,7 +10790,6 @@ function Window:DragWindow(begin, delta)
     self.Root.Position = begin + UDim2.fromOffset(delta.X, delta.Y)
     return begin
 end
-
 function Window:BuildBrand()
     local chrome = Config.Chrome
     local left = self.LeftCluster
@@ -11565,7 +10801,6 @@ function Window:BuildBrand()
     Draw.Stroke(label, "Ink", 1.5)
     self.PhoneTitle = label
 end
-
 function Window:BuildTitle(parent)
     local chrome = Config.Chrome
     local size = chrome.Brand
@@ -11585,7 +10820,6 @@ function Window:BuildTitle(parent)
     holder.Size = UDim2.fromOffset(width, size + 4)
     self.TitleHolder, self.TitleWidth = holder, width
 end
-
 function Window:WaveTitle()
     if Motion.Reduced then
         return
@@ -11595,7 +10829,6 @@ function Window:WaveTitle()
         task.delay(index * wave.Stagger, Motion.Impulse, letter, "Position", { 0, 0, 0, -wave.Velocity }, "Fast", wave.Damping)
     end
 end
-
 function Window:BuildPill(parent)
     local chrome = Config.Chrome
     local size = Util.TextSize("Small")
@@ -11604,7 +10837,6 @@ function Window:BuildPill(parent)
     Draw.Text({ Size = UDim2.fromScale(1, 1), TextXAlignment = Enum.TextXAlignment.Center, Parent = pill }, "Body", size, "TopbarText", self.SubTitle)
     self.PillSlot, self.PillWidth = pill, width
 end
-
 function Window:BuildHero(header)
     local chrome, z = Config.Chrome, Config.Chrome.Z
     local hero = Draw.New("Frame", { Name = "Hero", BackgroundTransparency = 1, ZIndex = z.HeaderContent, Parent = header })
@@ -11614,14 +10846,12 @@ function Window:BuildHero(header)
     Draw.Stroke(self.HeroText, "HeroInk", 2)
     self.HeaderDesc = Draw.Text({ Name = "Desc", TextTruncate = Enum.TextTruncate.AtEnd, TextTransparency = 0.15, ZIndex = z.HeaderContent, Parent = header }, "Desc", Util.TextSize("Desc"), "TopbarText")
 end
-
 function Window.MakeLetter()
     local slot = Draw.New("Frame", { Name = "Letter", BackgroundTransparency = 1 })
     local glyph = Draw.Text({ Name = "Glyph", Size = UDim2.fromScale(1, 1), TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Bottom, Parent = slot }, "Logo", Config.Chrome.Hero.Desktop, "TopbarText")
     Draw.Stroke(glyph, "HeroInk", 2)
     return slot
 end
-
 function Window:RenderHero(animate)
     local pool = Draw.Pool("HeroLetter", Window.MakeLetter)
     for _, slot in ipairs(self.HeroLetters) do
@@ -11650,7 +10880,6 @@ function Window:RenderHero(animate)
         Fx.Stagger(self.HeroLetters, Config.Chrome.HeroStagger, Window.DropLetter)
     end
 end
-
 function Window.DropLetter(slot)
     if not slot.Parent or slot.Parent.Name ~= "Hero" then
         return
@@ -11661,7 +10890,6 @@ function Window.DropLetter(slot)
     Motion.Spring(glyph, "Position", UDim2.new(), "Fast", drop)
     Motion.Spring(glyph, "TextTransparency", 0, "Fast")
 end
-
 function Window:BuildTopButtons()
     local right = self.RightCluster
     self:BuildSearchSlot(right)
@@ -11677,7 +10905,6 @@ function Window:BuildTopButtons()
         self:Hide()
     end)
 end
-
 function Window:BuildSearchSlot(parent)
     local chrome = Config.Chrome
     local field, box = Search.Field()
@@ -11695,7 +10922,6 @@ function Window:BuildSearchSlot(parent)
         self:SetQuery(box.Text)
     end)
 end
-
 function Window:BlockButton(name, art, order, callback)
     local button = Gui.Hitbox(name)
     button.LayoutOrder = order
@@ -11716,7 +10942,6 @@ function Window:BlockButton(name, art, order, callback)
     table.insert(self.TopButtons, button)
     return entry
 end
-
 function Window.SetArt(entry, art)
     if entry.Art == art then
         return
@@ -11735,7 +10960,6 @@ function Window.SetArt(entry, art)
     end
     entry.Sprite = sprite
 end
-
 function Window.SizeBlock(entry, size)
     if entry.Size == size then
         return
@@ -11747,7 +10971,6 @@ function Window.SizeBlock(entry, size)
         sprite.Size = UDim2.fromOffset(inner, inner)
     end
 end
-
 function Window:BuildDock()
     local chrome, z = Config.Chrome, Config.Chrome.Z
     local radius = UDim.new(0, chrome.DockRadius)
@@ -11769,7 +10992,6 @@ function Window:BuildDock()
     })
     self:BuildTip()
 end
-
 function Window:BuildTip()
     local tip, z = Config.Chrome.Tip, Config.Chrome.Z
     local frame = Draw.New("CanvasGroup", { Name = "DockTip", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 0.5), GroupTransparency = 1, Visible = false, ZIndex = z.DockTip, Parent = self.Body })
@@ -11783,7 +11005,6 @@ function Window:BuildTip()
         end
     end }
 end
-
 function Window:ShowTip(anchor, spec)
     if Platform.Touch or self.Mode == "Phone" or not self.Visible then
         return
@@ -11803,7 +11024,6 @@ function Window:ShowTip(anchor, spec)
     Motion.Spring(frame, "Position", home, "Fast", tip.Spring)
     Motion.Spring(frame, "GroupTransparency", 0, "Fast")
 end
-
 function Window:HideTip()
     if not self.TipShown then
         return
@@ -11811,7 +11031,6 @@ function Window:HideTip()
     self.TipShown = false
     Motion.Spring(self.Tip, "GroupTransparency", 1, "Fast", self.TipHideOptions)
 end
-
 function Window:DockTabs()
     local shown = {}
     for _, tab in ipairs(self.Tabs) do
@@ -11821,7 +11040,6 @@ function Window:DockTabs()
     end
     return shown
 end
-
 function Window:DockHover(tab, hovered)
     if hovered then
         self.HoverTab = tab
@@ -11832,7 +11050,6 @@ function Window:DockHover(tab, hovered)
     end
     self:Magnify()
 end
-
 function Window:Magnify()
     local chrome = Config.Chrome
     local shown = self:DockTabs()
@@ -11842,7 +11059,6 @@ function Window:Magnify()
         Motion.Spring(tab.Nav.Scale, "Scale", scale, "Fast", chrome.MagnifySpring)
     end
 end
-
 function Window:LayoutDock()
     if not self:Docked() then
         return
@@ -11855,7 +11071,6 @@ function Window:LayoutDock()
     self.Dock.Size = UDim2.fromOffset(dock.Width + chrome.DockShadow, height + chrome.DockShadow)
     self.DockRight = chrome.DockGap + dock.Width
 end
-
 function Window:BuildGround()
     local chrome, z = Config.Chrome, Config.Chrome.Z
     local radius = Config.Window.Radius
@@ -11890,7 +11105,6 @@ function Window:BuildGround()
         return begin
     end)
 end
-
 function Window:ResizeFrom(begin, delta)
     if self.Minimized or self.Mode == "Phone" then
         return
@@ -11900,7 +11114,6 @@ function Window:ResizeFrom(begin, delta)
     local grown = (self.Size.X - begin.Size.X) * State.UserScale
     self.Root.Position = begin.Position + UDim2.fromOffset(math.floor(grown / 2), 0)
 end
-
 function Window:BuildTabBar()
     local bar, z = Config.Chrome.Bar, Config.Chrome.Z
     local holder = Draw.New("Frame", { Name = "TabBar", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Visible = false, ZIndex = z.TabBar, Parent = self.Body })
@@ -11910,7 +11123,6 @@ function Window:BuildTabBar()
     self.BarRow = Container.New(face, { PadX = bar.Pad, PadY = bar.Pad, GapX = 0 })
     self.TabBar, self.BarButtons = holder, {}
 end
-
 function Window:LayoutBar()
     local bar = Config.Chrome.Bar
     local barred = not self:Docked()
@@ -11923,7 +11135,6 @@ function Window:LayoutBar()
     self.TabBar.Size = UDim2.fromOffset(width + bar.Shadow, bar.Height + bar.Shadow)
     self.BarRow:SetWidth(width)
 end
-
 function Window:BarTabs()
     local shown, overflow = {}, {}
     local limit = Config.Window.TabBarMax
@@ -11934,7 +11145,6 @@ function Window:BarTabs()
     end
     return shown, overflow
 end
-
 function Window:RenderTabBar()
     if self:Docked() then
         return
@@ -11952,7 +11162,6 @@ function Window:RenderTabBar()
     end
     self:RenderBarActive()
 end
-
 function Window:AddBarButton(key, text, icon, count, sameLine)
     local bar = Config.Chrome.Bar
     local button = Gui.Hitbox("BarButton")
@@ -11990,7 +11199,6 @@ function Window:AddBarButton(key, text, icon, count, sameLine)
     table.insert(self.BarButtons, entry)
     return entry
 end
-
 function Window:MoveBarPill(entry, animate)
     local chrome = Config.Chrome
     local inset = chrome.Bar.Inset
@@ -12009,7 +11217,6 @@ function Window:MoveBarPill(entry, animate)
     Motion.Spring(pill, "Size", size, "Fast", chrome.SquashSpring)
     Motion.Impulse(pill, "Size", { 0, stretch, 0, -stretch * 0.5 }, "Fast", chrome.SquashSpring.Damping)
 end
-
 function Window:RenderBarActive()
     local active = self.ActiveTab
     local inOverflow = active ~= nil and table.find(self.Overflow or {}, active) ~= nil
@@ -12024,7 +11231,6 @@ function Window:RenderBarActive()
         end
     end
 end
-
 function Window:OpenMore()
     Sheet.Open(Lang.Strings.MoreTabs, function(container)
         for _, tab in ipairs(self.Overflow or {}) do
@@ -12040,7 +11246,6 @@ function Window:OpenMore()
         end
     end, { Height = 0.6 })
 end
-
 function Window:ApplyMode(mode)
     self.Mode = mode
     self.Landscape = Platform.Landscape == true
@@ -12064,7 +11269,6 @@ function Window:ApplyMode(mode)
     Layout.MarkAll()
     self:EmitState()
 end
-
 function Window:LayoutBody()
     local chrome = Config.Chrome
     local docked = self:Docked()
@@ -12084,7 +11288,6 @@ function Window:LayoutBody()
     self:LayoutBar()
     self:OnPageWidth(pageWidth)
 end
-
 function Window:LayoutHeader()
     local chrome = Config.Chrome
     local phone = self.Mode == "Phone"
@@ -12103,7 +11306,6 @@ function Window:LayoutHeader()
     self.HeaderDesc.Visible = not phone and self.HasDesc == true
     self:LayoutTopRow()
 end
-
 function Window:LayoutTopRow()
     local chrome, mode = Config.Chrome, self.Mode
     local phone = mode == "Phone"
@@ -12135,14 +11337,12 @@ function Window:LayoutTopRow()
     used += self.TitleWidth + gap
     self.PillSlot.Visible = titleFits and mode == "Desktop" and self.SubTitle ~= "" and used + self.PillWidth <= room
 end
-
 function Window:MinSize()
     if Platform.Touch then
         return Config.Window.TouchMinWidth, Config.Window.TouchMinHeight
     end
     return Config.Window.MinWidth, Config.Window.MinHeight
 end
-
 function Window:Fit()
     local viewport = State.Stage.AbsoluteSize
     if viewport.X <= 0 then
@@ -12166,7 +11366,6 @@ function Window:Fit()
         self.Root.Position = UDim2.new(0.5, 0, 0.5, -math.floor(height / 2))
     end
 end
-
 function Window:FitPhone(viewport, scale)
     local inset = GuiService:GetGuiInset()
     local margin, shadow = Config.Chrome.PhoneMargin, Config.Window.Shadow
@@ -12176,14 +11375,12 @@ function Window:FitPhone(viewport, scale)
     self.Root.Position = UDim2.new(0.5, 0, 0, inset.Y + margin)
     self:Commit()
 end
-
 function Window:Commit()
     local shadow = Config.Window.Shadow
     local height = self.Minimized and self:HeaderHeight() or self.Size.Y
     Motion.Set(self.Root, "Size", UDim2.fromOffset(self.Size.X + shadow, height + shadow))
     self:LayoutBody()
 end
-
 function Window:OnPageWidth(width)
     if width == self.PageWidth then
         return
@@ -12197,7 +11394,6 @@ function Window:OnPageWidth(width)
     end
     self.SearchView.Root:SetWidth(width - Config.Page.ScrollBar)
 end
-
 function Window:AddTabSection(text)
     local chrome = Config.Chrome
     local holder = Draw.New("Frame", { Name = "Section", BackgroundTransparency = 1, ZIndex = chrome.Z.DockIcon })
@@ -12216,7 +11412,6 @@ function Window:AddTabSection(text)
     table.insert(self.Sections, section)
     return section
 end
-
 function Window:AddTab(name, icon, description)
     local tab = Tab.New(self, name, icon, description)
     table.insert(self.Tabs, tab)
@@ -12227,7 +11422,6 @@ function Window:AddTab(name, icon, description)
     self:RenderTabBar()
     return tab
 end
-
 function Window:FindTab(tab)
     if type(tab) == "table" and getmetatable(tab) == Tab then
         return tab
@@ -12239,7 +11433,6 @@ function Window:FindTab(tab)
     end
     return nil
 end
-
 function Window:SelectTab(target)
     local tab = self:FindTab(target)
     if not tab or tab == self.ActiveTab then
@@ -12268,7 +11461,6 @@ function Window:SelectTab(target)
     end
     self:EmitState()
 end
-
 function Window:SetHeading(title, description)
     local chrome = Config.Chrome
     self.HeroSpec = title
@@ -12281,7 +11473,6 @@ function Window:SetHeading(title, description)
     Motion.Set(self.HeaderDesc, "Position", home + UDim2.fromOffset(chrome.DescKick, 0))
     Motion.Spring(self.HeaderDesc, "Position", home, "Normal", { Damping = chrome.DescDamping })
 end
-
 function Window:SetQuery(text)
     local query = Search.Normalize(text)
     if self.SearchBox.Text ~= text and query == "" then
@@ -12312,7 +11503,6 @@ function Window:SetQuery(text)
         self:SetHeading(Lang.Strings.SearchResults, Lang.Strings.SearchDesc)
     end
 end
-
 function Window:PresentPage(view, shown, from)
     if shown and not view.Dormant then
         return
@@ -12331,7 +11521,6 @@ function Window:PresentPage(view, shown, from)
     Motion.Presence(view.Page, false, { From = from, Distance = Config.Chrome.PageSlide })
     task.delay(Config.Chrome.Park.Delay, Window.Park, self, view, 1)
 end
-
 function Window:StepPrepare(deadline)
     local view = self.Preparing
     if view.ApplyWidth then
@@ -12350,7 +11539,6 @@ function Window:StepPrepare(deadline)
         view:EnterCards()
     end
 end
-
 function Window.PageChunks(view)
     local containers = {}
     for container in pairs(Layout.All) do
@@ -12371,7 +11559,6 @@ function Window.PageChunks(view)
     end
     return chunks
 end
-
 function Window.AddChunk(chunks, frame)
     chunks[#chunks + 1] = frame
     if #frame:GetDescendants() <= Config.Chrome.Pages.Chunk then
@@ -12381,7 +11568,6 @@ function Window.AddChunk(chunks, frame)
         Window.AddChunk(chunks, child)
     end
 end
-
 function Window.Detach(view, deadline)
     if view.Phase ~= "Detach" then
         view.Chunks = Window.PageChunks(view)
@@ -12404,7 +11590,6 @@ function Window.Detach(view, deadline)
     view.Phase = "Detached"
     return true
 end
-
 function Window:Attach(view, deadline)
     local page = view.Page
     if page.Parent ~= self.PageHost then
@@ -12436,7 +11621,6 @@ function Window:Attach(view, deadline)
     view.Chunks, view.Detached, view.Phase = nil, nil, nil
     return true
 end
-
 function Window.Park(window, view, tries)
     local page = view.Page
     if not view.Dormant or view.Want or not page.Parent or Library.Unloaded then
@@ -12449,7 +11633,6 @@ function Window.Park(window, view, tries)
     page.Visible = false
     window.Parking[view] = true
 end
-
 function Window:PageTick()
     local pages = Config.Chrome.Pages
     if self.Preparing then
@@ -12470,12 +11653,10 @@ function Window:PageTick()
     end
     self:Prewarm(deadline)
 end
-
 function Window.Warmed(tab)
     local parked = tab.Parked
     return tab.Phase == "Detached" and not tab.PendingWidth and (not parked or next(parked) == nil)
 end
-
 function Window:Prewarm(deadline)
     if not self.Ready or not self.Visible or self.Minimized or Motion.Get(self.Warp.Y, "Value") then
         return
@@ -12501,7 +11682,6 @@ function Window:Prewarm(deadline)
         end
     end
 end
-
 function Window:DestroyPages()
     for _, view in ipairs(self.Tabs or {}) do
         for frame in pairs(view.Detached or {}) do
@@ -12513,7 +11693,6 @@ function Window:DestroyPages()
     end
     table.clear(self.Pages or {})
 end
-
 function Window:Show()
     if self.Visible then
         return
@@ -12525,7 +11704,6 @@ function Window:Show()
     Particles.Resume()
     self:EmitState()
 end
-
 function Window:Hide()
     if not self.Visible then
         return
@@ -12541,7 +11719,6 @@ function Window:Hide()
         Notify.Push(self.Title, Lang.Format("Hidden", Keybinds.Short(State.MenuKey)), 3, "Info")
     end
 end
-
 function Window:SetVisible(visible)
     if visible then
         self:Show()
@@ -12549,14 +11726,12 @@ function Window:SetVisible(visible)
         self:Hide()
     end
 end
-
 function Window:Toggle()
     if not self.Ready then
         return
     end
     self:SetVisible(not self.Visible)
 end
-
 function Window:SetMinimized(minimized)
     if self.Minimized == minimized or (minimized and self.Mode == "Phone") then
         return
@@ -12572,16 +11747,13 @@ function Window:SetMinimized(minimized)
     Float.Sync()
     self:EmitState()
 end
-
 function Window:SetScale(scale)
     State.UserScale = math.clamp(tonumber(scale) or 1, Config.ScaleRange.Min, Config.ScaleRange.Max)
     self:Fit()
 end
-
 function Window:SetTransparency(alpha)
     self.Body.BackgroundTransparency = math.clamp(tonumber(alpha) or 0, 0, 0.9)
 end
-
 function Tab.New(window, name, icon, description)
     local tab = setmetatable({ Window = window, Name = name, Icon = icon, Description = description, Groupboxes = {} }, Tab)
     tab:BuildNav()
@@ -12591,7 +11763,6 @@ function Tab.New(window, name, icon, description)
     tab.Left, tab.Right, tab.Columns = columns[1], columns[2], columns
     return tab
 end
-
 function Tab.BuildPage(window, tab)
     local page = Draw.New("CanvasGroup", { Name = tab and "Page" or "SearchPage", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Visible = false })
     window.Pages = window.Pages or {}
@@ -12600,7 +11771,6 @@ function Tab.BuildPage(window, tab)
     local root = Container.New(scroll, { PadX = Config.Page.Pad, PadY = Config.Chrome.PagePadY, GapY = tab and Config.Gap.Column or Config.Gap.Y, Window = window, Tab = tab })
     return { Page = page, Scroll = scroll, Root = root }
 end
-
 function Tab:BuildNav()
     local window = self.Window
     local dock = window:DockMetrics()
@@ -12631,19 +11801,16 @@ function Tab:BuildNav()
         end,
     })
 end
-
 function Tab:ApplyDock()
     local icon = self.Window:DockMetrics().Icon
     self.Nav.Slot.Size = UDim2.fromOffset(icon, icon)
     self.Nav.Sprite.Size = UDim2.fromOffset(icon, icon)
 end
-
 function Tab:RenderNav()
     if self.Window.ActiveTab == self then
         Motion.Pop(self.Nav.Sprite)
     end
 end
-
 function Tab:MoveIndicator(animate)
     local window, frame = self.Window, self.Nav.Frame
     if frame.Size.X.Offset <= 0 then
@@ -12666,7 +11833,6 @@ function Tab:MoveIndicator(animate)
     Motion.Spring(bubble, "Size", size, "Fast", chrome.SquashSpring)
     Motion.Impulse(bubble, "Size", { 0, -stretch * 0.5, 0, stretch }, "Fast", chrome.SquashSpring.Damping)
 end
-
 function Tab:ApplyWidth()
     local width = self.PendingWidth
     if not width then
@@ -12675,7 +11841,6 @@ function Tab:ApplyWidth()
     self.PendingWidth = nil
     self.Root:SetWidth(width - Config.Page.ScrollBar)
 end
-
 function Tab:SetShown(shown, forward)
     local from
     if shown then
@@ -12685,7 +11850,6 @@ function Tab:SetShown(shown, forward)
     end
     self.Window:PresentPage(self, shown, from)
 end
-
 function Tab:EnterCards()
     if Motion.Reduced then
         return
@@ -12700,7 +11864,6 @@ function Tab:EnterCards()
     end
     Fx.Stagger(lifts, Config.Chrome.Cards.Stagger, Fx.Rise)
 end
-
 function Tab:AddGroupbox(info, icon)
     if type(info) ~= "table" or info.EN then
         local side = (icon == "Left" or icon == "Right") and icon or nil
@@ -12709,19 +11872,15 @@ function Tab:AddGroupbox(info, icon)
     local column = (info.Side == "Left" and self.Left) or (info.Side == "Right" and self.Right) or self.Root
     return Groupbox.New(self, column, info)
 end
-
 function Tab:AddLeftGroupbox(name, icon)
     return self:AddGroupbox({ Name = name, Side = "Left", Icon = icon })
 end
-
 function Tab:AddRightGroupbox(name, icon)
     return self:AddGroupbox({ Name = name, Side = "Right", Icon = icon })
 end
-
 function Groupbox.HeaderHeight()
     return Platform.Metric("Header")
 end
-
 function Groupbox.New(tab, column, info)
     local group, z = Config.Group, Config.Chrome.Z
     local holder = Draw.New("Frame", { Name = "Groupbox", BackgroundTransparency = 1 })
@@ -12755,7 +11914,6 @@ function Groupbox.New(tab, column, info)
     table.insert(tab.Groupboxes, box)
     return box
 end
-
 function Groupbox:BuildHeader(card)
     local group = Config.Group
     local bar = Draw.Box("TextButton", { Name = "Header", Size = UDim2.new(1, 0, 0, Groupbox.HeaderHeight()) }, "PanelHeader", nil, group.Radius)
@@ -12792,24 +11950,20 @@ function Groupbox:BuildHeader(card)
         end,
     })
 end
-
 function Groupbox:PaintSeam()
     local radius = Config.Group.Radius
     local shown = math.clamp(self.ContentHeight * self.Open.Value, 0, radius)
     self.Patch.Size = UDim2.new(1, 0, 0, shown)
     self.Seam.BackgroundTransparency = 1 - shown / radius
 end
-
 function Groupbox:SetCollapsed(collapsed)
     self.Collapsed = collapsed == true
     Motion.Spring(self.Open, "Value", self.Collapsed and 0 or 1, "Normal")
     Motion.Spring(self.Chevron, "Rotation", self.Collapsed and -90 or 0, "Fast", { Damping = Config.Chrome.ChevronDamping })
 end
-
 function Search.Normalize(text)
     return tostring(text or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
 end
-
 function Search.Field()
     local chrome = Config.Chrome
     local field = Draw.Box("Frame", { Name = "SearchField" }, "Element", "Outline", UDim.new(1, 0), 2)
@@ -12833,7 +11987,6 @@ function Search.Field()
     end)
     return field, box
 end
-
 function Search.Entries(window)
     local entries = {}
     for _, tab in ipairs(window.Tabs) do
@@ -12843,7 +11996,6 @@ function Search.Entries(window)
     end
     return entries
 end
-
 function Search.Walk(entries, tab, box, container, depth)
     for _, item in ipairs(container.Items) do
         if item.Search then
@@ -12854,7 +12006,6 @@ function Search.Walk(entries, tab, box, container, depth)
         end
     end
 end
-
 function Search.WidgetOf(item)
     if item.Widget == nil then
         for _, option in pairs(Library.Options) do
@@ -12867,7 +12018,6 @@ function Search.WidgetOf(item)
     end
     return item.Widget or nil
 end
-
 function Search.LabelOf(item)
     if item.Label ~= nil then
         return Lang.Resolve(item.Label)
@@ -12878,11 +12028,9 @@ function Search.LabelOf(item)
     end
     return item.Search or ""
 end
-
 function Search.PathOf(entry)
     return string.format("%s › %s › %s", Lang.Resolve(entry.Tab.Name), Lang.Resolve(entry.Box.Name), Search.LabelOf(entry.Item))
 end
-
 function Search.Collect(window, query)
     local found = {}
     for _, entry in ipairs(Search.Entries(window)) do
@@ -12895,7 +12043,6 @@ function Search.Collect(window, query)
     end
     return found
 end
-
 function Search.Render(container, window, query, onPick)
     container:Clear()
     query = Search.Normalize(query)
@@ -12917,7 +12064,6 @@ function Search.Render(container, window, query, onPick)
         })
     end
 end
-
 function Search.CanvasY(frame, scroll)
     local y = 0
     local node = frame
@@ -12929,7 +12075,6 @@ function Search.CanvasY(frame, scroll)
     end
     return y
 end
-
 function Search.Jump(window, entry)
     window:SetQuery("")
     window:SelectTab(entry.Tab)
@@ -12944,7 +12089,6 @@ function Search.Jump(window, entry)
     Motion.Spring(scroll, "CanvasPosition", Vector2.new(0, target), "Soft")
     Search.Flash(entry.Item)
 end
-
 function Search.Flash(item)
     local widget = Search.WidgetOf(item)
     if widget then
@@ -12960,13 +12104,11 @@ function Search.Flash(item)
     stroke.Transparency = Config.Chrome.FlashAlpha
     Motion.Spring(stroke, "Transparency", 1, "Soft", { OnDone = Search.FlashDone })
 end
-
 function Search.FlashDone(stroke)
     if stroke.Parent then
         stroke.Parent:Destroy()
     end
 end
-
 function Search.OpenSheet(window)
     Sheet.Open(Lang.Strings.Search, function(container)
         local field, box = Search.Field()
@@ -12982,7 +12124,6 @@ function Search.OpenSheet(window)
         task.defer(box.CaptureFocus, box)
     end, { Height = 0.8 })
 end
-
 function Palette.WordStart(raw, index)
     if index == 1 then
         return true
@@ -12990,7 +12131,6 @@ function Palette.WordStart(raw, index)
     local before, here = raw:sub(index - 1, index - 1), raw:sub(index, index)
     return before == " " or before == "_" or before == "-" or (before:match("%l") ~= nil and here:match("%u") ~= nil)
 end
-
 function Palette.Score(raw, query)
     local text, settings = raw:lower(), Config.Chrome.Palette
     query = query:lower()
@@ -13026,7 +12166,6 @@ function Palette.Score(raw, query)
     end
     return score
 end
-
 function Palette.Toggle(window)
     if Palette.Frame and Palette.Frame.Visible then
         Palette.Close()
@@ -13034,7 +12173,6 @@ function Palette.Toggle(window)
         Palette.Open(window)
     end
 end
-
 function Palette.Open(window)
     if not window or Library.Unloaded then
         return
@@ -13052,7 +12190,6 @@ function Palette.Open(window)
     Motion.Pop(Palette.Card)
     task.defer(Palette.Box.CaptureFocus, Palette.Box)
 end
-
 function Palette.Close()
     if not Palette.Frame or not Palette.Frame.Visible then
         return
@@ -13062,7 +12199,6 @@ function Palette.Close()
         Palette.Box:ReleaseFocus()
     end
 end
-
 function Palette.Build()
     local settings = Config.Chrome.Palette
     local dim = Draw.New("TextButton", { Name = "Palette", Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 0, Visible = false, Parent = Popup.Layer("Dialog") })
@@ -13096,11 +12232,9 @@ function Palette.Build()
     end)
     Util.Connect(UserInputService.InputBegan, Palette.OnKey)
 end
-
 function Palette.Width()
     return math.min(Config.Chrome.Palette.Width, State.Stage.AbsoluteSize.X - Config.Overlay.Margin * 2)
 end
-
 function Palette.Fit()
     if not Palette.Card then
         return
@@ -13109,7 +12243,6 @@ function Palette.Fit()
     Palette.Card.Size = UDim2.fromOffset(width, Palette.Card.Size.Y.Offset)
     Palette.Body:SetWidth(width - Config.Group.Shadow)
 end
-
 function Palette.OnKey(input)
     if not Palette.Frame or not Palette.Frame.Visible then
         return
@@ -13121,7 +12254,6 @@ function Palette.OnKey(input)
     Palette.Index = (Palette.Index - 1 + step) % #Palette.Matches + 1
     Palette.Highlight()
 end
-
 function Palette.Refresh()
     local query = Search.Normalize(Palette.Box.Text)
     local scored = {}
@@ -13152,7 +12284,6 @@ function Palette.Refresh()
     end
     Palette.Highlight()
 end
-
 function Palette.Describe(entry)
     local widget = Search.WidgetOf(entry.Item)
     local state = ""
@@ -13161,13 +12292,11 @@ function Palette.Describe(entry)
     end
     return Search.PathOf(entry) .. state
 end
-
 function Palette.Highlight()
     for index, row in ipairs(Palette.Rows or {}) do
         row:SetSelected(index == Palette.Index)
     end
 end
-
 function Palette.Run(entry)
     if not entry then
         return
@@ -13183,7 +12312,6 @@ function Palette.Run(entry)
         task.defer(box.CaptureFocus, box)
     end
 end
-
 function Window:AddSettingsTab()
     local tab = self:AddTab(Lang.Strings.Settings, "settings", Lang.Strings.SettingsDesc)
     Window.BuildConfigGroup(tab:AddLeftGroupbox(Lang.Strings.Configs, "config"))
@@ -13209,7 +12337,6 @@ function Window:BuildThemeGroup(group)
     end)
     group.ThemeCards = cards
 end
-
 function Window.ThemeCard(group, name, columns)
     local palette, card = Themes[name], Config.Chrome.ThemeCard
     local cell = Draw.New("Frame", { Name = name, BackgroundTransparency = 1 })
@@ -13230,7 +12357,6 @@ function Window.ThemeCard(group, name, columns)
     end)
     return stroke
 end
-
 function Window.ThemeScene(preview, palette, card)
     local function Block(parent, color, position, size, round)
         local block = Draw.New("Frame", { BackgroundColor3 = color, BorderSizePixel = 0, Position = position, Size = size, Parent = parent })
@@ -13256,7 +12382,6 @@ function Window.ThemeScene(preview, palette, card)
     local switch = Block(panel, palette.Good, UDim2.fromScale(0.64, 0.48), UDim2.fromScale(0.26, 0.32), UDim.new(1, 0))
     Block(switch, Color3.new(1, 1, 1), UDim2.fromScale(0.52, 0.12), UDim2.fromScale(0.36, 0.76), UDim.new(1, 0))
 end
-
 function Window.BuildConfigGroup(group)
     local list = group:AddListBox("ConfigList", { Text = Lang.Strings.SavedConfigs, Values = Configs.List(), Height = 4, NoSave = true })
     local autoload = group:AddLabel(Lang.Format("Autoload", Configs.GetAutoload() or Lang.Get("None")))
@@ -13297,12 +12422,10 @@ function Window.BuildConfigGroup(group)
         Window.ResetOptions("All")
     end })
 end
-
 function Window.ResetOptions(scope)
     local count = Library:ResetConfig(scope or "All")
     Library:Notify(Lang.Strings.Configs, Lang.Get("ResetDone", count or 0), 3, "Success")
 end
-
 function Window.SelectedConfig(ui)
     local typed = tostring(ui.Name.Value or ""):gsub("^%s+", ""):gsub("%s+$", "")
     if typed ~= "" then
@@ -13311,7 +12434,6 @@ function Window.SelectedConfig(ui)
     local picked = ui.List.Value
     return type(picked) == "string" and picked ~= "" and picked or nil
 end
-
 function Window.RunConfig(ui, actionKey, handler)
     local name = Window.SelectedConfig(ui)
     if not name then
@@ -13328,17 +12450,14 @@ function Window.RunConfig(ui, actionKey, handler)
     end
     ui.List:SetValues(Configs.List())
 end
-
 function Window.ExportConfig()
     local copied = Util.Clipboard(Configs.Export())
     Library:Notify(Lang.Strings.Configs, copied and Lang.Strings.Exported or Lang.Strings.NoClipboard, 3, copied and "Success" or "Warning")
 end
-
 function Window.ImportConfig(input)
     local ok = Configs.Import(tostring(input.Value or ""))
     Library:Notify(Lang.Strings.Configs, ok and Lang.Strings.Imported or Lang.Strings.ImportBroken, 3, ok and "Success" or "Error")
 end
-
 Config.Intro = {
     Width = 440, Height = 236, Margin = 16, MaxScale = 1.35, Scrim = 0.12,
     MinShow = 1.5, MaxShow = 2.2, Exit = 0.32, Flourish = 0.12, Hold = 0, StepTimeout = 15,
@@ -13349,15 +12468,12 @@ Config.Intro = {
     BarY = 186, BarHeight = 12, BarInset = 26, Runner = 28, Flag = 52,
     StatusSize = 15,
 }
-
 Lang.Strings.IntroSkip = { EN = "Click to skip" }
 Lang.Strings.IntroSkipTouch = { EN = "Tap to skip" }
-
 Intro.PopIn = { Damping = 0.45 }
 Intro.LetterPop = { Damping = 0.42 }
 Intro.Settle = { Damping = 0.55 }
 Intro.CoinSpinOptions = { Damping = 0.12 }
-
 function Intro.Play(settings)
     settings = settings or {}
     settings.Started = os.clock()
@@ -13375,7 +12491,6 @@ function Intro.Play(settings)
     end
     Intro.Finish(settings)
 end
-
 function Intro.Finish(settings)
     if settings.Finished or Library.Unloaded then
         return
@@ -13383,11 +12498,9 @@ function Intro.Finish(settings)
     settings.Finished = true
     Util.Try(settings.OnDone)
 end
-
 function Intro.Left(settings, reserve)
     return Config.Intro.MaxShow + Config.Intro.Hold - reserve - (os.clock() - settings.Started)
 end
-
 function Intro.Wait(settings, reserve)
     local minimum = Config.Intro.MinShow + Config.Intro.Hold
     while not Library.Unloaded and not Intro.Skipped and Intro.Left(settings, reserve) > 0 do
@@ -13397,7 +12510,6 @@ function Intro.Wait(settings, reserve)
         task.wait(0.05)
     end
 end
-
 function Intro.RunSteps(settings, track)
     local steps = settings.Steps or {}
     local fallback = Lang.Strings.IntroSteps
@@ -13419,13 +12531,11 @@ function Intro.RunSteps(settings, track)
     settings.Ran = true
     Intro.Progress(track, 1)
 end
-
 function Intro.Status(track, spec)
     if track and track.Alive then
         track.Status.Text = Lang.Resolve(spec)
     end
 end
-
 function Intro.Progress(track, value)
     if not track or not track.Alive then
         return
@@ -13433,7 +12543,6 @@ function Intro.Progress(track, value)
     Motion.Spring(track.Value, "Value", value, "Soft")
     Motion.Impulse(track.Body, "Position", { 0, 0, 0, -90 }, "Fast", 0.35)
 end
-
 function Intro.Fit(layer)
     local intro = Config.Intro
     local top, bottom = Popup.Insets(layer)
@@ -13441,7 +12550,6 @@ function Intro.Fit(layer)
     local room = math.min((view.X - intro.Margin * 2) / intro.Width, (view.Y - top - bottom - intro.Margin * 6) / intro.Height)
     return math.clamp(room, 0.5, intro.MaxScale)
 end
-
 function Intro.Build(settings)
     local intro = Config.Intro
     local layer = Popup.Layer("Intro")
@@ -13463,14 +12571,12 @@ function Intro.Build(settings)
     Intro.BindSkip(screen)
     return parts
 end
-
 function Intro.SkipHint(screen, layer)
     local _, bottom = Popup.Insets(layer)
     local spec = Platform.Touch and Lang.Strings.IntroSkipTouch or Lang.Strings.IntroSkip
     local hint = Draw.Text({ AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -(bottom + Config.Intro.Margin * 2)), Size = UDim2.fromOffset(240, 18), TextXAlignment = Enum.TextXAlignment.Center, TextTransparency = 1, ZIndex = Config.Z.Top, Parent = screen }, "Desc", Util.TextSize("Small"), "White", spec)
     return hint
 end
-
 function Intro.BindSkip(screen)
     Intro.Skipped = false
     Gui.Clickable(screen, { OnClick = function()
@@ -13482,7 +12588,6 @@ function Intro.BindSkip(screen)
         end
     end)
 end
-
 function Intro.Block(stage)
     local intro = Config.Intro
     local holder = Draw.New("Frame", { Name = "Block", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromOffset(intro.Width / 2, intro.BlockY), Size = UDim2.fromOffset(intro.Block, intro.Block), ZIndex = Config.Z.Raised, Parent = stage })
@@ -13491,7 +12596,6 @@ function Intro.Block(stage)
     sprite.ZIndex = Config.Z.Raised
     return { Holder = holder, Scale = scale, Sprite = sprite }
 end
-
 function Intro.Coin(stage)
     local intro = Config.Intro
     local coin = Sprite.New(stage, "coin", intro.Coin)
@@ -13502,7 +12606,6 @@ function Intro.Coin(stage)
     coin.Visible = false
     return coin
 end
-
 function Intro.Logo(stage, title)
     local intro = Config.Intro
     local text = Lang.Resolve(title):upper()
@@ -13528,7 +12631,6 @@ function Intro.Logo(stage, title)
     end
     return letters
 end
-
 function Intro.Letter(row, glyph, order, size, tint)
     local intro = Config.Intro
     local font = #glyph > 1 and "Display" or "Logo"
@@ -13542,7 +12644,6 @@ function Intro.Letter(row, glyph, order, size, tint)
     stroke.Transparency = 1
     return { Holder = holder, Label = label, Scale = scale, Stroke = stroke, Drop = drop }
 end
-
 function Intro.Subtitle(stage, subTitle)
     local intro = Config.Intro
     local text = Lang.Resolve(subTitle or "")
@@ -13551,7 +12652,6 @@ function Intro.Subtitle(stage, subTitle)
     stroke.Transparency = 1
     return { Label = label, Stroke = stroke, Empty = text == "" }
 end
-
 function Intro.Track(stage)
     local intro = Config.Intro
     local inset, length = intro.BarInset, intro.Width - intro.BarInset * 2 - intro.Flag
@@ -13578,7 +12678,6 @@ function Intro.Track(stage)
     end)
     return track
 end
-
 function Intro.Show(settings, parts)
     local intro = Config.Intro
     Motion.Spring(parts.Screen, "BackgroundTransparency", intro.Scrim, "Normal")
@@ -13597,7 +12696,6 @@ function Intro.Show(settings, parts)
     end
     Intro.Exit(settings, parts)
 end
-
 function Intro.HitBlock(parts)
     local intro = Config.Intro
     local block = parts.Block
@@ -13611,7 +12709,6 @@ function Intro.HitBlock(parts)
     Motion.Set(coin, "Size", UDim2.fromOffset(intro.Coin, intro.Coin))
     Motion.Impulse(coin, "Size", { 0, intro.CoinSpin, 0, 0 }, "Fast", Intro.CoinSpinOptions.Damping)
 end
-
 function Intro.OpenLogo(parts)
     local intro = Config.Intro
     local center = UDim2.fromOffset(intro.Width / 2, intro.BlockY)
@@ -13630,7 +12727,6 @@ function Intro.OpenLogo(parts)
         Motion.Spring(sub.Label, "Position", UDim2.fromOffset(intro.Width / 2, intro.SubY), "Soft", Intro.Settle)
     end)
 end
-
 function Intro.RevealLetter(letter)
     if not letter.Holder.Parent then
         return
@@ -13641,7 +12737,6 @@ function Intro.RevealLetter(letter)
     Motion.Spring(letter.Scale, "Scale", 1, "Normal", Intro.LetterPop)
     Motion.Spring(letter.Holder, "Position", UDim2.fromScale(0.5, 0.5), "Normal", Intro.LetterPop)
 end
-
 function Intro.ReachFlag(parts)
     local track = parts.Track
     Motion.Impulse(track.Flag, "Position", { 0, 0, 0, -260 }, "Fast", 0.35)
@@ -13651,7 +12746,6 @@ function Intro.ReachFlag(parts)
     end
     task.wait(Config.Intro.Flourish)
 end
-
 function Intro.Exit(settings, parts)
     local intro = Config.Intro
     local view = parts.Layer.AbsoluteSize
@@ -13668,7 +12762,6 @@ function Intro.Exit(settings, parts)
     Motion.Spring(parts.Skip, "TextTransparency", 1, "Fast")
     task.wait(intro.Exit)
 end
-
 function Intro.Teardown(parts)
     parts.Track.Alive = false
     if Intro.KeyConnection then
@@ -13683,7 +12776,6 @@ function Intro.Teardown(parts)
     Motion.Cancel(parts.Screen)
     parts.Screen:Destroy()
 end
-
 function KeyGate.ReadSaved()
     if not Util.FileApi() or Util.SafeFile(isfile, Config.KeyCache) ~= true then
         return nil
@@ -13692,7 +12784,6 @@ function KeyGate.ReadSaved()
     local key = type(raw) == "string" and raw:gsub("%s", "") or ""
     return key ~= "" and key or nil
 end
-
 function KeyGate.Verify(settings, key)
     local ok, valid, message = pcall(settings.Verify, key)
     if not ok then
@@ -13700,7 +12791,6 @@ function KeyGate.Verify(settings, key)
     end
     return valid == true, message
 end
-
 function KeyGate.Show(settings, onUnlocked)
     local saved = settings.SaveKey ~= false and KeyGate.ReadSaved()
     if saved and KeyGate.Verify(settings, saved) then
@@ -13727,7 +12817,6 @@ function KeyGate.Show(settings, onUnlocked)
     card.Visible = false
     Motion.Presence(card, true, Dialog.Presence)
 end
-
 function KeyGate.BuildHeader(face, settings)
     local height = 58
     local bar = Draw.Box("Frame", { Size = UDim2.new(1, 0, 0, height), Parent = face }, "Accent")
@@ -13738,14 +12827,12 @@ function KeyGate.BuildHeader(face, settings)
     Draw.Stroke(title, "Ink", 2)
     return height
 end
-
 function KeyGate.Field(body)
     local field = Draw.Box("Frame", { Name = "Field" }, "Element", "Outline", Platform.Metric("Radius"), 2)
     local box = Draw.Text({ ClassName = "TextBox", ClearTextOnFocus = false, Position = UDim2.fromOffset(10, 0), Size = UDim2.new(1, -20, 1, 0), Parent = field }, "Body", Util.TextSize("Label"), "Text")
     body:Add(field, { Height = Platform.Metric("Box") })
     return box
 end
-
 function KeyGate.BuildBody(body, gate)
     local settings = gate.Settings
     Gui.Text(body, settings.Note or Lang.Strings.KeyNote, { Kind = "Desc" })
@@ -13759,7 +12846,6 @@ function KeyGate.BuildBody(body, gate)
     end })
     gate.Status = Gui.Text(body, "", { Kind = "Desc", Token = "SubText" })
 end
-
 function KeyGate.CopyLink(gate)
     local link = gate.Settings.Link
     if type(link) == "function" then
@@ -13772,7 +12858,6 @@ function KeyGate.CopyLink(gate)
     end
     gate.Status:Set(tostring(link or "-"))
 end
-
 function KeyGate.Check(gate)
     if gate.Checking then
         return
@@ -13795,7 +12880,6 @@ function KeyGate.Check(gate)
         KeyGate.Pass(gate)
     end)
 end
-
 function KeyGate.Pass(gate)
     Popup.ShowDim(gate.Dim, false)
     Motion.Presence(gate.Card, false, Dialog.Presence)
@@ -13808,7 +12892,6 @@ function KeyGate.Pass(gate)
         end
     end)
 end
-
 Config.Decor = {
     Tick = 0.5, MinWidth = 420, MinHeight = 80, DriftEvery = 8, Drift = 18, DriftSpeed = 1.1,
     TwinkleSpeed = 3, TwinkleAlpha = 0.85, StarAlpha = 0.2, Twinkles = 2,
@@ -13842,7 +12925,6 @@ Config.Particles.Themes = {
     Underground = { Glyph = "•", Fall = true },
     Castle = { Glyph = "•", Fall = false },
 }
-
 Decor.Handles = {}
 Decor.Backdrops = {}
 Decor.Walkers = {}
@@ -13850,16 +12932,13 @@ Decor.Ticks = 0
 Decor.TwinkleBack = { OnDone = function(star)
     Motion.Spring(star, "TextTransparency", Config.Decor.StarAlpha, Config.Decor.TwinkleSpeed)
 end }
-
 function Decor.WindowShown()
     local window = State.Window or Library.Window
     return window ~= nil and window.Visible ~= false and not window.Minimized
 end
-
 function Decor.Scene()
     return Config.Decor.Scenes[State.ThemeName] or Config.Decor.Scenes.Overworld
 end
-
 function Decor.EnsureTicking()
     if Decor.Ticking then
         return
@@ -13867,7 +12946,6 @@ function Decor.EnsureTicking()
     Decor.Ticking = true
     Util.Every(Config.Decor.Tick, Decor.Step)
 end
-
 function Decor.Attach(host)
     local pad = Config.Decor.Parallax.Pad
     local handle = { Host = host, Clouds = {}, Stars = {}, Hills = {}, Torches = {} }
@@ -13889,15 +12967,12 @@ function Decor.Attach(host)
     Decor.EnsureTicking()
     return handle
 end
-
 function Decor.Build(host)
     return Decor.Attach(host)
 end
-
 function Decor.Plane(handle, name)
     return name == "Far" and handle.Far or handle.Near
 end
-
 function Decor.BuildClouds(handle)
     for _, spot in ipairs(Config.Decor.Clouds) do
         local cloud = Draw.Cloud(Decor.Plane(handle, spot[4]), spot[3])
@@ -13905,7 +12980,6 @@ function Decor.BuildClouds(handle)
         handle.Clouds[#handle.Clouds + 1] = { Frame = cloud, Home = cloud.Position, Out = false }
     end
 end
-
 function Decor.BuildHills(handle)
     local decor = Config.Decor
     for _, spot in ipairs(decor.Hills) do
@@ -13931,7 +13005,6 @@ function Decor.BuildHills(handle)
         handle.Hills[#handle.Hills + 1] = hill
     end
 end
-
 function Decor.BuildStars(handle)
     local decor = Config.Decor
     for _, spot in ipairs(decor.Stars) do
@@ -13945,7 +13018,6 @@ function Decor.BuildStars(handle)
         }, "Glyph", spot[3], "DecorColor")
     end
 end
-
 function Decor.BuildTorches(handle)
     local decor = Config.Decor
     for _, x in ipairs(decor.Torches) do
@@ -13956,7 +13028,6 @@ function Decor.BuildTorches(handle)
         handle.Torches[#handle.Torches + 1] = { Frame = torch, Flame = flame }
     end
 end
-
 function Decor.BuildCeiling(handle)
     local decor = Config.Decor
     local strip = Draw.Box("Frame", { Name = "Ceiling", Size = UDim2.new(1, 0, 0, decor.Ceiling), BackgroundTransparency = decor.CeilingAlpha, Parent = handle.Far }, "Brick")
@@ -13964,12 +13035,10 @@ function Decor.BuildCeiling(handle)
     Draw.Bricks(mortar, decor.CeilingColumns, "BrickDark")
     handle.Ceiling = strip
 end
-
 function Decor.BuildShooting(handle)
     local size = Config.Decor.Shooting.Size
     handle.Shooting = Draw.Text({ Name = "Shooting", Text = "★", AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(size + 4, size + 4), TextXAlignment = Enum.TextXAlignment.Center, TextTransparency = 1, Visible = false, Parent = handle.Far }, "Glyph", size, "Coin")
 end
-
 function Decor.Render(handle)
     local host = handle.Host.AbsoluteSize
     local roomy = host.X >= Config.Decor.MinWidth and host.Y >= Config.Decor.MinHeight
@@ -13990,7 +13059,6 @@ function Decor.Render(handle)
     handle.Ceiling.Visible = scene.Ceiling == true
     handle.Shooting.Visible = roomy and scene.Shooting == true
 end
-
 function Decor.Shift(handle, ratio)
     if not handle then
         return
@@ -14000,7 +13068,6 @@ function Decor.Shift(handle, ratio)
     Motion.Spring(handle.Near, "Position", UDim2.fromOffset(near, 0), parallax.Speed, parallax.Spring)
     Motion.Spring(handle.Far, "Position", UDim2.fromOffset(near * parallax.Far, 0), parallax.Speed, parallax.Spring)
 end
-
 function Decor.AttachBackdrop(host)
     local lava = Config.Decor.Lava
     local glow = Draw.Box("Frame", { Name = "Lava", AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromScale(0, 1), Size = UDim2.new(1, 0, 0, lava.Height), BackgroundTransparency = 0, Parent = host }, "Accent")
@@ -14017,7 +13084,6 @@ function Decor.AttachBackdrop(host)
     Decor.EnsureTicking()
     return handle
 end
-
 function Decor.AttachGround(host)
     local walker = Config.Decor.Walker
     local frame = Draw.New("Frame", { Name = "Walker", BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.3, 0, 1, -2), Size = UDim2.fromOffset(walker.Size, walker.Size), ZIndex = Config.Chrome.Z.Walker, Parent = host })
@@ -14028,7 +13094,6 @@ function Decor.AttachGround(host)
     Decor.EnsureTicking()
     return handle
 end
-
 function Decor.Step()
     if Motion.Reduced then
         return
@@ -14058,7 +13123,6 @@ function Decor.Step()
         Decor.Walk(walker, ticks)
     end
 end
-
 function Decor.Owns(inst)
     for _, handle in ipairs(Decor.Handles) do
         if inst:IsDescendantOf(handle.Host) then
@@ -14077,7 +13141,6 @@ function Decor.Owns(inst)
     end
     return false
 end
-
 function Decor.Rest()
     local springs = Motion.Springs
     for index = #springs, 1, -1 do
@@ -14091,7 +13154,6 @@ function Decor.Rest()
         Motion.Stop()
     end
 end
-
 function Decor.Animate(handle, ticks)
     local decor = Config.Decor
     local stars = handle.Stars
@@ -14118,7 +13180,6 @@ function Decor.Animate(handle, ticks)
         end
     end
 end
-
 function Decor.Shoot(star)
     local shooting = Config.Decor.Shooting
     local x = 0.55 + math.random() * 0.35
@@ -14127,7 +13188,6 @@ function Decor.Shoot(star)
     Motion.Spring(star, "Position", UDim2.fromScale(x - shooting.Travel, 0.9), shooting.Speed)
     Motion.Spring(star, "TextTransparency", 1, shooting.Speed)
 end
-
 function Decor.Pulse(backdrop, ticks)
     local lava = Config.Decor.Lava
     if not backdrop.Glow.Visible or ticks % lava.Every ~= 0 then
@@ -14136,7 +13196,6 @@ function Decor.Pulse(backdrop, ticks)
     backdrop.Out = not backdrop.Out
     Motion.Spring(backdrop.Glow, "BackgroundTransparency", backdrop.Out and lava.Pulse or 0, lava.Speed)
 end
-
 function Decor.Walk(walker, ticks)
     local settings = Config.Decor.Walker
     local wide = walker.Host.AbsoluteSize.X >= settings.MinWidth
@@ -14152,15 +13211,12 @@ function Decor.Walk(walker, ticks)
         Motion.Impulse(walker.Hop, "Position", { 0, 0, 0, -settings.Hop }, "Fast", settings.HopDamping)
     end
 end
-
 Particles.Live = {}
 Particles.LiveCount = 0
 Particles.Paused = false
-
 function Particles.Make()
     return Draw.Text({ Name = "Particle", AnchorPoint = Vector2.new(0.5, 0.5), TextXAlignment = Enum.TextXAlignment.Center, TextTransparency = 1 }, "Glyph", 12, "ParticleColor")
 end
-
 function Particles.Released(label)
     if not Particles.Live[label] then
         return
@@ -14169,9 +13225,7 @@ function Particles.Released(label)
     Particles.LiveCount -= 1
     Draw.Pool("Particle", Particles.Make).Release(label)
 end
-
 Particles.DoneOptions = { OnDone = Particles.Released }
-
 function Particles.Build(parent)
     if Particles.Layer and Particles.Layer.Parent then
         Particles.Layer.Parent = parent
@@ -14184,16 +13238,13 @@ function Particles.Build(parent)
     end
     return Particles.Layer
 end
-
 function Particles.Active()
     local layer = Particles.Layer
     return Particles.Enabled and not Particles.Paused and not Motion.Reduced and layer ~= nil and layer.Parent ~= nil and Decor.WindowShown()
 end
-
 function Particles.Limit()
     return Platform.Mode == "Phone" and Config.Particles.PhoneCount or Config.Particles.Count
 end
-
 function Particles.Step()
     if not Particles.Active() then
         if Particles.LiveCount > 0 then
@@ -14205,7 +13256,6 @@ function Particles.Step()
         Particles.Launch()
     end
 end
-
 function Particles.Style()
     local override = Config.Particles.Themes[State.ThemeName]
     if override then
@@ -14213,7 +13263,6 @@ function Particles.Style()
     end
     return Theme.Colors.ParticleGlyph or "✦", Theme.Colors.ParticleFall == true
 end
-
 function Particles.Launch()
     local settings = Config.Particles
     local label = Draw.Pool("Particle", Particles.Make).Acquire()
@@ -14235,22 +13284,18 @@ function Particles.Launch()
     Motion.Spring(label, "Rotation", fall and 0 or math.random(-120, 120), speed)
     Motion.Spring(label, "TextTransparency", 1, speed * 0.8)
 end
-
 function Particles.Clear()
     for label in pairs(Particles.Live) do
         Particles.Released(label)
     end
 end
-
 function Particles.Pause()
     Particles.Paused = true
     Particles.Clear()
 end
-
 function Particles.Resume()
     Particles.Paused = false
 end
-
 function Particles.SetEnabled(enabled)
     Particles.Enabled = enabled ~= false
     if Particles.Layer then
@@ -14260,9 +13305,7 @@ function Particles.SetEnabled(enabled)
         Particles.Clear()
     end
 end
-
 Library.Visuals = { Enabled = false, Preview = false }
-
 function Library.Visuals.Source()
     local provider = Library.Visuals.Provider
     if not provider then
@@ -14274,20 +13317,17 @@ function Library.Visuals.Source()
     end
     return targets
 end
-
 function Library.Visuals.Category()
     if not Kit.Esp.Categories.Visuals then
         Kit.Esp.AddCategory("Visuals", { Text = Library:T("Targets"), Color = Color3.fromRGB(240, 92, 80), Source = Library.Visuals.Source, Enabled = true, Characters = true })
     end
     return Kit.Esp.Categories.Visuals
 end
-
 function Library.Visuals:SetEnabled(enabled)
     self.Enabled = enabled == true
     self.Category()
     if self.Enabled then Kit.Esp.Start() else Kit.Esp.Stop() end
 end
-
 function Library.Visuals:SetPreview(enabled)
     self.Preview = enabled == true
     local option = Library.Options.EspPreview
@@ -14296,20 +13336,16 @@ function Library.Visuals:SetPreview(enabled)
     end
     Library.Visuals.Sync()
 end
-
 function Library.Visuals:SetProvider(provider)
     self.Provider = provider
     self.Category()
 end
-
 function Library.Visuals:Set(key, value)
     Kit.Esp.Set(key, value)
 end
-
 function Library.Visuals:Get(key)
     return Kit.Esp.Settings[key]
 end
-
 Config.Layer.Preview = Config.Layer.Window + 1
 Config.Preview = {
     Width = 230, MinHeight = 260, Gap = 8, Margin = 8, Slide = 24, Pad = 10, Title = 30, Radius = 8,
@@ -14318,7 +13354,6 @@ Config.Preview = {
     Fallback = Color3.fromRGB(240, 92, 80),
 }
 Library.Visuals.Panel = {}
-
 function Library.Visuals.BuildView()
     local settings = Config.Preview
     local holder = Draw.New("Frame", { Name = "EspPreview", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) })
@@ -14348,7 +13383,6 @@ function Library.Visuals.BuildView()
     Util.Connect(view:GetPropertyChangedSignal("AbsoluteSize"), Library.Visuals.Render)
     return holder
 end
-
 function Library.Visuals.NewRig()
     local char = LocalPlayer.Character
     if char then
@@ -14363,7 +13397,6 @@ function Library.Visuals.NewRig()
     local ok, rig = pcall(Players.CreateHumanoidModelFromDescription, Players, Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
     return ok and rig or nil
 end
-
 function Library.Visuals.Strip(rig, colors)
     for _, part in ipairs(rig:GetDescendants()) do
         if part:IsA("LuaSourceContainer") or part:IsA("Sound") or part:IsA("ForceField") or part:IsA("BillboardGui") or part:IsA("Highlight") then
@@ -14379,7 +13412,6 @@ function Library.Visuals.Strip(rig, colors)
         end
     end
 end
-
 function Library.Visuals.EnsureModel()
     local panel = Library.Visuals.Panel
     if panel.Model and panel.Model.Parent then return panel.Model end
@@ -14399,7 +13431,6 @@ function Library.Visuals.EnsureModel()
     panel.Model = rig
     return rig
 end
-
 function Library.Visuals.Project(position, size)
     local camera = Library.Visuals.Panel.Camera
     local relative = camera.CFrame:PointToObjectSpace(position)
@@ -14409,7 +13440,6 @@ function Library.Visuals.Project(position, size)
     local y = (0.5 - relative.Y / depth / (2 * half)) * size.Y
     return Vector2.new(x, y), depth
 end
-
 function Library.Visuals.Color()
     local tuning = Kit.Esp.Settings
     if (tuning.TeamColor or tuning.ColorMode == "Team") and LocalPlayer.Team then
@@ -14426,7 +13456,6 @@ function Library.Visuals.Color()
     end
     return first and first.Color or Config.Preview.Fallback
 end
-
 function Library.Visuals.Tint(color)
     local panel = Library.Visuals.Panel
     if panel.Tinted == color then return end
@@ -14435,7 +13464,6 @@ function Library.Visuals.Tint(color)
         part.Color = color and base:Lerp(color, Config.Preview.Tint) or base
     end
 end
-
 function Library.Visuals.Render()
     local panel = Library.Visuals.Panel
     if not panel.Shown or not panel.Model then return end
@@ -14464,7 +13492,6 @@ function Library.Visuals.Render()
     end
     Library.Visuals.Line(drawing and show.Tracer == true, Vector2.new(size.X / 2, size.Y), Vector2.new(point.X, top + height), color)
 end
-
 function Library.Visuals.Frame(size)
     local panel = Library.Visuals.Panel
     local half = math.tan(math.rad(Config.Preview.Fov) / 2)
@@ -14473,7 +13500,6 @@ function Library.Visuals.Frame(size)
     local distance = math.max(fitX, fitY) * Config.Preview.Fit
     panel.Camera.CFrame = CFrame.lookAt(Vector3.new(0, 0, -distance), Vector3.zero)
 end
-
 function Library.Visuals.Line(shown, from, to, color)
     local tracer = Library.Visuals.Panel.Tracer
     tracer.Visible = shown
@@ -14484,12 +13510,10 @@ function Library.Visuals.Line(shown, from, to, color)
     tracer.Rotation = math.deg(math.atan2(delta.Y, delta.X))
     tracer.BackgroundColor3 = color
 end
-
 function Library.Visuals.Wanted()
     local visuals, window = Library.Visuals, State.Window
     return visuals.Preview and visuals.Tab ~= nil and window ~= nil and window:IsShown() and window.ActiveTab == visuals.Tab
 end
-
 function Library.Visuals.Place()
     local panel, window = Library.Visuals.Panel, State.Window
     if not panel.Card or not window then return end
@@ -14509,14 +13533,12 @@ function Library.Visuals.Place()
     panel.Card.Size = UDim2.fromOffset(settings.Width, height / scale)
     Motion.SetHome(panel.Card, UDim2.fromOffset(math.floor(x), math.floor(y)))
 end
-
 function Library.Visuals.Mount(parent)
     local holder = Library.Visuals.Panel.Holder
     if holder.Parent ~= parent then
         holder.Parent = parent
     end
 end
-
 function Library.Visuals.Spin()
     local panel = Library.Visuals.Panel
     local model = panel.Model
@@ -14526,7 +13548,6 @@ function Library.Visuals.Spin()
     panel.Spun = now
     model:PivotTo(CFrame.Angles(0, panel.Angle, 0) * panel.Base)
 end
-
 function Library.Visuals.SetSpinning(spinning)
     local panel = Library.Visuals.Panel
     if spinning == (panel.Job ~= nil) then return end
@@ -14538,7 +13559,6 @@ function Library.Visuals.SetSpinning(spinning)
     panel.Job = { Interval = Config.Preview.Tick, Elapsed = 0, Run = Library.Visuals.Spin, Inline = true }
     table.insert(State.Tasks, panel.Job)
 end
-
 function Library.Visuals.Sync()
     local visuals, panel = Library.Visuals, Library.Visuals.Panel
     if not panel.Card then return end
@@ -14561,14 +13581,12 @@ function Library.Visuals.Sync()
     visuals.SetSpinning(wanted)
     visuals.Render()
 end
-
 function Library.Visuals.Follow()
     local panel = Library.Visuals.Panel
     if panel.Shown and Platform.Mode ~= "Phone" then
         Library.Visuals.Place()
     end
 end
-
 function Library.Visuals.BuildPanel(window, group)
     local panel = Library.Visuals.Panel
     if panel.Card then return end
@@ -14589,7 +13607,6 @@ function Library.Visuals.BuildPanel(window, group)
     Util.Connect(State.Stage:GetPropertyChangedSignal("AbsoluteSize"), Library.Visuals.Follow)
     table.insert(State.UnloadHooks, Library.Visuals.Teardown)
 end
-
 function Library.Visuals.Teardown()
     local panel = Library.Visuals.Panel
     Library.Visuals.SetSpinning(false)
@@ -14602,7 +13619,6 @@ function Library.Visuals.Teardown()
     end
     table.clear(panel)
 end
-
 function Window:AddVisualsTab(options)
     options = options or {}
     Library.Visuals.Provider = options.Provider
@@ -14623,12 +13639,9 @@ function Window:AddVisualsTab(options)
     Library.Visuals.Sync()
     return tab
 end
-
 Config.Settings = { File = Config.Root .. "/settings.json", SaveDelay = 0.5, PruneInterval = 20 }
 Config.ExportPrefix = "MH2:"
-
 Keybinds.Modifiers = { LeftControl = true, RightControl = true, LeftShift = true, RightShift = true, LeftAlt = true, RightAlt = true }
-
 function Lang.Format(key, ...)
     local spec = Lang.Strings[key] or { EN = key }
     local args = table.pack(...)
@@ -14636,7 +13649,6 @@ function Lang.Format(key, ...)
         EN = string.format(spec.EN, table.unpack(args, 1, args.n)),
     }
 end
-
 function Gui.ClearPrevious(parent)
     local env = type(getgenv) == "function" and getgenv() or nil
     if env and type(env.UI) == "table" and env.UI ~= Library and not env.UI.Unloaded then
@@ -14651,7 +13663,6 @@ function Gui.ClearPrevious(parent)
         end
     end
 end
-
 function Gui.Setup()
     if State.Gui then
         return
@@ -14671,7 +13682,6 @@ function Gui.Setup()
     end)
     State.Stage = Draw.New("Frame", { Name = "Stage", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = State.Gui })
     State.Gui:SetAttribute(Config.GuiAttribute, Library.Version)
-
     Notify.Build()
     Tooltip.Build()
     Util.Connect(UserInputService.InputBegan, Gui.OnInputBegan)
@@ -14680,7 +13690,6 @@ function Gui.Setup()
     Util.Connect(RunService.RenderStepped, Gui.OnFrame)
     Util.Every(Config.Settings.PruneInterval, Theme.Prune)
 end
-
 function Gui.OnFrame(deltaTime)
     Motion.ReportFps(deltaTime)
     if Motion.Running then
@@ -14706,7 +13715,6 @@ function Gui.OnFrame(deltaTime)
         end
     end
 end
-
 function Gui.RunJob(job)
     if job.Inline then
         Util.Try(job.Run)
@@ -14726,7 +13734,6 @@ function Gui.RunJob(job)
         job.Thread, job.Yielded = thread, true
     end
 end
-
 function Gui.OnInputBegan(input, processed)
     State.LastInput = os.clock()
     if State.Binding then
@@ -14755,7 +13762,6 @@ function Gui.OnInputBegan(input, processed)
     end
     Keybinds.Dispatch(name, true)
 end
-
 function Gui.OnInputChanged(input)
     local drag = State.Drag
     if not drag or not Util.IsMove(input) then
@@ -14766,7 +13772,6 @@ function Gui.OnInputChanged(input)
     end
     drag.Move(input)
 end
-
 function Gui.OnInputEnded(input)
     if Util.IsPointer(input) and State.Drag then
         local drag = State.Drag
@@ -14783,18 +13788,15 @@ function Gui.OnInputEnded(input)
     end
     Keybinds.Dispatch(name, false)
 end
-
 function Keybinds.Short(name)
     return Config.Widget.KeyShort[name] or tostring(name)
 end
-
 function Keybinds.IsPalette(input)
     if input.KeyCode ~= Enum.KeyCode.K or Platform.Mode ~= "Desktop" then
         return false
     end
     return UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
 end
-
 function Keybinds.MenuDown()
     if Keybinds.Modifiers[State.MenuKey] then
         State.MenuArmed = true
@@ -14802,7 +13804,6 @@ function Keybinds.MenuDown()
     end
     Library:Toggle()
 end
-
 function Keybinds.Capture(input)
     local picker = State.Binding
     if input.UserInputType == Enum.UserInputType.Touch then
@@ -14824,7 +13825,6 @@ function Keybinds.Capture(input)
     end
     Util.Try(picker.SetKey, picker, name)
 end
-
 function Keybinds.Dispatch(name, down)
     local pickers = State.KeyPickers
     for index = #pickers, 1, -1 do
@@ -14837,7 +13837,6 @@ function Keybinds.Dispatch(name, down)
         end
     end
 end
-
 function Configs.SetFolder(name)
     local place = game.GameId ~= 0 and game.GameId or game.PlaceId
     Configs.Legacy = Config.ConfigRoot .. "/" .. Util.Sanitize(name)
@@ -14846,11 +13845,9 @@ function Configs.SetFolder(name)
         Util.EnsureFolder(Configs.Folder)
     end
 end
-
 function Configs.Path(name)
     return Configs.Folder .. "/" .. Util.Sanitize(name) .. ".json"
 end
-
 function Configs.Find(file)
     if not Util.FileApi() then
         return nil
@@ -14863,7 +13860,6 @@ function Configs.Find(file)
     end
     return nil
 end
-
 function Configs.TabNamed(tab, name)
     if type(tab) ~= "table" or tab.Name == nil then
         return false
@@ -14875,11 +13871,9 @@ function Configs.TabNamed(tab, name)
     end
     return tostring(spec):lower() == wanted or Lang.Resolve(spec):lower() == wanted
 end
-
 function Configs.HomeOf(option)
     return option.Container or (type(option.Row) == "table" and option.Row.Container) or nil
 end
-
 function Configs.InScope(option, scope)
     local container = Configs.HomeOf(option)
     while container do
@@ -14894,7 +13888,6 @@ function Configs.InScope(option, scope)
     end
     return false
 end
-
 function Configs.CaptureDefaults()
     Configs.Defaults = Configs.Defaults or {}
     for idx, option in pairs(Library.Options) do
@@ -14909,7 +13902,6 @@ function Configs.CaptureDefaults()
         end
     end
 end
-
 function Configs.Reset(scope)
     Configs.CaptureDefaults()
     local whole = scope == nil or (type(scope) == "string" and scope:lower() == "all")
@@ -14927,7 +13919,6 @@ function Configs.Reset(scope)
     end
     return count
 end
-
 function Configs.Snapshot()
     local snapshot = {}
     for idx, option in pairs(Library.Options) do
@@ -14940,7 +13931,6 @@ function Configs.Snapshot()
     end
     return snapshot
 end
-
 function Configs.Apply(snapshot)
     Configs.CaptureDefaults()
     for idx, saved in pairs(snapshot) do
@@ -14950,7 +13940,6 @@ function Configs.Apply(snapshot)
         end
     end
 end
-
 function Configs.Save(name)
     if not Util.FileApi() then
         return false, Lang.Get("NoFileApi")
@@ -14959,7 +13948,6 @@ function Configs.Save(name)
     local written = Util.SafeFile(writefile, Configs.Path(name), HttpService:JSONEncode(Configs.Snapshot()))
     return written ~= nil, written == nil and Lang.Get("NoFileApi") or nil
 end
-
 function Configs.Load(name)
     local path = Configs.Find(Util.Sanitize(name) .. ".json")
     if not path then
@@ -14972,7 +13960,6 @@ function Configs.Load(name)
     Configs.Apply(snapshot)
     return true
 end
-
 function Configs.Delete(name)
     local path = Configs.Find(Util.Sanitize(name) .. ".json")
     if type(delfile) ~= "function" or not path then
@@ -14980,7 +13967,6 @@ function Configs.Delete(name)
     end
     return Util.SafeFile(delfile, path) ~= nil
 end
-
 function Configs.List()
     if type(listfiles) ~= "function" or not Util.FileApi() then
         return {}
@@ -14999,7 +13985,6 @@ function Configs.List()
     table.sort(names)
     return names
 end
-
 function Configs.SetAutoload(name)
     if not Util.FileApi() then
         return false, Lang.Get("NoFileApi")
@@ -15007,7 +13992,6 @@ function Configs.SetAutoload(name)
     Util.EnsureFolder(Configs.Folder)
     return Util.SafeFile(writefile, Configs.Folder .. "/autoload.txt", name) ~= nil
 end
-
 function Configs.GetAutoload()
     local path = Configs.Find("autoload.txt")
     if not path then
@@ -15016,11 +14000,9 @@ function Configs.GetAutoload()
     local name = Util.SafeFile(readfile, path)
     return type(name) == "string" and name ~= "" and name or nil
 end
-
 function Configs.Export()
     return Config.ExportPrefix .. HttpService:JSONEncode(Configs.Snapshot())
 end
-
 function Configs.Import(text)
     text = tostring(text or ""):gsub("^%s+", ""):gsub("%s+$", "")
     local prefix = Config.ExportPrefix
@@ -15034,7 +14016,6 @@ function Configs.Import(text)
     Configs.Apply(snapshot)
     return true
 end
-
 function Settings.Load()
     State.Settings = {}
     if not Util.FileApi() or Util.SafeFile(isfile, Config.Settings.File) ~= true then
@@ -15045,7 +14026,6 @@ function Settings.Load()
         State.Settings = saved
     end
 end
-
 function Settings.Get(key, fallback)
     local value = State.Settings and State.Settings[key]
     if value == nil then
@@ -15053,14 +14033,12 @@ function Settings.Get(key, fallback)
     end
     return value
 end
-
 function Settings.Set(key, value)
     State.Settings = State.Settings or {}
     State.Settings[key] = value
     Settings.Token = (Settings.Token or 0) + 1
     task.delay(Config.Settings.SaveDelay, Settings.Flush, Settings.Token)
 end
-
 function Settings.Flush(token)
     if token ~= nil and token ~= Settings.Token then
         return
@@ -15071,7 +14049,6 @@ function Settings.Flush(token)
     Util.EnsureFolder(Config.Root)
     Util.SafeFile(writefile, Config.Settings.File, HttpService:JSONEncode(State.Settings))
 end
-
 function Settings.ApplyBoot(options)
     State.UserScale = math.clamp(tonumber(Settings.Get("Scale", options.Scale or 1)) or 1, Config.ScaleRange.Min, Config.ScaleRange.Max)
     State.MenuKey = Settings.Get("MenuKey", Util.KeyName(options.MenuKey or options.ToggleKey or options.MinimizeKey) or State.MenuKey)
@@ -15081,7 +14058,6 @@ function Settings.ApplyBoot(options)
     end
     return Settings.Get("Theme", options.Theme or "Overworld")
 end
-
 function Settings.ApplyOverlays(window, options)
     window:SetTransparency(Settings.Get("Transparency", 0))
     Watermark.SetVisible(Settings.Get("Watermark", options.Watermark ~= false) == true)
@@ -15090,7 +14066,6 @@ function Settings.ApplyOverlays(window, options)
     Float.SetSize(Settings.Get("FloatSize"))
     Notify.SetPosition(Settings.Get("NotifyCorner", "BottomRight"))
 end
-
 function Gui.Teardown()
     for _, callback in ipairs(State.UnloadHooks) do
         Util.Try(callback)
@@ -15117,13 +14092,10 @@ function Gui.Teardown()
         env.UI = nil
     end
 end
-
 Kit.Lib = { Config = { LogFolder = "UI/logs", RetryBase = 0.5, RetryMax = 8, FindTimeout = 5 } }
 Library.Lib = Kit.Lib
-
 Kit.Lib.Maid = {}
 Kit.Lib.Maid.__index = Kit.Lib.Maid
-
 function Kit.Lib.Maid.new(parent)
     local maid = setmetatable({ Tasks = {} }, Kit.Lib.Maid)
     if parent then
@@ -15131,14 +14103,12 @@ function Kit.Lib.Maid.new(parent)
     end
     return maid
 end
-
 function Kit.Lib.Maid:Give(job)
     if job ~= nil then
         self.Tasks[#self.Tasks + 1] = job
     end
     return job
 end
-
 function Kit.Lib.Maid.Drop(job)
     local kind = typeof(job)
     if kind == "RBXScriptConnection" then
@@ -15158,7 +14128,6 @@ function Kit.Lib.Maid.Drop(job)
         end
     end
 end
-
 function Kit.Lib.Maid:Cleanup()
     local tasks = self.Tasks
     self.Tasks = {}
@@ -15169,20 +14138,16 @@ function Kit.Lib.Maid:Cleanup()
         end
     end
 end
-
 Kit.Lib.Maid.Destroy = Kit.Lib.Maid.Cleanup
 Kit.Lib.Root = Kit.Lib.Maid.new()
 table.insert(State.UnloadHooks, function()
     Kit.Lib.Root:Cleanup()
 end)
-
 Kit.Lib.Signal = {}
 Kit.Lib.Signal.__index = Kit.Lib.Signal
-
 function Kit.Lib.Signal.new()
     return setmetatable({ Handlers = {} }, Kit.Lib.Signal)
 end
-
 function Kit.Lib.Signal:Connect(handler)
     local signal = self
     local conn = { Connected = true, Handler = handler }
@@ -15196,7 +14161,6 @@ function Kit.Lib.Signal:Connect(handler)
     self.Handlers[#self.Handlers + 1] = conn
     return conn
 end
-
 function Kit.Lib.Signal:Once(handler)
     local conn
     conn = self:Connect(function(...)
@@ -15205,7 +14169,6 @@ function Kit.Lib.Signal:Once(handler)
     end)
     return conn
 end
-
 function Kit.Lib.Signal:Fire(...)
     for _, conn in ipairs(table.clone(self.Handlers)) do
         if conn.Connected then
@@ -15213,7 +14176,6 @@ function Kit.Lib.Signal:Fire(...)
         end
     end
 end
-
 function Kit.Lib.Signal:Wait(timeout)
     local thread = coroutine.running()
     local done = false
@@ -15232,19 +14194,15 @@ function Kit.Lib.Signal:Wait(timeout)
     end
     return coroutine.yield()
 end
-
 function Kit.Lib.Signal:DisconnectAll()
     for _, conn in ipairs(self.Handlers) do
         conn.Connected = false
     end
     table.clear(self.Handlers)
 end
-
 Kit.Lib.Signal.Destroy = Kit.Lib.Signal.DisconnectAll
-
 Kit.Lib.StoreClass = {}
 Kit.Lib.StoreClass.__index = Kit.Lib.StoreClass
-
 function Kit.Lib.Store(initial)
     local values = {}
     for key, value in pairs(initial or {}) do
@@ -15252,11 +14210,9 @@ function Kit.Lib.Store(initial)
     end
     return setmetatable({ Values = values, Watchers = {} }, Kit.Lib.StoreClass)
 end
-
 function Kit.Lib.StoreClass:Get(key)
     return self.Values[key]
 end
-
 function Kit.Lib.StoreClass:Set(key, value)
     local old = self.Values[key]
     if old == value then
@@ -15267,7 +14223,6 @@ function Kit.Lib.StoreClass:Set(key, value)
         task.spawn(watcher, value, old)
     end
 end
-
 function Kit.Lib.StoreClass:Watch(key, watcher)
     local list = self.Watchers[key] or {}
     self.Watchers[key] = list
@@ -15279,7 +14234,6 @@ function Kit.Lib.StoreClass:Watch(key, watcher)
         end
     end
 end
-
 function Kit.Lib.Debounce(wait, fn)
     local token = 0
     return function(...)
@@ -15293,7 +14247,6 @@ function Kit.Lib.Debounce(wait, fn)
         end)
     end
 end
-
 function Kit.Lib.Throttle(gap, fn)
     local last = -math.huge
     return function(...)
@@ -15303,14 +14256,11 @@ function Kit.Lib.Throttle(gap, fn)
         return fn(...)
     end
 end
-
 function Kit.Lib.Defer(fn, ...)
     return task.defer(fn, ...)
 end
-
 Kit.Lib.AsyncClass = {}
 Kit.Lib.AsyncClass.__index = Kit.Lib.AsyncClass
-
 function Kit.Lib.Async(fn, ...)
     local job = setmetatable({ Status = "Pending", Done = Kit.Lib.Signal.new() }, Kit.Lib.AsyncClass)
     local args = table.pack(...)
@@ -15324,13 +14274,11 @@ function Kit.Lib.Async(fn, ...)
     end)
     return job
 end
-
 function Kit.Lib.AsyncClass:Settle(status, values)
     if self.Status ~= "Pending" then return end
     self.Status, self.Values = status, values
     self.Done:Fire()
 end
-
 function Kit.Lib.AsyncClass:Timeout(seconds)
     task.delay(seconds, function()
         if self.Status ~= "Pending" then return end
@@ -15341,7 +14289,6 @@ function Kit.Lib.AsyncClass:Timeout(seconds)
     end)
     return self
 end
-
 function Kit.Lib.AsyncClass:On(status, handler)
     if self.Status == status then
         task.spawn(handler, table.unpack(self.Values, 1, self.Values.n))
@@ -15354,22 +14301,18 @@ function Kit.Lib.AsyncClass:On(status, handler)
     end
     return self
 end
-
 function Kit.Lib.AsyncClass:Then(handler)
     return self:On("Resolved", handler)
 end
-
 function Kit.Lib.AsyncClass:Catch(handler)
     return self:On("Rejected", handler)
 end
-
 function Kit.Lib.AsyncClass:Await()
     if self.Status == "Pending" then
         self.Done:Wait()
     end
     return self.Status == "Resolved", table.unpack(self.Values, 1, self.Values.n)
 end
-
 function Kit.Lib.Await(target, timeout, ...)
     if type(target) == "function" then
         return Util.Await(timeout, target, ...)
@@ -15385,7 +14328,6 @@ function Kit.Lib.Await(target, timeout, ...)
     conn:Disconnect()
     return table.unpack(results, 1, results.n)
 end
-
 function Kit.Lib.Retry(fn, attempts, base)
     local wait = base or Kit.Lib.Config.RetryBase
     local results
@@ -15401,14 +14343,11 @@ function Kit.Lib.Retry(fn, attempts, base)
     end
     return table.unpack(results, 1, results.n)
 end
-
 Kit.Lib.Logger = {}
 Kit.Lib.Logger.__index = Kit.Lib.Logger
-
 function Kit.Lib.Log(name, toFile)
     return setmetatable({ Name = name, File = toFile and (Kit.Lib.Config.LogFolder .. "/" .. Util.Sanitize(name) .. ".log") or nil }, Kit.Lib.Logger)
 end
-
 function Kit.Lib.Logger:Write(level, ...)
     local parts = table.pack(...)
     for index = 1, parts.n do
@@ -15430,13 +14369,10 @@ function Kit.Lib.Logger:Write(level, ...)
         end
     end
 end
-
 function Kit.Lib.Logger:Info(...) self:Write("INFO", ...) end
 function Kit.Lib.Logger:Warn(...) self:Write("WARN", ...) end
 function Kit.Lib.Logger:Error(...) self:Write("ERROR", ...) end
-
 Kit.Lib.Logs = Kit.Lib.Log("Library")
-
 function Kit.Lib.New(class, props, children)
     local inst = Instance.new(class)
     local parent
@@ -15455,7 +14391,6 @@ function Kit.Lib.New(class, props, children)
     inst.Parent = parent
     return inst
 end
-
 function Kit.Lib.Find(root, path, timeout)
     local node = root
     local deadline = os.clock() + (timeout or 0)
@@ -15471,7 +14406,6 @@ function Kit.Lib.Find(root, path, timeout)
     end
     return node
 end
-
 function Kit.Lib.Memo(ttl, fn)
     local cache = {}
     local memo = setmetatable({}, {
@@ -15490,12 +14424,9 @@ function Kit.Lib.Memo(ttl, fn)
     end
     return memo
 end
-
 Kit.Lib.Cache = Kit.Lib.Memo
-
 Kit.Lib.RemoteClass = {}
 Kit.Lib.RemoteClass.__index = Kit.Lib.RemoteClass
-
 function Kit.Lib.Remote(path, cooldown)
     local handle = setmetatable({ Path = path }, Kit.Lib.RemoteClass)
     if cooldown then
@@ -15503,23 +14434,18 @@ function Kit.Lib.Remote(path, cooldown)
     end
     return handle
 end
-
 function Kit.Lib.RemoteClass:Get()
     return Kit.Remote.Find(self.Path)
 end
-
 function Kit.Lib.RemoteClass:Fire(...)
     return Kit.Remote.Fire(self.Path, ...)
 end
-
 function Kit.Lib.RemoteClass:Invoke(...)
     return Kit.Remote.Invoke(self.Path, ...)
 end
-
 function Kit.Lib.RemoteClass:Report(accepted, floor)
     Kit.Remote.Report(self.Path, accepted, floor)
 end
-
 function Kit.Lib.Option(idx)
     local option = Library.Options[idx]
     if not option then
@@ -15527,14 +14453,12 @@ function Kit.Lib.Option(idx)
     end
     return option
 end
-
 function Kit.Lib.Bind(idx, fn)
     local option = Kit.Lib.Option(idx)
     if not option then return end
     option:OnChanged(fn)
     task.spawn(fn, option.Value)
 end
-
 function Kit.Lib.When(idx, value, fn)
     local option = Kit.Lib.Option(idx)
     if not option then return end
@@ -15544,7 +14468,6 @@ function Kit.Lib.When(idx, value, fn)
         end
     end)
 end
-
 function Kit.Lib.Loop(idx, interval, fn, options)
     local maid = Kit.Lib.Root:Give(Kit.Lib.Maid.new())
     local job = "Loop:" .. idx
@@ -15566,7 +14489,6 @@ function Kit.Lib.Loop(idx, interval, fn, options)
     end)
     return maid
 end
-
 function Kit.Lib.Status(idx, fn, interval)
     local job = "Status:" .. idx
     Kit.Scheduler.Add(job, function()
@@ -15583,14 +14505,11 @@ function Kit.Lib.Status(idx, fn, interval)
         end
     end, { Interval = interval or 1 })
 end
-
 Library.Kit = Kit
-
 Kit.Platform = Platform
 Kit.Maid = Kit.Lib.Root:Give(Kit.Lib.Maid.new())
 Kit.Log = Kit.Lib.Log("UI Kit")
 Kit.Modules = {}
-
 Kit.Config = {
     ProbeTimeout = 1,
     InvokeTimeout = 8,
@@ -15629,7 +14548,6 @@ Kit.Config = {
     Discord = "https://discord.gg/sl8",
     DiscordNotify = 8,
 }
-
 do
     local resolved = {
         Request = request or http_request or (syn and syn.request),
@@ -15658,15 +14576,12 @@ do
         Util[name] = value
     end
 end
-
 function Kit.T(english)
     return Library:T(english)
 end
-
 function Kit.Connect(signal, handler)
     return Kit.Maid:Give(signal:Connect(handler))
 end
-
 function Util.Send(options)
     if not Util.Request then
         return nil
@@ -15674,7 +14589,6 @@ function Util.Send(options)
     local finished, response = Util.Await(Config.HttpTimeout, Util.Request, options)
     return finished and type(response) == "table" and response or nil
 end
-
 function Util.Unhook(target, rehook)
     local api = Util
     if target and api.RestoreFunction and pcall(api.RestoreFunction, target) then
@@ -15684,7 +14598,6 @@ function Util.Unhook(target, rehook)
     end
     rehook()
 end
-
 function Util.HookMeta(object, method, handler)
     local api = Util
     local wrapped = api.NewCClosure and api.NewCClosure(handler) or handler
@@ -15726,14 +14639,12 @@ function Util.HookMeta(object, method, handler)
     end
     return original, restore
 end
-
 function Util.RestoreAll()
     for index = #Util.Restores, 1, -1 do
         Util.Try(Util.Restores[index])
     end
     table.clear(Util.Restores)
 end
-
 function Util.ReadFile(path)
     if not Util.FileApi() or not Util.SafeFile(isfile, path) then
         return nil
@@ -15741,7 +14652,6 @@ function Util.ReadFile(path)
     local text = Util.SafeFile(readfile, path)
     return type(text) == "string" and text or nil
 end
-
 function Util.WriteFile(path, text)
     if not Util.FileApi() then
         return false
@@ -15752,7 +14662,6 @@ function Util.WriteFile(path, text)
     end
     return Util.SafeFile(writefile, path, text) ~= nil
 end
-
 Kit.Caps = setmetatable({ Probes = {} }, {
     __index = function(caps, name)
         local probe = rawget(caps, "Probes")[name]
@@ -15765,7 +14674,6 @@ Kit.Caps = setmetatable({ Probes = {} }, {
         return has
     end,
 })
-
 Kit.Caps.Probes.Hook = function()
     local api = Util
     if not (api.HookFunction and api.GetNamecallMethod and (api.HookMetamethod or api.GetRawMetatable)) then
@@ -15783,7 +14691,6 @@ Kit.Caps.Probes.Hook = function()
     end
     return works
 end
-
 Kit.Caps.Probes.Connections = function()
     if not Util.GetConnections then
         return false
@@ -15795,7 +14702,6 @@ Kit.Caps.Probes.Connections = function()
     event:Destroy()
     return type(list) == "table" and #list >= 1
 end
-
 Kit.Caps.Probes.Gc = function()
     if not Util.GetGc then
         return false
@@ -15803,7 +14709,6 @@ Kit.Caps.Probes.Gc = function()
     local found = Util.GetGc()
     return type(found) == "table" and #found > 0
 end
-
 Kit.Caps.Probes.Upvalues = function()
     if not Util.GetUpvalue then
         return false
@@ -15814,7 +14719,6 @@ Kit.Caps.Probes.Upvalues = function()
     end
     return Util.GetUpvalue(Holder, 1) == marker
 end
-
 Kit.Caps.Probes.Drawing = function()
     if type(Drawing) ~= "table" and type(Drawing) ~= "userdata" then
         return false
@@ -15824,40 +14728,31 @@ Kit.Caps.Probes.Drawing = function()
     remove(line)
     return true
 end
-
 Kit.Caps.Probes.FileSystem = function()
     local stamp = tostring(os.clock())
     return Util.WriteFile(Kit.Config.ProbeFile, stamp) and Util.ReadFile(Kit.Config.ProbeFile) == stamp
 end
-
 Kit.Caps.Probes.Hui = function()
     return type(gethui) == "function" and typeof(gethui()) == "Instance"
 end
-
 Kit.Caps.Probes.Http = function()
     return Util.Request ~= nil
 end
-
 Kit.Caps.Probes.Queue = function()
     return Util.QueueOnTeleport ~= nil
 end
-
 Kit.Caps.Probes.Clipboard = function()
     return type(setclipboard or toclipboard) == "function"
 end
-
 Kit.Caps.Probes.Signals = function()
     return Util.FireSignal ~= nil
 end
-
 Kit.Caps.Probes.Prompt = function()
     return Util.FirePrompt ~= nil
 end
-
 Kit.Caps.Probes.Touch = function()
     return Util.FireTouch ~= nil
 end
-
 function Kit.Caps.NeedCap(option, cap)
     option = type(option) == "string" and Library.Options[option] or option
     if type(option) ~= "table" or type(option.OnChanged) ~= "function" then
@@ -15872,9 +14767,7 @@ function Kit.Caps.NeedCap(option, cap)
         task.defer(option.SetValue, option, false)
     end)
 end
-
 Kit.Override = { Groups = {} }
-
 function Kit.Override.Write(entry, value)
     entry.Writing = true
     local ok = pcall(function()
@@ -15883,7 +14776,6 @@ function Kit.Override.Write(entry, value)
     entry.Writing = false
     return ok
 end
-
 function Kit.Override.Set(group, inst, prop, value, enforce)
     local entries = Kit.Override.Groups[group]
     if not entries then
@@ -15920,7 +14812,6 @@ function Kit.Override.Set(group, inst, prop, value, enforce)
     end
     return written
 end
-
 function Kit.Override.Release(entry)
     for _, key in ipairs({ "Conn", "Gone", "Return" }) do
         if entry[key] then
@@ -15929,7 +14820,6 @@ function Kit.Override.Release(entry)
         end
     end
 end
-
 function Kit.Override.Drop(entries, entry)
     Kit.Override.Release(entry)
     local index = table.find(entries, entry)
@@ -15937,7 +14827,6 @@ function Kit.Override.Drop(entries, entry)
         table.remove(entries, index)
     end
 end
-
 function Kit.Override.PutBack(entry)
     Kit.Override.Release(entry)
     local inst = entry.Instance
@@ -15952,7 +14841,6 @@ function Kit.Override.PutBack(entry)
         Kit.Override.Release(entry)
     end)
 end
-
 function Kit.Override.Restore(group)
     local entries = Kit.Override.Groups[group]
     if not entries then
@@ -15963,15 +14851,12 @@ function Kit.Override.Restore(group)
         Kit.Override.PutBack(entries[index])
     end
 end
-
 function Kit.Override.RestoreAll()
     for group in pairs(Kit.Override.Groups) do
         Kit.Override.Restore(group)
     end
 end
-
 Kit.Scheduler = { Jobs = {}, Lanes = { Tick = {}, Render = {}, Physics = {} }, Snapshots = { Tick = {}, Render = {}, Physics = {} }, Bound = {} }
-
 function Kit.Scheduler.Add(name, run, options)
     options = options or {}
     Kit.Scheduler.Remove(name)
@@ -15992,7 +14877,6 @@ function Kit.Scheduler.Add(name, run, options)
     Kit.Scheduler.Bind(job.Lane)
     return job
 end
-
 function Kit.Scheduler.Remove(name)
     local job = Kit.Scheduler.Jobs[name]
     if not job then
@@ -16012,18 +14896,15 @@ function Kit.Scheduler.Remove(name)
         Kit.Scheduler.Unbind(job.Lane)
     end
 end
-
 function Kit.Scheduler.Has(name)
     return Kit.Scheduler.Jobs[name] ~= nil
 end
-
 function Kit.Scheduler.SetInterval(name, interval)
     local job = Kit.Scheduler.Jobs[name]
     if job then
         job.Interval = interval
     end
 end
-
 function Kit.Scheduler.Bind(laneName)
     local bound = Kit.Scheduler.Bound
     if bound[laneName] then
@@ -16044,7 +14925,6 @@ function Kit.Scheduler.Bind(laneName)
         end)
     end
 end
-
 function Kit.Scheduler.Unbind(laneName)
     local bound = Kit.Scheduler.Bound[laneName]
     if not bound then
@@ -16057,7 +14937,6 @@ function Kit.Scheduler.Unbind(laneName)
         bound:Disconnect()
     end
 end
-
 function Kit.Scheduler.Step(laneName, deltaTime)
     local lane = Kit.Scheduler.Lanes[laneName]
     local snapshot = Kit.Scheduler.Snapshots[laneName]
@@ -16074,7 +14953,6 @@ function Kit.Scheduler.Step(laneName, deltaTime)
         end
     end
 end
-
 function Kit.Scheduler.Spawn(job, deltaTime, now)
     local thread = job.Thread
     if thread and coroutine.status(thread) ~= "dead" then
@@ -16085,7 +14963,6 @@ function Kit.Scheduler.Spawn(job, deltaTime, now)
     job.Started = now
     job.Thread = task.spawn(Kit.Scheduler.Call, job, deltaTime)
 end
-
 function Kit.Scheduler.Call(job, deltaTime)
     local ok, err = pcall(job.Run, deltaTime)
     if ok then
@@ -16099,7 +14976,6 @@ function Kit.Scheduler.Call(job, deltaTime)
         Kit.Scheduler.Remove(job.Name)
     end
 end
-
 function Kit.Scheduler.Status()
     local count = 0
     for _ in pairs(Kit.Scheduler.Jobs) do
@@ -16107,7 +14983,6 @@ function Kit.Scheduler.Status()
     end
     return count == 0 and "Idle" or (count .. " jobs")
 end
-
 function Kit.Scheduler.Stop()
     for name in pairs(Kit.Scheduler.Jobs) do
         Kit.Scheduler.Remove(name)
@@ -16116,10 +14991,8 @@ function Kit.Scheduler.Stop()
         Kit.Scheduler.Unbind(laneName)
     end
 end
-
 Kit.Fsm = {}
 Kit.Fsm.__index = Kit.Fsm
-
 function Kit.Fsm.new(spec)
     local machine = setmetatable({
         Name = spec.Name or "Fsm",
@@ -16130,7 +15003,6 @@ function Kit.Fsm.new(spec)
     machine:Go(machine.Initial)
     return machine
 end
-
 function Kit.Fsm:Go(name, note)
     local state = self.States[name]
     if not state then
@@ -16147,11 +15019,9 @@ function Kit.Fsm:Go(name, note)
     end
     return true
 end
-
 function Kit.Fsm:Elapsed()
     return os.clock() - self.Entered
 end
-
 function Kit.Fsm:Step(deltaTime)
     local state = self.States[self.State]
     if state.Timeout and self:Elapsed() > state.Timeout then
@@ -16173,21 +15043,17 @@ function Kit.Fsm:Step(deltaTime)
     end
     return false
 end
-
 function Kit.Fsm:Reset()
     self:Go(self.Initial)
 end
-
 function Kit.Fsm:Status()
     return self.Note and (self.State .. " · " .. tostring(self.Note)) or self.State
 end
-
 Kit.Arbiter = {
     Claims = {},
     Sequence = 0,
     Priority = { Escape = 100, Heal = 100, Event = 80, Boss = 80, Quest = 60, Farm = 40, Collect = 20 },
 }
-
 function Kit.Arbiter.Request(claim)
     local claims = Kit.Arbiter.Claims
     if table.find(claims, claim) then
@@ -16216,7 +15082,6 @@ function Kit.Arbiter.Request(claim)
     end
     return true
 end
-
 function Kit.Arbiter.Release(claim)
     local claims = Kit.Arbiter.Claims
     local index = table.find(claims, claim)
@@ -16235,26 +15100,20 @@ function Kit.Arbiter.Release(claim)
         Util.Try(resumed.OnResume, resumed)
     end
 end
-
 function Kit.Arbiter.Owns(claim)
     return Kit.Arbiter.Claims[1] == claim
 end
-
 function Kit.Arbiter.Current()
     return Kit.Arbiter.Claims[1]
 end
-
 function Kit.Arbiter.Status()
     local top = Kit.Arbiter.Claims[1]
     return top and tostring(top.Name) or "Idle"
 end
-
 function Kit.Arbiter.Stop()
     table.clear(Kit.Arbiter.Claims)
 end
-
 Kit.Game = { Modules = {} }
-
 function Kit.Game.Resolve(path, root)
     local node = root
     for segment in path:gmatch("[^%./]+") do
@@ -16270,7 +15129,6 @@ function Kit.Game.Resolve(path, root)
     end
     return node
 end
-
 function Kit.Game.Require(target)
     if type(target) == "string" then
         target = Kit.Game.Resolve(target)
@@ -16289,7 +15147,6 @@ function Kit.Game.Require(target)
     Kit.Game.Modules[target] = ok and value or false
     return ok and value or nil
 end
-
 function Kit.Game.HasKeys(candidate, keys)
     for _, key in ipairs(keys) do
         if rawget(candidate, key) == nil then
@@ -16298,7 +15155,6 @@ function Kit.Game.HasKeys(candidate, keys)
     end
     return true
 end
-
 function Kit.Game.FindTable(keys)
     if Util.FilterGc then
         local ok, found = pcall(Util.FilterGc, "table", { Keys = keys }, true)
@@ -16316,7 +15172,6 @@ function Kit.Game.FindTable(keys)
     end
     return nil
 end
-
 function Kit.Game.FindFunction(name)
     if Util.FilterGc then
         local ok, found = pcall(Util.FilterGc, "function", { Name = name, IgnoreExecutor = true }, true)
@@ -16334,7 +15189,6 @@ function Kit.Game.FindFunction(name)
     end
     return nil
 end
-
 function Kit.Game.Upvalue(fn, index)
     if not Util.GetUpvalue then
         return nil
@@ -16342,16 +15196,13 @@ function Kit.Game.Upvalue(fn, index)
     local ok, value = pcall(Util.GetUpvalue, fn, index)
     return ok and value or nil
 end
-
 function Kit.Game.SetUpvalue(fn, index, value)
     if not Util.SetUpvalue then
         return false
     end
     return (pcall(Util.SetUpvalue, fn, index, value))
 end
-
 Kit.Remote = { Cache = {}, Gates = {}, Classes = { RemoteEvent = true, RemoteFunction = true, UnreliableRemoteEvent = true } }
-
 function Kit.Remote.Find(query, root)
     if typeof(query) == "Instance" then
         return query
@@ -16372,7 +15223,6 @@ function Kit.Remote.Find(query, root)
     Kit.Remote.Cache[query] = found
     return found
 end
-
 function Kit.Remote.Search(name, root)
     local quick = root:FindFirstChild(name, true)
     if quick and Kit.Remote.Classes[quick.ClassName] then
@@ -16385,7 +15235,6 @@ function Kit.Remote.Search(name, root)
     end
     return nil
 end
-
 function Kit.Remote.Gate(remote)
     local gate = Kit.Remote.Gates[remote]
     if not gate then
@@ -16394,7 +15243,6 @@ function Kit.Remote.Gate(remote)
     end
     return gate
 end
-
 function Kit.Remote.SetCooldown(query, seconds)
     local remote = Kit.Remote.Find(query)
     if not remote then
@@ -16403,13 +15251,11 @@ function Kit.Remote.SetCooldown(query, seconds)
     local gate = Kit.Remote.Gate(remote)
     gate.Cooldown, gate.Floor = seconds, seconds
 end
-
 function Kit.Remote.Ready(query)
     local remote = Kit.Remote.Find(query)
     local gate = remote and Kit.Remote.Gates[remote]
     return not gate or os.clock() - gate.Last >= gate.Cooldown
 end
-
 function Kit.Remote.Report(query, accepted, floor)
     local remote = Kit.Remote.Find(query)
     if not remote then
@@ -16427,7 +15273,6 @@ function Kit.Remote.Report(query, accepted, floor)
     end
     gate.Cooldown = math.max(gate.Cooldown * Kit.Config.RemoteBackoff, now - gate.LastAccepted, gate.Floor)
 end
-
 function Kit.Remote.Fire(query, ...)
     local remote = Kit.Remote.Find(query)
     if not remote then
@@ -16440,7 +15285,6 @@ function Kit.Remote.Fire(query, ...)
     local ok, err = pcall(remote.FireServer, remote, ...)
     return ok, not ok and tostring(err) or nil
 end
-
 function Kit.Remote.Invoke(query, ...)
     local remote = Kit.Remote.Find(query)
     if not remote or not remote:IsA("RemoteFunction") then
@@ -16452,9 +15296,7 @@ function Kit.Remote.Invoke(query, ...)
     Kit.Remote.Gate(remote).Last = os.clock()
     return Util.Await(Kit.Config.InvokeTimeout, remote.InvokeServer, remote, ...)
 end
-
 Kit.Stats = { Tracked = {} }
-
 function Kit.Stats.Entry(name)
     local entry = Kit.Stats.Tracked[name]
     if not entry then
@@ -16463,7 +15305,6 @@ function Kit.Stats.Entry(name)
     end
     return entry
 end
-
 function Kit.Stats.Track(name, read, widget)
     local entry = Kit.Stats.Entry(name)
     entry.Read, entry.Widget = read, widget
@@ -16476,20 +15317,17 @@ function Kit.Stats.Track(name, read, widget)
     end
     Kit.Stats.Push(entry)
 end
-
 function Kit.Stats.Add(name, amount, widget)
     local entry = Kit.Stats.Entry(name)
     entry.Widget = widget or entry.Widget
     entry.Value += amount
     Kit.Stats.Push(entry)
 end
-
 function Kit.Stats.Push(entry)
     if entry.Widget and entry.Widget.SetValue then
         Util.Try(entry.Widget.SetValue, entry.Widget, entry.Value)
     end
 end
-
 function Kit.Stats.Sample()
     for _, entry in pairs(Kit.Stats.Tracked) do
         if not entry.Read then continue end
@@ -16500,7 +15338,6 @@ function Kit.Stats.Sample()
         end
     end
 end
-
 function Kit.Stats.Get(name)
     local entry = Kit.Stats.Tracked[name]
     if not entry then
@@ -16510,20 +15347,16 @@ function Kit.Stats.Get(name)
     local hours = math.max(os.clock() - entry.StartTime, 1) / 3600
     return entry.Value, gained, gained / hours
 end
-
 function Kit.Stats.Reset(name)
     local entry = Kit.Stats.Tracked[name]
     if entry then
         entry.Start, entry.StartTime = entry.Value, os.clock()
     end
 end
-
 function Kit.Stats.Stop()
     table.clear(Kit.Stats.Tracked)
 end
-
 Kit.Overlay = {}
-
 function Kit.Overlay.Screen()
     local screen = Kit.Overlay.Gui
     if screen and screen.Parent then
@@ -16539,7 +15372,6 @@ function Kit.Overlay.Screen()
     Kit.Overlay.Gui = screen
     return screen
 end
-
 function Kit.Overlay.Folder()
     local folder = Kit.Overlay.Holder
     if folder and folder.Parent then
@@ -16551,7 +15383,6 @@ function Kit.Overlay.Folder()
     Kit.Overlay.Holder = folder
     return folder
 end
-
 function Kit.Overlay.Stop()
     for _, key in ipairs({ "Gui", "Holder" }) do
         if Kit.Overlay[key] then
@@ -16560,9 +15391,7 @@ function Kit.Overlay.Stop()
         end
     end
 end
-
 Kit.Ui = {}
-
 function Kit.Ui.Group(target, side, name, icon)
     if type(target.AddLeftGroupbox) ~= "function" then
         if target.KitUsed then
@@ -16573,19 +15402,15 @@ function Kit.Ui.Group(target, side, name, icon)
     end
     return side == "Right" and target:AddRightGroupbox(name, icon) or target:AddLeftGroupbox(name, icon)
 end
-
 function Kit.Ui.Notify(english, kind)
     Library:Notify("Notification", Kit.T(english), 3, kind or "Info")
 end
-
 function Kit.Ui.Key(toggle, idx, default)
     toggle:AddKeyPicker(idx, { Default = Platform.Touch and "None" or (default or "None"), Mode = "Toggle", FloatButton = true })
     return toggle
 end
-
 function Kit.Switchable(module)
     module.Active = module.Active or {}
-
     function module.Set(name, enabled)
         local feature = module.Features[name]
         if not feature then
@@ -16603,21 +15428,18 @@ function Kit.Switchable(module)
         local ok = Util.Try(enabled and feature.Enable or feature.Disable)
         return ok
     end
-
     function module.Refresh(name)
         local feature = module.Features[name]
         if feature and module.Active[name] and (not module.Ready or module.Ready()) then
             Util.Try(feature.Enable)
         end
     end
-
     function module.Stop()
         for name in pairs(module.Active) do
             Util.Try(module.Features[name].Disable)
         end
         table.clear(module.Active)
     end
-
     function module.Status()
         local names = {}
         for name in pairs(module.Active) do
@@ -16626,11 +15448,9 @@ function Kit.Switchable(module)
         table.sort(names)
         return #names == 0 and "Idle" or table.concat(names, ", ")
     end
-
     table.insert(Kit.Modules, module)
     return module
 end
-
 function Kit.Cleanup()
     for _, module in ipairs(Kit.Modules) do
         Util.Try(module.Stop)
@@ -16643,9 +15463,7 @@ function Kit.Cleanup()
     Kit.Maid:Cleanup()
     Kit.Overlay.Stop()
 end
-
 Kit.Lib.Root:Give(Kit.Cleanup)
-
 Kit.Player = {
     Parts = {},
     CharConns = {},
@@ -16657,7 +15475,6 @@ Kit.Player = {
         FlySpeed = Kit.Config.Player.FlySpeed,
     },
 }
-
 function Kit.Player.Ensure()
     if Kit.Player.Bound then
         return
@@ -16670,7 +15487,6 @@ function Kit.Player.Ensure()
         Kit.Player.Bind(char, true)
     end)
 end
-
 function Kit.Player.Bind(char, wait)
     local player = Kit.Player
     player.Character = char
@@ -16703,7 +15519,6 @@ function Kit.Player.Bind(char, wait)
         task.spawn(Util.Try, handler, char, hum, root)
     end
 end
-
 function Kit.Player.OnRespawn(handler)
     Kit.Player.Ensure()
     table.insert(Kit.Player.RespawnHandlers, handler)
@@ -16714,28 +15529,23 @@ function Kit.Player.OnRespawn(handler)
         end
     end
 end
-
 function Kit.Player.Ready()
     Kit.Player.Ensure()
     return Kit.Player.Humanoid ~= nil and Kit.Player.Humanoid.Parent ~= nil
 end
-
 function Kit.Player.Alive()
     local hum = Kit.Player.Humanoid
     return hum ~= nil and hum.Parent ~= nil and hum.Health > 0
 end
-
 function Kit.Player.SetValue(name, value)
     Kit.Player.Values[name] = value
     if name == "WalkSpeed" or name == "JumpPower" then
         Kit.Player.Refresh(name)
     end
 end
-
 function Kit.Player.Typing()
     return UserInputService:GetFocusedTextBox() ~= nil
 end
-
 function Kit.Player.KeysDown(names)
     for _, name in ipairs(names) do
         if UserInputService:IsKeyDown(Enum.KeyCode[name]) then
@@ -16744,7 +15554,6 @@ function Kit.Player.KeysDown(names)
     end
     return false
 end
-
 function Kit.Player.FlyStep()
     local root, hum = Kit.Player.Root, Kit.Player.Humanoid
     if not root or not hum then return end
@@ -16764,7 +15573,6 @@ function Kit.Player.FlyStep()
     end
     root.AssemblyLinearVelocity = velocity.Magnitude > 0 and velocity.Unit * Kit.Player.Values.FlySpeed or Vector3.zero
 end
-
 function Kit.Player.NoclipStep()
     local saved = Kit.Player.NoclipSaved
     for _, part in ipairs(Kit.Player.Parts) do
@@ -16776,7 +15584,6 @@ function Kit.Player.NoclipStep()
         end
     end
 end
-
 function Kit.Player.NoclipRestore()
     for part, collide in pairs(Kit.Player.NoclipSaved) do
         if part.Parent then
@@ -16785,7 +15592,6 @@ function Kit.Player.NoclipRestore()
     end
     table.clear(Kit.Player.NoclipSaved)
 end
-
 function Kit.Player.DownParams()
     local params = Kit.Player.Params
     if not params then
@@ -16799,7 +15605,6 @@ function Kit.Player.DownParams()
     params.FilterDescendantsInstances = Kit.Player.Ignore
     return params
 end
-
 function Kit.Player.WaterStep()
     local root = Kit.Player.Root
     local plate = Kit.Player.Plate
@@ -16816,7 +15621,6 @@ function Kit.Player.WaterStep()
         plate.CFrame = CFrame.new(0, -1e5, 0)
     end
 end
-
 function Kit.Player.FallStep()
     local root = Kit.Player.Root
     if not root then return end
@@ -16829,7 +15633,6 @@ function Kit.Player.FallStep()
         root.AssemblyLinearVelocity = Vector3.new(velocity.X, config.FallSoft, velocity.Z)
     end
 end
-
 Kit.Player.Features = {
     WalkSpeed = {
         Enable = function()
@@ -16922,14 +15725,11 @@ Kit.Player.Features = {
         end,
     },
 }
-
 Kit.Switchable(Kit.Player)
-
 function Kit.Player.Build(target)
     local T = Kit.T
     local config = Kit.Config.Player
     local move = Kit.Ui.Group(target, "Left", T("Movement"), "speed")
-
     Kit.Ui.Key(move:AddToggle("KitWalkSpeed", {
         Text = T("WalkSpeed"), Icon = "speed",
         Callback = function(on) Kit.Player.Set("WalkSpeed", on) end,
@@ -16938,7 +15738,6 @@ function Kit.Player.Build(target)
         Text = T("Speed"), Icon = "speed", Min = 16, Max = config.MaxWalkSpeed, Default = config.WalkSpeed, Step = 1,
         Callback = function(value) Kit.Player.SetValue("WalkSpeed", value) end,
     })
-
     Kit.Ui.Key(move:AddToggle("KitJumpPower", {
         Text = T("JumpPower"), Icon = "jump",
         Callback = function(on) Kit.Player.Set("JumpPower", on) end,
@@ -16947,7 +15746,6 @@ function Kit.Player.Build(target)
         Text = T("Power"), Icon = "jump", Min = 50, Max = config.MaxJumpPower, Default = config.JumpPower, Step = 1,
         Callback = function(value) Kit.Player.SetValue("JumpPower", value) end,
     })
-
     Kit.Ui.Key(move:AddToggle("KitFly", {
         Text = T("Fly"), Icon = "fly",
         Description = T("Space/E up, Q down"),
@@ -16957,7 +15755,6 @@ function Kit.Player.Build(target)
         Text = T("Fly Speed"), Icon = "fly", Min = 10, Max = config.MaxFlySpeed, Default = config.FlySpeed, Step = 5,
         Callback = function(value) Kit.Player.SetValue("FlySpeed", value) end,
     })
-
     Kit.Ui.Key(move:AddToggle("KitNoclip", {
         Text = T("Noclip"), Icon = "noclip",
         Callback = function(on) Kit.Player.Set("Noclip", on) end,
@@ -16966,7 +15763,6 @@ function Kit.Player.Build(target)
         Text = T("Infinite Jump"), Icon = "infjump",
         Callback = function(on) Kit.Player.Set("InfJump", on) end,
     })
-
     local body = Kit.Ui.Group(target, "Right", T("Character"), "player")
     body:AddToggle("KitWalkOnWater", {
         Text = T("Walk on Water"), Icon = "walkwater",
@@ -16984,19 +15780,14 @@ function Kit.Player.Build(target)
     })
     return move, body
 end
-
 Kit.World = { Values = { Time = Kit.Config.World.Time }, Effects = {} }
-
 function Kit.World.Lighting()
     return game:GetService("Lighting")
 end
-
 function Kit.World.Atmosphere()
     return Kit.World.Lighting():FindFirstChildOfClass("Atmosphere")
 end
-
 Kit.World.EffectClasses = { ParticleEmitter = true, Trail = true, Beam = true, Smoke = true, Fire = true, Sparkles = true }
-
 function Kit.World.QuietEffects()
     local batch = Kit.Config.World.ScanBatch
     local list = Workspace:GetDescendants()
@@ -17010,7 +15801,6 @@ function Kit.World.QuietEffects()
         end
     end
 end
-
 Kit.World.Features = {
     Fullbright = {
         Enable = function()
@@ -17069,14 +15859,11 @@ Kit.World.Features = {
         end,
     },
 }
-
 Kit.Switchable(Kit.World)
-
 function Kit.World.SetTime(hour)
     Kit.World.Values.Time = hour
     Kit.World.Refresh("TimeLock")
 end
-
 function Kit.World.Build(target)
     local T = Kit.T
     local group = Kit.Ui.Group(target, "Right", T("World"), "sun")
@@ -17094,9 +15881,7 @@ function Kit.World.Build(target)
     })
     return group
 end
-
 Kit.AntiAfk = { Disabled = {} }
-
 function Kit.AntiAfk.Start()
     if Kit.AntiAfk.Running then
         return
@@ -17115,7 +15900,6 @@ function Kit.AntiAfk.Start()
         virtualUser:ClickButton2(Vector2.zero)
     end)
 end
-
 function Kit.AntiAfk.Stop()
     Kit.AntiAfk.Running = false
     for _, conn in ipairs(Kit.AntiAfk.Disabled) do
@@ -17127,29 +15911,22 @@ function Kit.AntiAfk.Stop()
         Kit.AntiAfk.Conn = nil
     end
 end
-
 function Kit.AntiAfk.Status()
     return Kit.AntiAfk.Running and "On" or "Off"
 end
-
 table.insert(Kit.Modules, Kit.AntiAfk)
-
 Kit.Server = {}
-
 function Kit.Server.TeleportService()
     return game:GetService("TeleportService")
 end
-
 function Kit.Server.Queue(source)
     Kit.Server.Source = source
 end
-
 function Kit.Server.Prepare()
     if Kit.Server.Source and Util.QueueOnTeleport then
         pcall(Util.QueueOnTeleport, Kit.Server.Source)
     end
 end
-
 function Kit.Server.Rejoin()
     Kit.Server.Prepare()
     local teleport = Kit.Server.TeleportService()
@@ -17159,7 +15936,6 @@ function Kit.Server.Rejoin()
         teleport:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
     end
 end
-
 function Kit.Server.List()
     local found, cursor = {}, nil
     for _ = 1, Kit.Config.Server.HopPages do
@@ -17177,7 +15953,6 @@ function Kit.Server.List()
     end
     return #found > 0 and found or nil
 end
-
 function Kit.Server.Hop(mode)
     local servers = Kit.Server.List()
     if not servers then
@@ -17201,7 +15976,6 @@ function Kit.Server.Hop(mode)
     end
     return ok
 end
-
 function Kit.Server.Start()
     if Kit.Server.KickConn then
         return
@@ -17217,20 +15991,16 @@ function Kit.Server.Start()
         end)
     end)
 end
-
 function Kit.Server.Stop()
     if Kit.Server.KickConn then
         Kit.Server.KickConn:Disconnect()
         Kit.Server.KickConn = nil
     end
 end
-
 function Kit.Server.Status()
     return Kit.Server.KickConn and "Auto rejoin" or "Idle"
 end
-
 table.insert(Kit.Modules, Kit.Server)
-
 function Kit.Server.Build(target)
     local T = Kit.T
     local group = Kit.Ui.Group(target, "Right", T("Server"), "server")
@@ -17257,7 +16027,6 @@ function Kit.Server.Build(target)
     end)
     return group
 end
-
 Kit.Esp = {
     Categories = {},
     Order = {},
@@ -17311,7 +16080,6 @@ Kit.Esp = {
         },
     },
 }
-
 Kit.Esp.Bones = {
     R15 = {
         { "Head", "UpperTorso" }, { "UpperTorso", "LowerTorso" },
@@ -17324,7 +16092,6 @@ Kit.Esp.Bones = {
         { "Head", "Torso" }, { "Torso", "Left Arm" }, { "Torso", "Right Arm" }, { "Torso", "Left Leg" }, { "Torso", "Right Leg" },
     },
 }
-
 function Kit.Esp.AddCategory(name, spec)
     spec = spec or {}
     if not Kit.Esp.Categories[name] then
@@ -17342,21 +16109,17 @@ function Kit.Esp.AddCategory(name, spec)
     }
     return Kit.Esp.Categories[name]
 end
-
 function Kit.Esp.OnChanged(fn)
     table.insert(Kit.Esp.Listeners, fn)
 end
-
 function Kit.Esp.Changed()
     for _, listener in ipairs(Kit.Esp.Listeners) do
         Util.Try(listener)
     end
 end
-
 function Kit.Esp.PlayerSource()
     return Players:GetPlayers()
 end
-
 function Kit.Esp.SetCategory(name, enabled)
     local category = Kit.Esp.Categories[name]
     if category then
@@ -17364,7 +16127,6 @@ function Kit.Esp.SetCategory(name, enabled)
     end
     Kit.Esp.Changed()
 end
-
 function Kit.Esp.SetColor(name, color)
     local category = Kit.Esp.Categories[name]
     if category then
@@ -17372,7 +16134,6 @@ function Kit.Esp.SetColor(name, color)
     end
     Kit.Esp.Changed()
 end
-
 function Kit.Esp.Set(key, value)
     Kit.Esp.Settings[key] = value
     if key == "Rate" then
@@ -17380,11 +16141,9 @@ function Kit.Esp.Set(key, value)
     end
     Kit.Esp.Changed()
 end
-
 function Kit.Esp.SetFocus(model)
     Kit.Esp.FocusModel = model
 end
-
 function Kit.Esp.Gather(category)
     local source = category.Source
     if type(source) == "function" then
@@ -17399,7 +16158,6 @@ function Kit.Esp.Gather(category)
     end
     return type(source) == "table" and source or {}
 end
-
 function Kit.Esp.Resolve(target)
     if typeof(target) ~= "Instance" then
         return nil
@@ -17413,7 +16171,6 @@ function Kit.Esp.Resolve(target)
     end
     return nil
 end
-
 function Kit.Esp.Read(raw)
     if type(raw) ~= "table" then
         return nil, Kit.Esp.Resolve(raw)
@@ -17422,7 +16179,6 @@ function Kit.Esp.Read(raw)
     if typeof(model) ~= "Instance" or model == LocalPlayer.Character then return nil end
     return raw, model, raw.Player or Players:GetPlayerFromCharacter(model)
 end
-
 function Kit.Esp.Anchor(model, info)
     if info and typeof(info.Root) == "Instance" and info.Root.Parent then
         return info.Root
@@ -17432,7 +16188,6 @@ function Kit.Esp.Anchor(model, info)
     end
     return model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
 end
-
 function Kit.Esp.Relation(entry)
     local info, player = entry.Info, entry.Player
     if not entry.Character then return "Object" end
@@ -17447,14 +16202,12 @@ function Kit.Esp.Relation(entry)
     if friendly then return "Team" end
     return entry.Kind == "Bot" and "Bot" or "Enemy"
 end
-
 function Kit.Esp.Hostile(player)
     if not player or not Kit.Esp.Settings.TeamCheck then
         return true
     end
     return player.Team == nil or player.Team ~= LocalPlayer.Team
 end
-
 function Kit.Esp.Health(entry)
     local info, hum = entry.Info, entry.Humanoid
     local health = info and tonumber(info.Health)
@@ -17465,7 +16218,6 @@ function Kit.Esp.Health(entry)
     if not health then return nil end
     return health, (maxHealth and maxHealth > 0) and maxHealth or 100
 end
-
 function Kit.Esp.RawName(entry)
     local info, player, category = entry.Info, entry.Player, entry.Category
     if info and type(info.Name) == "string" then return info.Name end
@@ -17478,14 +16230,12 @@ function Kit.Esp.RawName(entry)
     end
     return entry.Model.Name
 end
-
 function Kit.Esp.Name(entry)
     local name = Kit.Esp.RawName(entry)
     if Kit.Esp.Mode ~= "Drawing" or not name:find("[\128-\255]") then return name end
     if entry.Player then return entry.Player.Name end
     return entry.Kind ~= "Object" and tostring(entry.Kind) or name
 end
-
 function Kit.Esp.Start()
     if Kit.Esp.Running then
         return
@@ -17496,7 +16246,6 @@ function Kit.Esp.Start()
     Kit.Scheduler.Add("KitEspSight", Kit.Esp.SightStep, { Interval = Kit.Config.Esp.SightRate })
     Kit.Scheduler.Add("KitEspDraw", Kit.Esp.Draw, { Lane = "Render", Priority = -10 })
 end
-
 function Kit.Esp.Stop()
     Kit.Esp.Running = false
     Kit.Scheduler.Remove("KitEspScan")
@@ -17513,7 +16262,6 @@ function Kit.Esp.Stop()
     table.clear(Kit.Esp.Sight)
     Kit.Esp.Radar.Destroy()
 end
-
 function Kit.Esp.Status()
     local count = 0
     for _ in pairs(Kit.Esp.Entries) do
@@ -17521,7 +16269,6 @@ function Kit.Esp.Status()
     end
     return Kit.Esp.Running and (count .. " shown") or "Off"
 end
-
 function Kit.Esp.Acquire(model)
     local entry = table.remove(Kit.Esp.Pool)
     while entry and entry.Mode ~= Kit.Esp.Mode do
@@ -17532,7 +16279,6 @@ function Kit.Esp.Acquire(model)
     entry.Model, entry.Visible, entry.Watching, entry.Measured = model, true, false, 0
     return entry
 end
-
 function Kit.Esp.Release(entry)
     Kit.Esp.HideAll(entry)
     Kit.Esp.SetChams(entry, false)
@@ -17543,7 +16289,6 @@ function Kit.Esp.Release(entry)
     entry.Model, entry.Part, entry.Head, entry.Humanoid, entry.Player, entry.Info, entry.BoneParts = nil, nil, nil, nil, nil, nil, nil
     table.insert(Kit.Esp.Pool, entry)
 end
-
 function Kit.Esp.Destroy(entry)
     for _, shape in pairs(entry.Shapes) do
         Kit.Esp.Shape.Remove(shape)
@@ -17554,7 +16299,6 @@ function Kit.Esp.Destroy(entry)
         entry.Chams = nil
     end
 end
-
 function Kit.Esp.Measure(entry)
     local model, part = entry.Model, entry.Part
     local now = os.clock()
@@ -17571,7 +16315,6 @@ function Kit.Esp.Measure(entry)
     entry.Offset = part.CFrame:ToObjectSpace(frame)
     entry.Size = Vector3.new(size.X, math.clamp(size.Y, Kit.Config.Esp.MinHeight, Kit.Config.Esp.MaxHeight), size.Z)
 end
-
 function Kit.Esp.MeasureBody(entry)
     local root = entry.Part.CFrame
     local low, high
@@ -17587,7 +16330,6 @@ function Kit.Esp.MeasureBody(entry)
     entry.Size = Vector3.new(size.X, math.clamp(size.Y, Kit.Config.Esp.MinHeight, Kit.Config.Esp.MaxHeight), size.Z)
     return true
 end
-
 function Kit.Esp.Bind(entry, model, info)
     entry.Head = info and typeof(info.Head) == "Instance" and info.Head or model:FindFirstChild("Head")
     entry.Humanoid = model:FindFirstChildOfClass("Humanoid")
@@ -17595,7 +16337,6 @@ function Kit.Esp.Bind(entry, model, info)
     entry.Kind = info and info.Kind or (entry.Player and "Player") or (entry.Character and "Bot") or "Object"
     entry.Relation = Kit.Esp.Relation(entry)
 end
-
 function Kit.Esp.FindBones(entry)
     local model = entry.Model
     local rig = model:FindFirstChild("UpperTorso") and Kit.Esp.Bones.R15 or model:FindFirstChild("Torso") and Kit.Esp.Bones.R6
@@ -17607,7 +16348,6 @@ function Kit.Esp.FindBones(entry)
     end
     entry.BoneParts = parts
 end
-
 function Kit.Esp.Wanted(entry)
     local tuning = Kit.Esp.Settings
     if tuning.TeamCheck and entry.Relation == "Team" then return false end
@@ -17616,7 +16356,6 @@ function Kit.Esp.Wanted(entry)
     if not health or not entry.Character then return true end
     return not (tuning.HideDead and health <= 0)
 end
-
 function Kit.Esp.Track(category, raw, origin, seen)
     local info, model, player = Kit.Esp.Read(raw)
     if not model or seen[model] or not model.Parent or model == Kit.Esp.Spectated then return end
@@ -17637,7 +16376,6 @@ function Kit.Esp.Track(category, raw, origin, seen)
     Kit.Esp.Measure(entry)
     entry.TopText, entry.BottomText = Kit.Esp.TopText(entry), Kit.Esp.BottomText(entry)
 end
-
 function Kit.Esp.Rank()
     local ranked = Kit.Esp.Ranked
     table.clear(ranked)
@@ -17648,7 +16386,6 @@ function Kit.Esp.Rank()
     table.clear(Kit.Esp.Sight)
     table.move(ranked, 1, #ranked, 1, Kit.Esp.Sight)
 end
-
 function Kit.Esp.Scan()
     local camera = Workspace.CurrentCamera
     if not camera then return end
@@ -17677,11 +16414,9 @@ function Kit.Esp.Scan()
         Kit.Esp.FocusModel = ok and model or nil
     end
 end
-
 Kit.Esp.Params = RaycastParams.new()
 Kit.Esp.Params.FilterType = Enum.RaycastFilterType.Exclude
 Kit.Esp.Filter = {}
-
 function Kit.Esp.LineOfSight(origin, part, model)
     local params, filter = Kit.Esp.Params, Kit.Esp.Filter
     table.clear(filter)
@@ -17696,7 +16431,6 @@ function Kit.Esp.LineOfSight(origin, part, model)
     end
     return false
 end
-
 function Kit.Esp.Watching(entry, origin)
     local head = entry.Head
     if not Kit.Esp.Settings.Watch or not head or not entry.Visible then return false end
@@ -17704,7 +16438,6 @@ function Kit.Esp.Watching(entry, origin)
     if toMe.Magnitude < 1e-3 then return false end
     return head.CFrame.LookVector:Dot(toMe.Unit) >= math.cos(math.rad(Kit.Esp.Settings.WatchAngle))
 end
-
 function Kit.Esp.SightStep()
     local camera, queue = Workspace.CurrentCamera, Kit.Esp.Sight
     if not camera or #queue == 0 then return end
@@ -17721,7 +16454,6 @@ function Kit.Esp.SightStep()
         entry.Watching = Kit.Esp.Watching(entry, origin)
     end
 end
-
 function Kit.Esp.Defaults()
     local config = Kit.Config.Esp
     local touch = Platform.Touch
@@ -17729,18 +16461,14 @@ function Kit.Esp.Defaults()
     Kit.Esp.Settings.MaxDistance = touch and config.TouchMaxDistance or config.MaxDistance
     Kit.Esp.Settings.TextSize = touch and config.TouchTextSize or config.TextSize
 end
-
 table.insert(Kit.Modules, Kit.Esp)
-
 Kit.Esp.Shape = {}
-
 local function Put(cache, target, key, value, slot)
     slot = slot or key
     if cache[slot] == value then return end
     cache[slot] = value
     target[key] = value
 end
-
 function Kit.Esp.Shape.New(kind, zIndex)
     if Kit.Esp.Mode == "Drawing" then
         local native = Drawing.new(kind)
@@ -17767,11 +16495,9 @@ function Kit.Esp.Shape.New(kind, zIndex)
     gui.Parent = Kit.Overlay.Screen()
     return { Kind = kind, Gui = gui, Stroke = stroke, Cache = {} }
 end
-
 function Kit.Esp.Shape.Show(shape, visible)
     Put(shape.Cache, shape.Native or shape.Gui, "Visible", visible)
 end
-
 function Kit.Esp.Shape.Remove(shape)
     if shape.Native then
         pcall(shape.Native.Remove, shape.Native)
@@ -17779,7 +16505,6 @@ function Kit.Esp.Shape.Remove(shape)
     end
     shape.Gui:Destroy()
 end
-
 function Kit.Esp.Shape.Line(shape, from, to, color, thickness, alpha)
     local cache, native = shape.Cache, shape.Native
     if native then
@@ -17798,7 +16523,6 @@ function Kit.Esp.Shape.Line(shape, from, to, color, thickness, alpha)
     end
     Kit.Esp.Shape.Show(shape, true)
 end
-
 function Kit.Esp.Shape.Fill(shape, pos, size, color, thickness, filled, alpha)
     local cache, native, circle = shape.Cache, shape.Native, shape.Kind == "Circle"
     if native then
@@ -17822,7 +16546,6 @@ function Kit.Esp.Shape.Fill(shape, pos, size, color, thickness, filled, alpha)
     end
     Kit.Esp.Shape.Show(shape, true)
 end
-
 function Kit.Esp.Shape.Text(shape, pos, text, color, alpha)
     local tuning, cache = Kit.Esp.Settings, shape.Cache
     local native = shape.Native
@@ -17842,7 +16565,6 @@ function Kit.Esp.Shape.Text(shape, pos, text, color, alpha)
     end
     Kit.Esp.Shape.Show(shape, true)
 end
-
 function Kit.Esp.Shape.Arrow(shape, pos, dir, size, color, alpha)
     local cache, native = shape.Cache, shape.Native
     if native then
@@ -17865,7 +16587,6 @@ function Kit.Esp.Shape.Arrow(shape, pos, dir, size, color, alpha)
     end
     Kit.Esp.Shape.Show(shape, true)
 end
-
 function Kit.Esp.Use(entry, key, kind, zIndex)
     local shape = entry.Shapes[key]
     if not shape then
@@ -17875,25 +16596,21 @@ function Kit.Esp.Use(entry, key, kind, zIndex)
     shape.Frame = Kit.Esp.Frame
     return shape
 end
-
 function Kit.Esp.Sweep(entry)
     local frame = Kit.Esp.Frame
     for _, shape in pairs(entry.Shapes) do
         if shape.Frame ~= frame then Kit.Esp.Shape.Show(shape, false) end
     end
 end
-
 function Kit.Esp.HideAll(entry)
     for _, shape in pairs(entry.Shapes) do
         Kit.Esp.Shape.Show(shape, false)
     end
 end
-
 function Kit.Esp.HealthColor(ratio)
     local colors = Kit.Esp.Settings.Colors
     return colors.HealthLow:Lerp(colors.HealthHigh, math.clamp(ratio, 0, 1))
 end
-
 function Kit.Esp.ColorOf(entry)
     local tuning = Kit.Esp.Settings
     local colors, mode = tuning.Colors, tuning.TeamColor and "Team" or tuning.ColorMode
@@ -17913,7 +16630,6 @@ function Kit.Esp.ColorOf(entry)
     end
     return colors[entry.Relation .. (entry.Visible and "Visible" or "Hidden")] or entry.Category.Color
 end
-
 function Kit.Esp.SetChams(entry, on, color, alpha)
     local chams = entry.Chams
     if not on then
@@ -17943,13 +16659,11 @@ function Kit.Esp.SetChams(entry, on, color, alpha)
     Put(cache, chams, "FillTransparency", 1 - tuning.ChamsFill * alpha)
     Put(cache, chams, "OutlineTransparency", tuning.ChamsOutline)
 end
-
 function Kit.Esp.Chams(entry, color, alpha)
     local tuning = Kit.Esp.Settings
     local wanted = tuning.Show.Chams == true and not (tuning.ChamsMode == "Behind Wall" and entry.Visible)
     Kit.Esp.SetChams(entry, wanted, color, alpha)
 end
-
 function Kit.Esp.Bounds(entry, frame, camera)
     local half = entry.Size / 2
     local points = entry.Points or table.create(8)
@@ -17968,10 +16682,8 @@ function Kit.Esp.Bounds(entry, frame, camera)
     bounds.Min, bounds.Max, bounds.Points = Vector2.new(minX, minY), Vector2.new(maxX, maxY), points
     return bounds
 end
-
 Kit.Esp.Edges = { { 1, 2 }, { 3, 4 }, { 5, 6 }, { 7, 8 }, { 1, 3 }, { 2, 4 }, { 5, 7 }, { 6, 8 }, { 1, 5 }, { 2, 6 }, { 3, 7 }, { 4, 8 } }
 Kit.Esp.Outline = Color3.new(0, 0, 0)
-
 function Kit.Esp.DrawBox(entry, bounds, color, alpha)
     local tuning, shape = Kit.Esp.Settings, Kit.Esp.Shape
     local pos, size = bounds.Min, bounds.Max - bounds.Min
@@ -17994,7 +16706,6 @@ function Kit.Esp.DrawBox(entry, bounds, color, alpha)
     end
     shape.Fill(Kit.Esp.Use(entry, "Box", "Square", 2), pos, size, color, thickness, false, alpha)
 end
-
 function Kit.Esp.DrawCorners(entry, pos, size, color, alpha)
     local thickness = Kit.Esp.Settings.Thickness
     local span = math.min(size.X, size.Y) * Kit.Config.Esp.CornerRatio
@@ -18009,7 +16720,6 @@ function Kit.Esp.DrawCorners(entry, pos, size, color, alpha)
         Kit.Esp.Shape.Line(Kit.Esp.Use(entry, "CornerY" .. index, "Line", 2), at, at + Vector2.new(0, span * corner[3]), color, thickness, alpha)
     end
 end
-
 function Kit.Esp.DrawBar(entry, key, bounds, ratio, color, slot, alpha)
     local config, side = Kit.Config.Esp, Kit.Esp.Settings.BarSide
     local width = config.BarWidth
@@ -18031,7 +16741,6 @@ function Kit.Esp.DrawBar(entry, key, bounds, ratio, color, slot, alpha)
     Kit.Esp.Shape.Fill(Kit.Esp.Use(entry, key .. "Back", "Square", 1), back[1], back[2], Kit.Esp.Outline, 1, true, config.BarBack * alpha)
     Kit.Esp.Shape.Fill(Kit.Esp.Use(entry, key, "Square", 2), fill[1], fill[2], color, 1, true, alpha)
 end
-
 function Kit.Esp.DrawBars(entry, bounds, alpha)
     local show, info = Kit.Esp.Settings.Show, entry.Info
     local health, maxHealth = Kit.Esp.Health(entry)
@@ -18051,11 +16760,9 @@ function Kit.Esp.DrawBars(entry, bounds, alpha)
     local side = Kit.Esp.Settings.BarSide
     return side == "Top" and used or 0, side == "Bottom" and used or 0
 end
-
 function Kit.Esp.TopText(entry)
     return Kit.Esp.Settings.Show.Name and Kit.Esp.Name(entry) or ""
 end
-
 function Kit.Esp.BottomText(entry)
     local show, info = Kit.Esp.Settings.Show, entry.Info
     local parts = {}
@@ -18069,14 +16776,12 @@ function Kit.Esp.BottomText(entry)
     if entry.Watching then parts[#parts + 1] = "!" end
     return table.concat(parts, " · ")
 end
-
 function Kit.Esp.Caption(entry, distance)
     entry.Distance = distance
     local top, bottom = Kit.Esp.TopText(entry), Kit.Esp.BottomText(entry)
     if top == "" or bottom == "" then return top .. bottom end
     return top .. " " .. bottom
 end
-
 function Kit.Esp.DrawText(entry, bounds, above, below, color, alpha)
     local size = Kit.Esp.Settings.TextSize
     local middle = (bounds.Min.X + bounds.Max.X) / 2
@@ -18090,7 +16795,6 @@ function Kit.Esp.DrawText(entry, bounds, above, below, color, alpha)
         Kit.Esp.Shape.Text(Kit.Esp.Use(entry, "Bottom", "Text", 3), at, bottom, color, alpha)
     end
 end
-
 function Kit.Esp.TracerFrom(viewport)
     local origin = Kit.Esp.Settings.TracerOrigin
     if origin == "Center" then return viewport / 2 end
@@ -18098,7 +16802,6 @@ function Kit.Esp.TracerFrom(viewport)
     if origin == "Mouse" then return UserInputService:GetMouseLocation() end
     return Vector2.new(viewport.X / 2, viewport.Y)
 end
-
 function Kit.Esp.DrawLines(entry, bounds, camera, color, alpha)
     local tuning, show, shape = Kit.Esp.Settings, Kit.Esp.Settings.Show, Kit.Esp.Shape
     if show.Tracer and entry.Character then
@@ -18124,7 +16827,6 @@ function Kit.Esp.DrawLines(entry, bounds, camera, color, alpha)
         shape.Fill(Kit.Esp.Use(entry, "HeadDot", "Circle", 3), center, Vector2.new(radius, radius), color, 1, true, alpha)
     end
 end
-
 function Kit.Esp.DrawArrow(entry, camera, world, color, alpha)
     local tuning = Kit.Esp.Settings
     if not tuning.Show.Arrows or not (entry.Character or entry.Category.MaxDistance == math.huge) then return end
@@ -18135,7 +16837,6 @@ function Kit.Esp.DrawArrow(entry, camera, world, color, alpha)
     local pos = camera.ViewportSize / 2 + dir * tuning.ArrowRadius
     Kit.Esp.Shape.Arrow(Kit.Esp.Use(entry, "Arrow", "Triangle", 3), pos, dir, tuning.ArrowSize, color, alpha)
 end
-
 function Kit.Esp.DrawEntry(entry, camera)
     local tuning, part = Kit.Esp.Settings, entry.Part
     if not part or not part.Parent or not entry.Size or (tuning.VisibleOnly and not entry.Visible) then
@@ -18159,7 +16860,6 @@ function Kit.Esp.DrawEntry(entry, camera)
     Kit.Esp.DrawText(entry, bounds, above, below, color, alpha)
     Kit.Esp.DrawLines(entry, bounds, camera, color, alpha)
 end
-
 function Kit.Esp.Draw()
     local camera = Workspace.CurrentCamera
     if not camera then return end
@@ -18171,9 +16871,7 @@ function Kit.Esp.Draw()
     end
     Kit.Esp.Radar.Draw(camera)
 end
-
 Kit.Esp.Radar = { Shapes = {} }
-
 function Kit.Esp.Radar.Shape(key, kind, zIndex)
     local shape = Kit.Esp.Radar.Shapes[key]
     if not shape then
@@ -18182,7 +16880,6 @@ function Kit.Esp.Radar.Shape(key, kind, zIndex)
     end
     return shape
 end
-
 function Kit.Esp.Radar.Project(camera, world)
     local tuning = Kit.Esp.Settings
     local offset = world - camera.CFrame.Position
@@ -18200,7 +16897,6 @@ function Kit.Esp.Radar.Project(camera, world)
     if scaled.Magnitude > half - 3 then scaled = scaled.Unit * (half - 3) end
     return Kit.Esp.Radar.Corner(camera) + Vector2.new(half, half) + scaled
 end
-
 function Kit.Esp.Radar.Corner(camera)
     local tuning, margin = Kit.Esp.Settings, Kit.Config.Esp.RadarMargin
     local corner, size, viewport = tuning.RadarCorner, tuning.RadarSize, camera.ViewportSize
@@ -18208,13 +16904,11 @@ function Kit.Esp.Radar.Corner(camera)
     local y = corner:find("Bottom") and viewport.Y - margin.Y - size or margin.Y
     return Vector2.new(x, y)
 end
-
 function Kit.Esp.Radar.Blip(entry, camera, color)
     if not Kit.Esp.Settings.Show.Radar or not entry.Character then return end
     local pos = Kit.Esp.Radar.Project(camera, entry.Part.Position)
     Kit.Esp.Shape.Fill(Kit.Esp.Use(entry, "Blip", "Circle", 6), pos, Vector2.new(3, 3), color, 1, true, 1)
 end
-
 function Kit.Esp.Radar.Draw(camera)
     local radar, tuning = Kit.Esp.Radar, Kit.Esp.Settings
     if not tuning.Show.Radar then
@@ -18233,17 +16927,14 @@ function Kit.Esp.Radar.Draw(camera)
         shape.Arrow(radar.Shape("Me", "Triangle", 7), middle, look.Unit, 5, tuning.Colors.Focus, 1)
     end
 end
-
 function Kit.Esp.Radar.Destroy()
     for key, shape in pairs(Kit.Esp.Radar.Shapes) do
         Kit.Esp.Shape.Remove(shape)
         Kit.Esp.Radar.Shapes[key] = nil
     end
 end
-
 Kit.Esp.TextKeys = { Name = "Name", Distance = "Distance", Health = "HealthText", Weapon = "Weapon", Status = "Flags" }
 Kit.Esp.KindKeys = { Players = "Player", Bots = "Bot" }
-
 Kit.Esp.Presets = {
     Legit = {
         KitEspShowBox = false, KitEspShowChams = true, KitEspChamsMode = "Behind Wall", KitEspShowHealth = false, KitEspShowTracer = false,
@@ -18259,32 +16950,27 @@ Kit.Esp.Presets = {
         KitEspShowArrows = true, KitEspShowRadar = false, KitEspDistance = 500, KitEspRate = 0.5, KitEspText = { "Name", "Distance" },
     },
 }
-
 local function Plain(value)
     return type(value) == "table" and value.EN or value
 end
-
 function Kit.Esp.Setter(key, scale)
     return function(value)
         value = Plain(value)
         Kit.Esp.Set(key, scale and value / scale or value)
     end
 end
-
 function Kit.Esp.ShowSetter(key)
     return function(on)
         Kit.Esp.Settings.Show[key] = on == true
         Kit.Esp.Changed()
     end
 end
-
 function Kit.Esp.ColorSetter(key)
     return function(color)
         Kit.Esp.Settings.Colors[key] = color
         Kit.Esp.Changed()
     end
 end
-
 function Kit.Esp.ApplyPreset(name)
     for idx, value in pairs(Kit.Esp.Presets[name] or {}) do
         local option = Library.Toggles[idx] or Library.Options[idx]
@@ -18292,15 +16978,12 @@ function Kit.Esp.ApplyPreset(name)
     end
     Kit.Ui.Notify("ESP preset: " .. name, "Success")
 end
-
 function Kit.Esp.Element(group, key, text)
     return group:AddToggle("KitEspShow" .. key, { Text = text, Default = Kit.Esp.Settings.Show[key] == true, Callback = Kit.Esp.ShowSetter(key) })
 end
-
 function Kit.Esp.Under(key)
     return { "KitEspShow" .. key, true }
 end
-
 function Kit.Esp.BuildMain(target, T)
     local tuning = Kit.Esp.Settings
     local main = Kit.Ui.Group(target, "Left", T("ESP", "ESP"), "eye")
@@ -18333,7 +17016,6 @@ function Kit.Esp.BuildMain(target, T)
         :AddButton({ Text = T("Mobile"), Style = "Ghost" }, function() Kit.Esp.ApplyPreset("Mobile") end)
     return main
 end
-
 function Kit.Esp.BuildBox(target, T)
     local tuning = Kit.Esp.Settings
     local group = Kit.Ui.Group(target, "Left", T("Box"), "box")
@@ -18347,7 +17029,6 @@ function Kit.Esp.BuildBox(target, T)
     })
     group:AddSlider("KitEspThickness", { Text = T("Line Thickness"), Min = 1, Max = 4, Step = 0.5, Rounding = 1, Default = tuning.Thickness, Callback = Kit.Esp.Setter("Thickness") })
 end
-
 function Kit.Esp.BuildChams(target, T)
     local tuning = Kit.Esp.Settings
     local group = Kit.Ui.Group(target, "Left", T("Chams"), "chams")
@@ -18359,7 +17040,6 @@ function Kit.Esp.BuildChams(target, T)
     group:AddSlider("KitEspChamsFill", { Text = T("Fill Opacity"), Min = 0, Max = 100, Default = tuning.ChamsFill * 100, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsFill", 100) })
     group:AddSlider("KitEspChamsOutline", { Text = T("Outline Transparency"), Min = 0, Max = 100, Default = 0, Suffix = "%", DependsOn = Kit.Esp.Under("Chams"), Callback = Kit.Esp.Setter("ChamsOutline", 100) })
 end
-
 function Kit.Esp.BuildHealth(target, T)
     local group = Kit.Ui.Group(target, "Left", T("Health"), "health")
     Kit.Esp.Element(group, "Health", T("Health Bar"))
@@ -18369,7 +17049,6 @@ function Kit.Esp.BuildHealth(target, T)
         Values = { T("Left"), T("Right"), T("Top"), T("Bottom") }, Callback = Kit.Esp.Setter("BarSide"),
     })
 end
-
 function Kit.Esp.BuildText(target, T)
     local tuning = Kit.Esp.Settings
     local group = Kit.Ui.Group(target, "Right", T("Text"), "edit")
@@ -18388,7 +17067,6 @@ function Kit.Esp.BuildText(target, T)
     })
     group:AddSlider("KitEspTextSize", { Text = T("Size"), Min = 8, Max = 24, Step = 1, Default = tuning.TextSize, Callback = Kit.Esp.Setter("TextSize") })
 end
-
 function Kit.Esp.BuildLines(target, T)
     local tuning = Kit.Esp.Settings
     local group = Kit.Ui.Group(target, "Right", T("Tracer & Body"), "tracer")
@@ -18400,7 +17078,6 @@ function Kit.Esp.BuildLines(target, T)
     Kit.Esp.Element(group, "Skeleton", T("Skeleton"))
     Kit.Esp.Element(group, "HeadDot", T("Head Dot"))
 end
-
 function Kit.Esp.BuildOffscreen(target, T)
     local tuning = Kit.Esp.Settings
     local group = Kit.Ui.Group(target, "Right", T("Off-screen & Radar"), "radar")
@@ -18417,7 +17094,6 @@ function Kit.Esp.BuildOffscreen(target, T)
     })
     group:AddToggle("KitEspRadarRotate", { Text = T("Rotate With Camera"), Default = true, DependsOn = Kit.Esp.Under("Radar"), Callback = Kit.Esp.Setter("RadarRotate") })
 end
-
 function Kit.Esp.BuildColors(target, T)
     local group = Kit.Ui.Group(target, "Right", T("Colors"), "palette")
     local colors = Kit.Esp.Settings.Colors
@@ -18448,7 +17124,6 @@ function Kit.Esp.BuildColors(target, T)
         :AddColorPicker("KitEspElementHealthLow", { Default = colors.HealthLow, Callback = Kit.Esp.ColorSetter("HealthLow") })
     group:AddLabel({ Text = T("Armor Bar") }):AddColorPicker("KitEspElementArmor", { Default = colors.Armor, Callback = Kit.Esp.ColorSetter("Armor") })
 end
-
 function Kit.Esp.BuildAdvanced(target, T, kinds)
     local tuning = Kit.Esp.Settings
     local group = Kit.Ui.Group(target, "Left", T("Advanced"), "filter")
@@ -18480,11 +17155,9 @@ function Kit.Esp.BuildAdvanced(target, T, kinds)
         Callback = Kit.Esp.Setter("Rate"),
     })
 end
-
 function Kit.Esp.Id(name)
     return "KitEsp" .. tostring(name):gsub("[^%w]", "")
 end
-
 function Kit.Esp.Build(target, options)
     options = options or {}
     local T = Kit.T
@@ -18506,7 +17179,6 @@ function Kit.Esp.Build(target, options)
     Kit.Esp.BuildColors(target, T)
     return main, main
 end
-
 Kit.Aim = {
     Players = {},
     Ignore = {},
@@ -18535,7 +17207,6 @@ Kit.Aim = {
         },
     },
 }
-
 function Kit.Aim.Track()
     if Kit.Aim.Tracking then
         return
@@ -18556,7 +17227,6 @@ function Kit.Aim.Track()
         end
     end)
 end
-
 function Kit.Aim.Center()
     local camera = Workspace.CurrentCamera
     if Platform.Touch or UserInputService.MouseBehavior == Enum.MouseBehavior.LockCenter then
@@ -18564,7 +17234,6 @@ function Kit.Aim.Center()
     end
     return UserInputService:GetMouseLocation()
 end
-
 function Kit.Aim.Params()
     local params = Kit.Aim.RayParams
     if not params then
@@ -18578,13 +17247,11 @@ function Kit.Aim.Params()
     params.FilterDescendantsInstances = Kit.Aim.Ignore
     return params
 end
-
 function Kit.Aim.Visible(part, char)
     local origin = Workspace.CurrentCamera.CFrame.Position
     local hit = Workspace:Raycast(origin, part.Position - origin, Kit.Aim.Params())
     return hit == nil or hit.Instance:IsDescendantOf(char)
 end
-
 function Kit.Aim.PickPart(char, kind)
     for _, name in ipairs(Kit.Aim.Parts[kind] or Kit.Aim.Parts.Head) do
         local part = char:FindFirstChild(name)
@@ -18594,14 +17261,12 @@ function Kit.Aim.PickPart(char, kind)
     end
     return nil
 end
-
 function Kit.Aim.Hostile(tuning, player)
     if not tuning.TeamCheck then
         return true
     end
     return player.Team == nil or player.Team ~= LocalPlayer.Team
 end
-
 function Kit.Aim.Score(tuning, player, center, camera)
     local char = player.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
@@ -18622,7 +17287,6 @@ function Kit.Aim.Score(tuning, player, center, camera)
     end
     return offset, part
 end
-
 function Kit.Aim.Find(tuning, sticky)
     local camera = Workspace.CurrentCamera
     local center = Kit.Aim.Center()
@@ -18641,7 +17305,6 @@ function Kit.Aim.Find(tuning, sticky)
     end
     return bestPlayer, bestPart
 end
-
 function Kit.Aim.KeyDown(system)
     local key = system.Key
     if not key or type(key.GetState) ~= "function" then
@@ -18649,7 +17312,6 @@ function Kit.Aim.KeyDown(system)
     end
     return key:GetState() == true
 end
-
 function Kit.Aim.Circle(system)
     local circle = system.Circle
     if circle then
@@ -18674,7 +17336,6 @@ function Kit.Aim.Circle(system)
     system.Circle = { Frame = frame, Stroke = stroke }
     return system.Circle
 end
-
 function Kit.Aim.DrawCircle(system, visible)
     local tuning = system.Settings
     if not visible and not system.Circle then return end
@@ -18690,7 +17351,6 @@ function Kit.Aim.DrawCircle(system, visible)
     circle.Frame.Size = UDim2.fromOffset(tuning.Fov * 2, tuning.Fov * 2)
     circle.Stroke.Color = tuning.FovColor
 end
-
 function Kit.Aim.DropCircle(system)
     local circle = system.Circle
     if not circle then return end
@@ -18702,7 +17362,6 @@ function Kit.Aim.DropCircle(system)
         circle.Frame:Destroy()
     end
 end
-
 function Kit.Aim.AimbotStep(deltaTime)
     local system = Kit.Aim.Aimbot
     local tuning = system.Settings
@@ -18719,7 +17378,6 @@ function Kit.Aim.AimbotStep(deltaTime)
     local alpha = tuning.Smoothness <= 0 and 1 or 1 - tuning.Smoothness ^ (deltaTime * 60)
     camera.CFrame = camera.CFrame:Lerp(goal, math.clamp(alpha, 0, 1))
 end
-
 function Kit.Aim.SilentStep()
     local system = Kit.Aim.Silent
     local tuning = system.Settings
@@ -18731,29 +17389,24 @@ function Kit.Aim.SilentStep()
     local kind = math.random(100) <= tuning.HeadChance and "Head" or "Torso"
     system.Shot = Kit.Aim.PickPart(player.Character, kind)
 end
-
 function Kit.Aim.FromShooter(origin)
     local camera = Workspace.CurrentCamera
     local root = Kit.Player.Root
     local radius = Kit.Config.Aim.ShotRadius
     return (origin - camera.CFrame.Position).Magnitude <= radius or (root ~= nil and (origin - root.Position).Magnitude <= radius)
 end
-
 function Kit.Aim.Redirect(origin, direction)
     local shot = Kit.Aim.Silent.Shot
     if not shot or not shot.Parent or typeof(origin) ~= "Vector3" or typeof(direction) ~= "Vector3" then return nil end
     if direction.Magnitude < Kit.Config.Aim.MinRay or not Kit.Aim.FromShooter(origin) then return nil end
     return (shot.Position - origin).Unit * direction.Magnitude
 end
-
 function Kit.Aim.RedirectRay(ray)
     if typeof(ray) ~= "Ray" then return nil end
     local bent = Kit.Aim.Redirect(ray.Origin, ray.Direction)
     return bent and Ray.new(ray.Origin, bent) or nil
 end
-
 Kit.Aim.RayMethods = { FindPartOnRay = true, FindPartOnRayWithIgnoreList = true, FindPartOnRayWithWhitelist = true }
-
 function Kit.Aim.HookExact(target, handler)
     local api = Util
     local wrapped = api.NewCClosure and api.NewCClosure(handler) or handler
@@ -18772,12 +17425,10 @@ function Kit.Aim.HookExact(target, handler)
         putBack()
     end
 end
-
 function Kit.Aim.Bypass()
     local checkCaller = Util.CheckCaller
     return Kit.Aim.Silent.Shot == nil or (checkCaller ~= nil and checkCaller())
 end
-
 function Kit.Aim.HookRayFunctions(unhooks)
     local original
     original, unhooks[#unhooks + 1] = Kit.Aim.HookExact(Workspace.Raycast, function(self, origin, direction, ...)
@@ -18796,7 +17447,6 @@ function Kit.Aim.HookRayFunctions(unhooks)
     end
     return original ~= nil
 end
-
 function Kit.Aim.HookRayNamecall(unhooks)
     local api = Util
     local namecall
@@ -18821,7 +17471,6 @@ function Kit.Aim.HookRayNamecall(unhooks)
     end)
     return namecall ~= nil
 end
-
 function Kit.Aim.HookMouse(unhooks)
     local mouse = LocalPlayer:GetMouse()
     local index
@@ -18834,7 +17483,6 @@ function Kit.Aim.HookMouse(unhooks)
     end)
     return index ~= nil
 end
-
 function Kit.Aim.InstallSilent()
     local system = Kit.Aim.Silent
     if system.Installed then return true end
@@ -18855,7 +17503,6 @@ function Kit.Aim.InstallSilent()
     end
     return hooked
 end
-
 function Kit.Aim.RemoveSilent()
     local system = Kit.Aim.Silent
     for _, unhook in pairs(system.Unhooks or {}) do
@@ -18863,7 +17510,6 @@ function Kit.Aim.RemoveSilent()
     end
     system.Unhooks, system.Installed = nil, false
 end
-
 function Kit.Aim.SetSilentMethod(method)
     local system = Kit.Aim.Silent
     system.Settings.Method = method
@@ -18871,7 +17517,6 @@ function Kit.Aim.SetSilentMethod(method)
     Kit.Aim.RemoveSilent()
     Kit.Aim.InstallSilent()
 end
-
 function Kit.Aim.Click(preferTool)
     local char = LocalPlayer.Character
     local tool = char and char:FindFirstChildOfClass("Tool")
@@ -18882,7 +17527,6 @@ function Kit.Aim.Click(preferTool)
         Util.MouseClick()
     end
 end
-
 function Kit.Aim.TriggerStep()
     local system = Kit.Aim.Trigger
     local tuning = system.Settings
@@ -18909,7 +17553,6 @@ function Kit.Aim.TriggerStep()
         Kit.Aim.Click()
     end
 end
-
 function Kit.Aim.RageStep()
     local system = Kit.Aim.Rage
     local tuning = system.Settings
@@ -18927,9 +17570,7 @@ function Kit.Aim.RageStep()
     system.Next = now + tuning.FireGap
     Kit.Aim.Click(true)
 end
-
 Kit.Aim.Steps = { Aimbot = Kit.Aim.AimbotStep, Silent = Kit.Aim.SilentStep, Trigger = Kit.Aim.TriggerStep, Rage = Kit.Aim.RageStep }
-
 function Kit.Aim.Set(which, enabled)
     local system = Kit.Aim[which]
     if not system then
@@ -18955,13 +17596,11 @@ function Kit.Aim.Set(which, enabled)
     Kit.Scheduler.Add(job, Kit.Aim.Steps[which], { Lane = "Render", Priority = 5 })
     return true
 end
-
 function Kit.Aim.Stop()
     for which in pairs(Kit.Aim.Steps) do
         Kit.Aim.Set(which, false)
     end
 end
-
 function Kit.Aim.Status()
     local on = {}
     for _, which in ipairs({ "Aimbot", "Silent", "Trigger", "Rage" }) do
@@ -18971,15 +17610,12 @@ function Kit.Aim.Status()
     end
     return #on == 0 and "Off" or table.concat(on, ", ")
 end
-
 table.insert(Kit.Modules, Kit.Aim)
-
 function Kit.Aim.Bind(system, option)
     return function(value)
         system.Settings[option] = value
     end
 end
-
 function Kit.Aim.BuildBase(group, which, text, extra)
     local T = Kit.T
     local system = Kit.Aim[which]
@@ -19011,7 +17647,6 @@ function Kit.Aim.BuildBase(group, which, text, extra)
     })
     return toggle
 end
-
 function Kit.Aim.BuildFov(group, which)
     local T = Kit.T
     local system = Kit.Aim[which]
@@ -19026,14 +17661,12 @@ function Kit.Aim.BuildFov(group, which)
         Callback = Kit.Aim.Bind(system, "Fov"),
     })
 end
-
 function Kit.Aim.BuildPart(group, which)
     group:AddDropdown("Kit" .. which .. "Part", {
         Text = Kit.T("Aim Part"), Values = { "Head", "Torso" }, Default = Kit.Aim[which].Settings.Part,
         Callback = Kit.Aim.Bind(Kit.Aim[which], "Part"),
     })
 end
-
 function Kit.Aim.Build(target, options)
     options = options or {}
     local T = Kit.T
@@ -19041,7 +17674,6 @@ function Kit.Aim.Build(target, options)
         Kit.Aim.Aimbot.Settings.Fov = Kit.Config.Aim.TouchFov
     end
     Kit.Aim.Aimbot.Settings.ShowFov, Kit.Aim.Silent.Settings.ShowFov = false, false
-
     local aimbot = Kit.Ui.Group(target, "Left", T("Aimbot"), "aimbot")
     Kit.Aim.BuildBase(aimbot, "Aimbot", T("Aimbot"))
     Kit.Aim.BuildPart(aimbot, "Aimbot")
@@ -19051,7 +17683,6 @@ function Kit.Aim.Build(target, options)
     })
     aimbot:AddToggle("KitAimbotSticky", { Text = T("Sticky Target"), Callback = Kit.Aim.Bind(Kit.Aim.Aimbot, "Sticky") })
     Kit.Aim.BuildFov(aimbot, "Aimbot")
-
     local silent
     if options.Silent then
         silent = Kit.Ui.Group(target, "Right", T("Silent Aim"), "silentaim")
@@ -19070,7 +17701,6 @@ function Kit.Aim.Build(target, options)
         })
         Kit.Aim.BuildFov(silent, "Silent")
     end
-
     local trigger
     if options.Trigger ~= false then
         trigger = Kit.Ui.Group(target, options.Silent and "Left" or "Right", T("Triggerbot"), "triggerbot")
@@ -19084,7 +17714,6 @@ function Kit.Aim.Build(target, options)
             Callback = Kit.Aim.Bind(Kit.Aim.Trigger, "Chance"),
         })
     end
-
     local rage
     if options.Rage ~= false then
         rage = Kit.Ui.Group(target, "Right", T("Ragebot"), "ragebot")
@@ -19097,7 +17726,6 @@ function Kit.Aim.Build(target, options)
     end
     return aimbot, silent, trigger, rage
 end
-
 Kit.Guns = {
     Settings = { NoRecoil = false, NoSpread = false, FullAuto = false, RapidFire = false, RapidScale = Kit.Config.Guns.RapidScale },
     Originals = { NoRecoil = {}, NoSpread = {}, FullAuto = {}, RapidFire = {} },
@@ -19118,7 +17746,6 @@ Kit.Guns = {
         },
     },
 }
-
 function Kit.Guns.Patch(rule, current)
     local kind = typeof(current)
     local scale = Kit.Guns.Settings.RapidScale
@@ -19139,7 +17766,6 @@ function Kit.Guns.Patch(rule, current)
     end
     return nil
 end
-
 function Kit.Guns.Write(target, field, value)
     if field == "Value" then
         target.Value = value
@@ -19147,7 +17773,6 @@ function Kit.Guns.Write(target, field, value)
         target:SetAttribute(field, value)
     end
 end
-
 function Kit.Guns.Apply(mod, target, field, name)
     local rule = Kit.Guns.Rules[mod][name:lower():gsub("[^%a]", "")]
     if not rule then return end
@@ -19162,7 +17787,6 @@ function Kit.Guns.Apply(mod, target, field, name)
     saved[target][field] = original
     Kit.Guns.Write(target, field, patched)
 end
-
 function Kit.Guns.PatchObject(mod, target)
     if target:IsA("ValueBase") then
         Kit.Guns.Apply(mod, target, "Value", target.Name)
@@ -19171,7 +17795,6 @@ function Kit.Guns.PatchObject(mod, target)
         Kit.Guns.Apply(mod, target, name, name)
     end
 end
-
 function Kit.Guns.Watch(tool)
     if Kit.Guns.Watched[tool] then return end
     Kit.Guns.Watched[tool] = true
@@ -19179,7 +17802,6 @@ function Kit.Guns.Watch(tool)
         Kit.Guns.FiredAt = os.clock()
     end)
 end
-
 function Kit.Guns.Tools()
     local tools = {}
     for _, holder in ipairs({ LocalPlayer.Character, LocalPlayer:FindFirstChildOfClass("Backpack") }) do
@@ -19191,7 +17813,6 @@ function Kit.Guns.Tools()
     end
     return tools
 end
-
 function Kit.Guns.Scan()
     local settings = Kit.Guns.Settings
     for _, tool in ipairs(Kit.Guns.Tools()) do
@@ -19205,7 +17826,6 @@ function Kit.Guns.Scan()
         end
     end
 end
-
 function Kit.Guns.Restore(mod)
     local saved = Kit.Guns.Originals[mod]
     for target, fields in pairs(saved) do
@@ -19215,14 +17835,12 @@ function Kit.Guns.Restore(mod)
     end
     table.clear(saved)
 end
-
 function Kit.Guns.Firing()
     if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
         return true
     end
     return os.clock() - (Kit.Guns.FiredAt or 0) < Kit.Config.Guns.FireWindow
 end
-
 function Kit.Guns.RecoilStep()
     local camera = Workspace.CurrentCamera
     local pitch = math.asin(math.clamp(camera.CFrame.LookVector.Y, -1, 1))
@@ -19234,7 +17852,6 @@ function Kit.Guns.RecoilStep()
     camera.CFrame = camera.CFrame * CFrame.Angles(-rise, 0, 0)
     Kit.Guns.Pitch = last
 end
-
 function Kit.Guns.Sync()
     local settings = Kit.Guns.Settings
     local any = settings.NoRecoil or settings.NoSpread or settings.FullAuto or settings.RapidFire
@@ -19250,7 +17867,6 @@ function Kit.Guns.Sync()
         Kit.Guns.Pitch = nil
     end
 end
-
 function Kit.Guns.Set(mod, enabled)
     if Kit.Guns.Originals[mod] == nil then return end
     Kit.Guns.Settings[mod] = enabled == true
@@ -19261,14 +17877,12 @@ function Kit.Guns.Set(mod, enabled)
     end
     Kit.Guns.Sync()
 end
-
 function Kit.Guns.SetRapidScale(scale)
     Kit.Guns.Settings.RapidScale = scale
     if not Kit.Guns.Settings.RapidFire then return end
     Kit.Guns.Restore("RapidFire")
     Kit.Guns.Scan()
 end
-
 function Kit.Guns.Stop()
     for mod in pairs(Kit.Guns.Originals) do
         Kit.Guns.Settings[mod] = false
@@ -19276,7 +17890,6 @@ function Kit.Guns.Stop()
     end
     Kit.Guns.Sync()
 end
-
 function Kit.Guns.Status()
     local on = {}
     for _, mod in ipairs({ "NoRecoil", "NoSpread", "FullAuto", "RapidFire" }) do
@@ -19286,9 +17899,7 @@ function Kit.Guns.Status()
     end
     return #on == 0 and "Off" or table.concat(on, ", ")
 end
-
 table.insert(Kit.Modules, Kit.Guns)
-
 function Kit.Guns.Build(target)
     local T = Kit.T
     local group = Kit.Ui.Group(target, "Left", T("Gun Mods"), "fullauto")
@@ -19307,9 +17918,7 @@ function Kit.Guns.Build(target)
     })
     return group
 end
-
 Kit.Teleport = { Mode = "Instant", Speed = Kit.Config.Teleport.TweenSpeed, Ignore = {} }
-
 function Kit.Teleport.Resolve(target)
     local kind = typeof(target)
     if kind == "CFrame" then
@@ -19332,7 +17941,6 @@ function Kit.Teleport.Resolve(target)
     end
     return nil
 end
-
 function Kit.Teleport.Stream(position)
     if not Workspace.StreamingEnabled then
         return
@@ -19340,7 +17948,6 @@ function Kit.Teleport.Stream(position)
     local timeout = Kit.Config.Teleport.StreamTimeout
     Util.Await(timeout, LocalPlayer.RequestStreamAroundAsync, LocalPlayer, position, timeout)
 end
-
 function Kit.Teleport.Ground(goal, exclude)
     local config = Kit.Config.Teleport
     local params = Kit.Teleport.Params
@@ -19361,7 +17968,6 @@ function Kit.Teleport.Ground(goal, exclude)
     end
     return CFrame.new(hit.Position + Vector3.new(0, config.GroundLift, 0)) * goal.Rotation
 end
-
 function Kit.Teleport.Tween(root, goal)
     local distance = (root.Position - goal.Position).Magnitude
     local duration = distance / math.max(Kit.Teleport.Speed, 1)
@@ -19379,7 +17985,6 @@ function Kit.Teleport.Tween(root, goal)
     tween:Cancel()
     Kit.Scheduler.Remove("KitTeleportHold")
 end
-
 function Kit.Teleport.To(target, options)
     options = options or {}
     Kit.Player.Ensure()
@@ -19406,7 +18011,6 @@ function Kit.Teleport.To(target, options)
     end
     return true
 end
-
 function Kit.Teleport.Back()
     local last = Kit.Teleport.Last
     if not last then
@@ -19414,11 +18018,9 @@ function Kit.Teleport.Back()
     end
     return Kit.Teleport.To(last, { Ground = false })
 end
-
 function Kit.Teleport.Entry(name, category, target)
     return { Name = name, Category = category, Target = target }
 end
-
 function Kit.Teleport.FromFolder(folder, category)
     return function()
         local entries = {}
@@ -19430,7 +18032,6 @@ function Kit.Teleport.FromFolder(folder, category)
         return entries
     end
 end
-
 function Kit.Teleport.FromTag(tag, category)
     return function()
         local entries = {}
@@ -19440,7 +18041,6 @@ function Kit.Teleport.FromTag(tag, category)
         return entries
     end
 end
-
 function Kit.Teleport.FromAttribute(attribute, category, root)
     return function()
         local entries = {}
@@ -19453,7 +18053,6 @@ function Kit.Teleport.FromAttribute(attribute, category, root)
         return entries
     end
 end
-
 function Kit.Teleport.FromPlayers(category)
     return function()
         local entries = {}
@@ -19465,7 +18064,6 @@ function Kit.Teleport.FromPlayers(category)
         return entries
     end
 end
-
 function Kit.Teleport.FromList(places, category)
     return function()
         local entries = {}
@@ -19478,7 +18076,6 @@ function Kit.Teleport.FromList(places, category)
         return entries
     end
 end
-
 function Kit.Teleport.Collect(providers)
     local entries = {}
     for _, provider in ipairs(providers) do
@@ -19496,13 +18093,10 @@ function Kit.Teleport.Collect(providers)
     end
     return entries
 end
-
 function Kit.Teleport.Stop()
     Kit.Scheduler.Remove("KitTeleportHold")
 end
-
 table.insert(Kit.Modules, Kit.Teleport)
-
 function Kit.Teleport.Build(target, providers)
     local T = Kit.T
     providers = providers or {}
@@ -19541,13 +18135,10 @@ function Kit.Teleport.Build(target, providers)
     end)
     return group
 end
-
 Kit.Webhook = { Queue = {}, Url = "", Enabled = false }
-
 function Kit.Webhook.Valid(url)
     return type(url) == "string" and (url:match("^https://[%w%.]*discord%.com/api/webhooks/") or url:match("^https://[%w%.]*discordapp%.com/api/webhooks/")) ~= nil
 end
-
 function Kit.Webhook.Send(embed, url)
     url = url or Kit.Webhook.Url
     if not Kit.Webhook.Valid(url) or not Util.Request then
@@ -19580,14 +18171,12 @@ function Kit.Webhook.Send(embed, url)
     end
     return true
 end
-
 function Kit.Webhook.Notify(title, description, fields)
     if not Kit.Webhook.Enabled then
         return false
     end
     return Kit.Webhook.Send({ Title = title, Description = description, Fields = fields })
 end
-
 function Kit.Webhook.Pump()
     local queue = Kit.Webhook.Queue
     local gap = Kit.Config.Webhook.MinGap
@@ -19612,18 +18201,14 @@ function Kit.Webhook.Pump()
     end
     Kit.Webhook.Pumping = false
 end
-
 function Kit.Webhook.Stop()
     table.clear(Kit.Webhook.Queue)
     Kit.Webhook.Enabled = false
 end
-
 function Kit.Webhook.Status()
     return Kit.Webhook.Enabled and (#Kit.Webhook.Queue .. " queued") or "Off"
 end
-
 table.insert(Kit.Modules, Kit.Webhook)
-
 function Kit.Webhook.Build(target)
     local T = Kit.T
     local group = Kit.Ui.Group(target, "Right", T("Webhook"), "webhook")
@@ -19651,9 +18236,7 @@ function Kit.Webhook.Build(target)
     end)
     return group
 end
-
 Kit.Discord = {}
-
 function Kit.Discord.Copy(link)
     link = link or Kit.Config.Discord
     if Util.Clipboard(link) then
@@ -19662,7 +18245,6 @@ function Kit.Discord.Copy(link)
         Library:Notify("Discord", link, Kit.Config.DiscordNotify, "Info")
     end
 end
-
 function Kit.Discord.Build(target, link)
     local T = Kit.T
     link = link or Kit.Config.Discord
@@ -19673,7 +18255,6 @@ function Kit.Discord.Build(target, link)
     end)
     return group
 end
-
 function Library:CreateWindow(options)
     options = options or {}
     Settings.Load()
@@ -19700,7 +18281,6 @@ function Library:CreateWindow(options)
     end
     return window
 end
-
 function Library.Build(window, options)
     if Library.Unloaded then
         return
@@ -19710,7 +18290,6 @@ function Library.Build(window, options)
     QuickBar.Restore()
     Layout.Flush()
 end
-
 function Library.Reveal(window)
     if Library.Unloaded then
         return
@@ -19720,7 +18299,6 @@ function Library.Reveal(window)
     local key = Platform.Touch and "ReadyTouch" or "Ready"
     Library:Notify(window.Title, Lang.Format(key, Keybinds.Short(State.MenuKey)), 5, "Success")
 end
-
 function Library.Boot(window, options)
     if Library.Unloaded then
         return
@@ -19756,11 +18334,9 @@ function Library.Boot(window, options)
         end,
     })
 end
-
 function Library:T(english)
     return { EN = english }
 end
-
 function Library:SetTheme(name)
     Theme.Apply(name)
     local option = self.Options.ThemeOption
@@ -19768,11 +18344,9 @@ function Library:SetTheme(name)
         Util.Try(option.SetValue, option, State.ThemeName)
     end
 end
-
 function Library:SetAssets(map)
     Assets.Configure(map)
 end
-
 function Library:Notify(info, content, duration, kind, action)
     if type(info) == "table" and not info.EN then
         info, content, duration, kind, action = info.Title, info.Content or info.Description, info.Duration, info.Kind or info.Type or info.Icon, info.Action
@@ -19782,22 +18356,18 @@ function Library:Notify(info, content, duration, kind, action)
     end
     return Notify.Push(info, content, duration, kind, action)
 end
-
 function Library:Dialog(options)
     if self.Unloaded then return nil end
     return Dialog.Open(options)
 end
-
 function Library:Prompt(ask)
     if self.Unloaded then return nil end
     return Dialog.Prompt(ask)
 end
-
 function Library:Sheet(title, build, options)
     if self.Unloaded then return nil end
     return Sheet.Open(title, build, options)
 end
-
 function Library:Popup(anchor, build, options)
     if self.Unloaded then return nil end
     local frame = typeof(anchor) == "Instance" and anchor or (type(anchor) == "table" and (anchor.Frame or (anchor.Row and anchor.Row.Control)))
@@ -19807,13 +18377,11 @@ function Library:Popup(anchor, build, options)
     end
     return Popup.Open(frame, build, options)
 end
-
 function Library:ClosePopups()
     Popup.Close()
     Sheet.Close()
     Dialog.Close()
 end
-
 function Library:Pin(idx, pinned)
     if pinned == nil then
         pinned = not QuickBar.Has(idx)
@@ -19825,70 +18393,56 @@ function Library:Pin(idx, pinned)
     end
     return QuickBar.Has(idx)
 end
-
 function Library:SetOverlay(name, visible)
     local overlay = ({ Watermark = Watermark, KeybindList = KeybindList, Float = Float })[name]
     if overlay then
         overlay.SetVisible(visible == true)
     end
 end
-
 function Library:SetWatermarkTitle(title)
     Watermark.SetTitle(title)
 end
-
 function Library:Toggle()
     if self.Window then
         self.Window:Toggle()
     end
 end
-
 function Library:SetScale(scale)
     if self.Window then
         self.Window:SetScale(scale)
     end
 end
-
 function Library:Every(interval, callback)
     local job = { Interval = interval, Elapsed = 0, Run = callback }
     table.insert(State.Tasks, job)
     return job
 end
-
 function Library:SaveConfig(name)
     return Configs.Save(name)
 end
-
 function Library:LoadConfig(name)
     return Configs.Load(name)
 end
-
 function Library:ResetConfig(scope)
     return Configs.Reset(scope)
 end
-
 function Library:ExportConfig()
     return Configs.Export()
 end
-
 function Library:ImportConfig(text)
     return Configs.Import(text)
 end
-
 function Library:SetReduceMotion(enabled)
     Motion.SetReduced(enabled == true)
 end
-
 function Library:SetNotifyPosition(corner)
     if table.find(Window.Corners, corner) then
         Notify.SetPosition(corner)
     end
 end
-
 function Library:GetTabs()
     return self.Window and table.clone(self.Window.Tabs) or {}
 end
-
 function Library:LoadAutoloadConfig()
     local name = Configs.GetAutoload()
     if not name then
@@ -19899,11 +18453,9 @@ function Library:LoadAutoloadConfig()
         or { EN = "Autoload failed: " .. tostring(reason) .. tostring(reason) }
     self:Notify(Lang.Strings.Configs, message, 3, ok and "Success" or "Error")
 end
-
 function Library:OnUnload(callback)
     table.insert(State.UnloadHooks, callback)
 end
-
 function Library:Unload()
     if self.Unloaded then
         return
@@ -19912,8 +18464,6 @@ function Library:Unload()
     Gui.Teardown()
     self.Window = nil
 end
-
 Library.Themes = Themes.Order
 Library.Util = Util
-
 return Library
