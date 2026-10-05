@@ -1,7 +1,7 @@
 local BaseURL = "https://raw.githubusercontent.com/taxesy/gui/main/gui.lua"
 
 local function Fetch()
-    local URL = BaseURL .. "?m0pu=" .. tostring(os.time())
+    local URL = BaseURL .. "?v=" .. tostring(os.time())
 
     local ok, body = pcall(function()
         return game:HttpGet(URL)
