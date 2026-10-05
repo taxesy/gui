@@ -27,7 +27,7 @@ local Config = {
     AssetDir = "assets",
     ConfigRoot = "configs",
     KeyCache = "key.txt",
-    DefaultAssets = { logo = "https://raw.githubusercontent.com/taxesy/gui/main/logo.png" },
+    DefaultAssets = {},
     HttpTimeout = 8,
     AssetWait = 0.25,
     Text = { Title = 26, Header = 22, Group = 16, Label = 15, Desc = 13, Small = 12, Button = 15, Watermark = 13, Section = 13 },
